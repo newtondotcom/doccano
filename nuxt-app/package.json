@@ -1,0 +1,30 @@
+{
+    "name": "nuxt-app",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "build": "nuxt build",
+        "dev": "nuxt dev",
+        "generate": "nuxt generate",
+        "preview": "nuxt preview",
+        "postinstall": "nuxt prepare",
+        "lint": "oxlint",
+        "lint:fix": "oxlint --fix",
+        "fmt": "oxfmt",
+        "fmt:check": "oxfmt --check"
+    },
+    "dependencies": {
+        "@pinia/nuxt": "^0.11.3",
+        "nuxt": "^4.4.8",
+        "pinia": "^3.0.4",
+        "vue": "^3.5.38",
+        "vue-router": "^5.1.0",
+        "vue-youtube": "^1.4.0",
+        "vuetify-nuxt-module": "1.0.0-rc.1"
+    },
+    "devDependencies": {
+        "oxfmt": "^0.56.0",
+        "oxlint": "^1.71.0",
+        "vuetify": "^4.1.2"
+    }
+}
