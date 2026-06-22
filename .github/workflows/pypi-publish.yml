@@ -20,14 +20,11 @@ jobs:
                   mkdir backend/client
             - name: Fix up git URLs
               run: echo -e '[url "https://github.com/"]\n  insteadOf = "git@github.com:"' >> ~/.gitconfig
-            - name: Use Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "18.x"
-            - name: Build with Node.js
+            - uses: oven-sh/setup-bun@v2
+            - name: Build with bun
               run: |
-                  yarn install
-                  yarn build
+                  bun install
+                  bun run build
                   cp -r dist ../backend/client/
               working-directory: ./frontend
               env:

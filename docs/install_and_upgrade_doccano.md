@@ -261,28 +261,28 @@ Did you pass the test? Great!
 
 ### Frontend
 
-The doccano frontend is built in Node.js and uses [Yarn](https://yarnpkg.com/) as a package manager. If you haven't installed them yet, please see [Node.js](https://nodejs.org/en/) and [Yarn](https://yarnpkg.com/) documentation.
+The doccano frontend is built in Node.js and uses [Bun](https://bun.com/) as a package manager. If you haven't installed them yet, please see [Bun](https://bun.com/) documentation.
 
 First, to install the defined dependencies for our project, just run the `install` command.
 
 ```bash
 cd frontend
-yarn install
+bun install
 ```
 
 Then run the `dev` command to serve with hot reload at <localhost:3000>:
 
 ```bash
-yarn dev
+bun dev
 ```
 
 After you change the code, don't forget to run
 the following commands to ensure code consistency:
 
 ```bash
-yarn lintfix
-yarn precommit
-yarn fix:prettier
+bun lintfix
+bun precommit
+bun fix:prettier
 ```
 
 ### How to create a Python package

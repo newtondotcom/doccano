@@ -8,8 +8,8 @@ mkdir -p backend/client
 # Build frontend
 cd frontend
 export PUBLIC_PATH="/static/_nuxt/"
-yarn install
-yarn build
+bun install
+bun run build
 cp -r dist ../backend/client/
 
 # Install backend dependencies and collect static files

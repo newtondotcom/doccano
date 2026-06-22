@@ -76,7 +76,7 @@ The `tools` directory contains some shell scripts. They are mainly used in Docke
 
 |       file        |                                                     description                                                      |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------- |
-| create-package.sh | This script creates doccano's Python package. Note that yarn and uv must already be installed.                   |
+| create-package.sh | This script creates doccano's Python package. Note that bun and uv must already be installed.                   |
 | heroku.sh         | This script is used to create django's superuser in Heroku.                                                          |
 | prod-celery.sh    | This script is used to run celery in `compose.prod.yml`.                                                      |
 | prod-flower.sh    | This script is used to run Flower in `compose.prod.yml`.                                                      |

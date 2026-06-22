@@ -36,17 +36,13 @@ jobs:
                 working-directory: ./frontend
         steps:
             - uses: actions/checkout@v7
-            - uses: actions/setup-node@v4
-              with:
-                  node-version: "18"
-            - name: Install Yarn
-              run: npm install -g yarn
+            - uses: oven-sh/setup-bun@v2
             - name: Install npm modules
-              run: yarn install
+              run: bun install
             - name: Lint
-              run: yarn lint
+              run: bun lint
             - name: Prettier
-              run: yarn lint:prettier
+              run: bun lint:prettier
 
     docker-lint:
         runs-on: ubuntu-latest

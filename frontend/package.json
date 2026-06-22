@@ -7,7 +7,7 @@
   "scripts": {
     "lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore .",
     "lintfix": "eslint --fix --ext .ts,.js,.vue --ignore-path .gitignore .",
-    "precommit": "yarn lint",
+    "precommit": "bun lint",
     "lint:prettier": "prettier --check .",
     "fix:prettier": "prettier --write .",
     "test": "jest",
@@ -56,8 +56,7 @@
     "vue-youtube": "^1.4.0",
     "vuetify": "^2.*",
     "wavesurfer.js": "^5.1.0",
-    "webpack": "^4.46.0",
-    "yarn": "^1.22.10"
+    "webpack": "^4.46.0"
   },
   "devDependencies": {
     "@babel/core": "^7.14.8",

@@ -86,16 +86,16 @@ Explain the suggestion and include additional details to help developers underst
 
         $ celery --app=config worker --loglevel=INFO --concurrency=1
 
-    The doccano frontend is built in Node.js and uses Yarn as a package manager. If you haven't installed them yet, please see Node.js and Yarn documentation.
+    The doccano frontend is built in Node.js and uses bun as a package manager. If you haven't installed them yet, please see Node.js and bun documentation.
 
     First, to install the defined dependencies for our project, just run the install command.
 
         $ cd frontend
-        $ yarn install
+        $ bun install
 
     Then run the dev command to serve with hot reload at :
 
-        $ yarn dev
+        $ bun dev
 
     Now, you can access to the frontend at <http://127.0.0.1:3000/>.
 
@@ -106,9 +106,9 @@ Explain the suggestion and include additional details to help developers underst
 
     For the frontend, you can execute the following commands:
 
-        $ yarn lintfix
-        $ yarn precommit
-        $ yarn fix:prettier
+        $ bun lintfix
+        $ bun precommit
+        $ bun fix:prettier
 
 1. **Push commits to your forked repository:** Group changes into atomic git commits, then push them to your `origin` repository. There's no need to wait until all changes are final before pushing — it's always good to have a backup, in case something goes wrong in your local copy.
 
