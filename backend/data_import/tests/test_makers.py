@@ -1,6 +1,6 @@
 import uuid
 
-import polars as pl
+import pandas as pd
 from django.test import TestCase
 
 from data_import.pipeline.data import TextData
@@ -28,23 +28,25 @@ class TestExamplesMaker(TestCase):
             self.text_column: "text1",
             self.label_column: ["A"],
         }
-        self.maker = ExampleMaker(self.project.item, TextData, self.text_column, [self.label_column])
+        self.maker = ExampleMaker(
+            self.project.item, TextData, self.text_column, [self.label_column]
+        )
 
     def test_make_examples(self):
-        df = pl.DataFrame([self.record])
+        df = pd.DataFrame([self.record])
         examples = self.maker.make(df)
         self.assertEqual(len(examples), 1)
 
     def test_check_column_existence(self):
         self.record.pop(self.text_column)
-        df = pl.DataFrame([self.record])
+        df = pd.DataFrame([self.record])
         examples = self.maker.make(df)
         self.assertEqual(len(examples), 0)
         self.assertEqual(len(self.maker.errors), 1)
 
     def test_empty_text_raises_error(self):
         self.record[self.text_column] = ""
-        df = pl.DataFrame([self.record])
+        df = pd.DataFrame([self.record])
         examples = self.maker.make(df)
         self.assertEqual(len(examples), 0)
         self.assertEqual(len(self.maker.errors), 1)
@@ -54,10 +56,18 @@ class TestLabelFormatter(TestCase):
     def setUp(self):
         self.label_column = "label"
         self.label_class = CategoryLabel
-        self.df = pl.DataFrame(
+        self.df = pd.DataFrame(
             [
-                {LINE_NUMBER_COLUMN: 1, UUID_COLUMN: uuid.uuid4(), self.label_column: ["A"]},
-                {LINE_NUMBER_COLUMN: 2, UUID_COLUMN: uuid.uuid4(), self.label_column: ["B", "C"]},
+                {
+                    LINE_NUMBER_COLUMN: 1,
+                    UUID_COLUMN: uuid.uuid4(),
+                    self.label_column: ["A"],
+                },
+                {
+                    LINE_NUMBER_COLUMN: 2,
+                    UUID_COLUMN: uuid.uuid4(),
+                    self.label_column: ["B", "C"],
+                },
             ]
         )
 
@@ -76,12 +86,24 @@ class TestLabelFormatter(TestCase):
 
     def test_format_with_partially_correct_column(self):
         label_maker = LabelMaker(column=self.label_column, label_class=self.label_class)
-        df = pl.DataFrame(
+        df = pd.DataFrame(
             [
-                {LINE_NUMBER_COLUMN: 1, UUID_COLUMN: uuid.uuid4(), self.label_column: ["A"]},
-                {LINE_NUMBER_COLUMN: 2, UUID_COLUMN: uuid.uuid4(), "invalid_column": ["B"]},
+                {
+                    LINE_NUMBER_COLUMN: 1,
+                    UUID_COLUMN: uuid.uuid4(),
+                    self.label_column: ["A"],
+                },
+                {
+                    LINE_NUMBER_COLUMN: 2,
+                    UUID_COLUMN: uuid.uuid4(),
+                    "invalid_column": ["B"],
+                },
                 {LINE_NUMBER_COLUMN: 3, UUID_COLUMN: uuid.uuid4()},
-                {LINE_NUMBER_COLUMN: 3, UUID_COLUMN: uuid.uuid4(), self.label_column: [{}]},
+                {
+                    LINE_NUMBER_COLUMN: 3,
+                    UUID_COLUMN: uuid.uuid4(),
+                    self.label_column: [{}],
+                },
             ]
         )
         labels = label_maker.make(df)

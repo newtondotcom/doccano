@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-import polars as pl
+import pandas as pd
 from pandas.testing import assert_frame_equal
 
 from data_import.pipeline.readers import (
@@ -47,5 +47,5 @@ class TestReader(unittest.TestCase):
         mock.return_value = "uuid"
         reader = Reader(self.filenames, self.parser)
         batch = next(reader.batch(2))
-        expected_df = pl.DataFrame(self.rows)
+        expected_df = pd.DataFrame(self.rows)
         assert_frame_equal(batch, expected_df)

@@ -1,16 +1,21 @@
 from typing import Any, Dict, Iterator, List
 
-import polars as pl
+import pandas as pd
 from django.db.models.query import QuerySet
+
+from data_export.models import ExportedExample
 
 from .comments import Comments
 from .labels import Labels
-from data_export.models import ExportedExample
 
 
 class Dataset:
     def __init__(
-        self, examples: QuerySet[ExportedExample], labels: List[Labels], comments: List[Comments], is_text_project=True
+        self,
+        examples: QuerySet[ExportedExample],
+        labels: List[Labels],
+        comments: List[Comments],
+        is_text_project=True,
     ):
         self.examples = examples
         self.labels = labels
@@ -26,5 +31,5 @@ class Dataset:
                 data.update(**comment.find_by(example.id))
             yield data
 
-    def to_dataframe(self) -> pl.DataFrame:
-        return pl.DataFrame(self)
+    def to_dataframe(self) -> pd.DataFrame:
+        return pd.DataFrame(self)

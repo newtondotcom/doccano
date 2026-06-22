@@ -1,14 +1,15 @@
 import os
 import zipfile
 
-import polars as pl
+import pandas as pd
 from django.test import TestCase, override_settings
 from model_bakery import baker
 
-from ..celery_tasks import export_dataset
 from data_export.models import DATA
 from projects.models import ProjectType
 from projects.tests.utils import prepare_project
+
+from ..celery_tasks import export_dataset
 
 
 def read_zip_content(file):
@@ -18,8 +19,8 @@ def read_zip_content(file):
             username = file.filename.split(".")[0]
             with z.open(file) as f:
                 try:
-                    df = pl.read_json(f, lines=True)
-                except pl.errors.EmptyDataError:
+                    df = pd.read_json(f, lines=True)
+                except pd.errors.EmptyDataError:
                     continue
             datasets[username] = df.to_dict(orient="records")
     return datasets
@@ -30,7 +31,7 @@ class TestExport(TestCase):
     def export_dataset(self, confirmed_only=False):
         file = export_dataset(self.project.id, "JSONL", confirmed_only)
         if self.project.item.collaborative_annotation:
-            dataset = pl.read_json(file, lines=True).to_dict(orient="records")
+            dataset = pd.read_json(file, lines=True).to_dict(orient="records")
         else:
             dataset = read_zip_content(file)
         os.remove(file)

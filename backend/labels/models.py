@@ -95,11 +95,9 @@ class Span(Label):
                     "This overlapping is not allowed in this project."
                 )
 
-    def save(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
-    ):
+    def save(self, **kwargs):
         self.full_clean()
-        super().save(force_insert, force_update, using, update_fields)
+        super().save(**kwargs)
 
     def is_overlapping(self, other: "Span"):
         return (
@@ -147,11 +145,9 @@ class Relation(Label):
         type_text = self.type.text
         return f"{from_span} - ({type_text}) -> {to_span}"
 
-    def save(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
-    ):
+    def save(self, **kwargs):
         self.full_clean()
-        super().save(force_insert, force_update, using, update_fields)
+        super().save(**kwargs)
 
     def clean(self):
         same_example = self.from_id.example == self.to_id.example == self.example
