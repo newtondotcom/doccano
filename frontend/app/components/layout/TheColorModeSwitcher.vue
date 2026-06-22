@@ -3,7 +3,7 @@
     <v-icon v-if="theme.global.name.value === 'dark'" @click="theme.change('light')">
       {{ mdiMoonWaxingCrescent }}
     </v-icon>
-    <v-icon v-if="theme.global.name.value === 'light'" @click="theme.change('dark')"">
+    <v-icon v-if="theme.global.name.value === 'light'" @click="theme.change('dark')">
       {{ mdiWhiteBalanceSunny }}
     </v-icon>
   </v-btn>
