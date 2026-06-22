@@ -4,7 +4,7 @@ import dataclasses
 import uuid
 from typing import Any, Dict, Iterator, List
 
-import pandas as pd
+import polars as pl
 
 from .exceptions import FileParseException
 
@@ -34,7 +34,7 @@ class BaseReader(collections.abc.Iterable):
         raise NotImplementedError("Please implement this method in the subclass.")
 
     @abc.abstractmethod
-    def batch(self, batch_size: int) -> Iterator[pd.DataFrame]:
+    def batch(self, batch_size: int) -> Iterator[pl.DataFrame]:
         raise NotImplementedError("Please implement this method in the subclass.")
 
 
@@ -75,15 +75,15 @@ class Reader(BaseReader):
                     **row,
                 }
 
-    def batch(self, batch_size: int) -> Iterator[pd.DataFrame]:
+    def batch(self, batch_size: int) -> Iterator[pl.DataFrame]:
         batch = []
         for record in self:
             batch.append(record)
             if len(batch) == batch_size:
-                yield pd.DataFrame(batch)
+                yield pl.DataFrame(batch)
                 batch = []
         if batch:
-            yield pd.DataFrame(batch)
+            yield pl.DataFrame(batch)
 
     @property
     def errors(self) -> List[FileParseException]:

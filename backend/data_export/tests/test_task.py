@@ -1,7 +1,7 @@
 import os
 import zipfile
 
-import pandas as pd
+import polars as pl
 from django.test import TestCase, override_settings
 from model_mommy import mommy
 
@@ -18,8 +18,8 @@ def read_zip_content(file):
             username = file.filename.split(".")[0]
             with z.open(file) as f:
                 try:
-                    df = pd.read_json(f, lines=True)
-                except pd.errors.EmptyDataError:
+                    df = pl.read_json(f, lines=True)
+                except pl.errors.EmptyDataError:
                     continue
             datasets[username] = df.to_dict(orient="records")
     return datasets
@@ -30,7 +30,7 @@ class TestExport(TestCase):
     def export_dataset(self, confirmed_only=False):
         file = export_dataset(self.project.id, "JSONL", confirmed_only)
         if self.project.item.collaborative_annotation:
-            dataset = pd.read_json(file, lines=True).to_dict(orient="records")
+            dataset = pl.read_json(file, lines=True).to_dict(orient="records")
         else:
             dataset = read_zip_content(file)
         os.remove(file)

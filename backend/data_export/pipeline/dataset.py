@@ -1,6 +1,6 @@
 from typing import Any, Dict, Iterator, List
 
-import pandas as pd
+import polars as pl
 from django.db.models.query import QuerySet
 
 from .comments import Comments
@@ -26,5 +26,5 @@ class Dataset:
                 data.update(**comment.find_by(example.id))
             yield data
 
-    def to_dataframe(self) -> pd.DataFrame:
-        return pd.DataFrame(self)
+    def to_dataframe(self) -> pl.DataFrame:
+        return pl.DataFrame(self)

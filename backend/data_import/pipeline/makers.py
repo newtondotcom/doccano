@@ -1,6 +1,6 @@
 from typing import List, Optional, Type
 
-import pandas as pd
+import polars as pl
 
 from .data import BaseData
 from .exceptions import FileParseException
@@ -29,7 +29,7 @@ class ExampleMaker:
         self.exclude_columns = exclude_columns or []
         self._errors: List[FileParseException] = []
 
-    def make(self, df: pd.DataFrame) -> List[Example]:
+    def make(self, df: pl.DataFrame) -> List[Example]:
         if not self.check_column_existence(df):
             return []
         self.check_value_existence(df)
@@ -51,7 +51,7 @@ class ExampleMaker:
                 self._errors.append(error)
         return examples
 
-    def check_column_existence(self, df: pd.DataFrame) -> bool:
+    def check_column_existence(self, df: pl.DataFrame) -> bool:
         message = f"Column {self.column_data} not found in the file"
         if self.column_data not in df.columns:
             for filename in df[UPLOAD_NAME_COLUMN].unique():
@@ -59,7 +59,7 @@ class ExampleMaker:
             return False
         return True
 
-    def check_value_existence(self, df: pd.DataFrame):
+    def check_value_existence(self, df: pl.DataFrame):
         df_without_data_column = df[df[self.column_data].isnull()]
         for row in df_without_data_column.to_dict(orient="records"):
             message = f"Column {self.column_data} not found in record"
@@ -73,7 +73,7 @@ class ExampleMaker:
 
 
 class BinaryExampleMaker(ExampleMaker):
-    def make(self, df: pd.DataFrame) -> List[Example]:
+    def make(self, df: pl.DataFrame) -> List[Example]:
         examples = []
         for row in df.to_dict(orient="records"):
             data = self.data_class.parse(**row)
@@ -88,7 +88,7 @@ class LabelMaker:
         self.label_class = label_class
         self._errors: List[FileParseException] = []
 
-    def make(self, df: pd.DataFrame) -> List[Label]:
+    def make(self, df: pl.DataFrame) -> List[Label]:
         if not self.check_column_existence(df):
             return []
 
@@ -104,7 +104,7 @@ class LabelMaker:
                 pass
         return labels
 
-    def check_column_existence(self, df: pd.DataFrame) -> bool:
+    def check_column_existence(self, df: pl.DataFrame) -> bool:
         message = f"Column {self.column} not found in the file"
         if self.column not in df.columns:
             for filename in df[UPLOAD_NAME_COLUMN].unique():

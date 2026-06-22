@@ -1,6 +1,6 @@
 import abc
 
-import pandas as pd
+import polars as pl
 
 
 class Writer(abc.ABC):
@@ -8,7 +8,7 @@ class Writer(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def write(file, dataset: pd.DataFrame):
+    def write(file, dataset: pl.DataFrame):
         raise NotImplementedError("Please implement this method in the subclass.")
 
 
@@ -16,7 +16,7 @@ class CsvWriter(Writer):
     extension = "csv"
 
     @staticmethod
-    def write(file, dataset: pd.DataFrame):
+    def write(file, dataset: pl.DataFrame):
         dataset.to_csv(file, index=False, encoding="utf-8")
 
 
@@ -24,7 +24,7 @@ class JsonWriter(Writer):
     extension = "json"
 
     @staticmethod
-    def write(file, dataset: pd.DataFrame):
+    def write(file, dataset: pl.DataFrame):
         dataset.to_json(file, orient="records", force_ascii=False)
 
 
@@ -32,7 +32,7 @@ class JsonlWriter(Writer):
     extension = "jsonl"
 
     @staticmethod
-    def write(file, dataset: pd.DataFrame):
+    def write(file, dataset: pl.DataFrame):
         dataset.to_json(file, orient="records", force_ascii=False, lines=True)
 
 
@@ -40,5 +40,5 @@ class FastTextWriter(Writer):
     extension = "txt"
 
     @staticmethod
-    def write(file, dataset: pd.DataFrame):
+    def write(file, dataset: pl.DataFrame):
         dataset.to_csv(file, index=False, encoding="utf-8", header=False)

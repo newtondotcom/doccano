@@ -1,7 +1,7 @@
 import os
 import unittest
 
-import pandas as pd
+import polars as pl
 from pandas.testing import assert_frame_equal
 
 from ..pipeline.writers import CsvWriter, FastTextWriter, JsonlWriter, JsonWriter
@@ -9,7 +9,7 @@ from ..pipeline.writers import CsvWriter, FastTextWriter, JsonlWriter, JsonWrite
 
 class TestWriter(unittest.TestCase):
     def setUp(self):
-        self.dataset = pd.DataFrame(
+        self.dataset = pl.DataFrame(
             [
                 {"id": 0, "text": "A"},
                 {"id": 1, "text": "B"},
@@ -26,7 +26,7 @@ class TestCSVWriter(TestWriter):
     def test_write(self):
         writer = CsvWriter()
         writer.write(self.file, self.dataset)
-        loaded_dataset = pd.read_csv(self.file)
+        loaded_dataset = pl.read_csv(self.file)
         assert_frame_equal(self.dataset, loaded_dataset)
 
 
@@ -34,7 +34,7 @@ class TestJsonWriter(TestWriter):
     def test_write(self):
         writer = JsonWriter()
         writer.write(self.file, self.dataset)
-        loaded_dataset = pd.read_json(self.file)
+        loaded_dataset = pl.read_json(self.file)
         assert_frame_equal(self.dataset, loaded_dataset)
 
 
@@ -42,14 +42,14 @@ class TestJsonlWriter(TestWriter):
     def test_write(self):
         writer = JsonlWriter()
         writer.write(self.file, self.dataset)
-        loaded_dataset = pd.read_json(self.file, lines=True)
+        loaded_dataset = pl.read_json(self.file, lines=True)
         assert_frame_equal(self.dataset, loaded_dataset)
 
 
 class TestFastText(unittest.TestCase):
     def setUp(self):
         self.expected = "__label__A exampleA\n__label__B exampleB"
-        self.dataset = pd.DataFrame([*zip(self.expected.split("\n"))])
+        self.dataset = pl.DataFrame([*zip(self.expected.split("\n"))])
 
     def test_write(self):
         file = "tmp.txt"

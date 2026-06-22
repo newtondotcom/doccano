@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock
 
-import pandas as pd
+import polars as pl
 from pandas.testing import assert_frame_equal
 
 from data_export.pipeline.dataset import Dataset
@@ -25,5 +25,5 @@ class TestDataset(unittest.TestCase):
     def test_to_dataframe(self):
         dataset = Dataset(self.examples, self.labels, self.comments)
         df = dataset.to_dataframe()
-        expected = pd.DataFrame([{"data": "example", "labels": ["label"], "comments": ["comment"]}])
+        expected = pl.DataFrame([{"data": "example", "labels": ["label"], "comments": ["comment"]}])
         assert_frame_equal(df, expected)
