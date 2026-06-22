@@ -40,9 +40,9 @@ jobs:
             - name: Install npm modules
               run: bun install
             - name: Lint
-              run: bun lint
-            - name: Prettier
-              run: bun lint:prettier
+              run: bun lint:fix
+            - name: Format
+              run: bun fmt
 
     docker-lint:
         runs-on: ubuntu-latest
