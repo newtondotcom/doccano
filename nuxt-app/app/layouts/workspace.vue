@@ -1,51 +1,53 @@
 <template>
-    <v-app>
-        <the-header>
-            <template #leftDrawerIcon>
-                <v-app-bar-nav-icon @click="drawerLeft = !drawerLeft" />
-            </template>
-        </the-header>
+  <v-app>
+    <the-header>
+      <template #leftDrawerIcon>
+        <v-app-bar-nav-icon @click="drawerLeft = !drawerLeft" />
+      </template>
+    </the-header>
 
-        <v-navigation-drawer v-model="drawerLeft" app clipped>
-            <the-side-bar
-                :is-project-admin="isProjectAdmin"
-                :project="currentProject"
-            />
-        </v-navigation-drawer>
+    <v-navigation-drawer v-model="drawerLeft" app clipped>
+      <the-side-bar :is-project-admin="isProjectAdmin" :project="currentProject" />
+    </v-navigation-drawer>
 
-        <v-main class="pb-0">
-            <nuxt />
-        </v-main>
-    </v-app>
+    <v-main class="pb-0">
+      <nuxt />
+    </v-main>
+  </v-app>
 </template>
 
-<script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
-import TheHeader from "@/components/layout/TheHeader";
-import TheSideBar from "@/components/layout/TheSideBar";
-import { useMainStore as useProjectStore } from "@/store/projects";
+<script>
+import { mapGetters } from 'vuex'
+import TheHeader from '~/components/layout/TheHeader'
+import TheSideBar from '~/components/layout/TheSideBar'
 
-definePageMeta({
-    middleware: ["check-auth", "auth", "set-project"],
-});
+export default {
+  components: {
+    TheSideBar,
+    TheHeader
+  },
+  middleware: ['check-auth', 'auth', 'set-project'],
 
-const drawerLeft = ref(null);
-const isProjectAdmin = ref(false);
-const projectStore = useProjectStore();
-const currentProject = computed(() => projectStore.currentProject);
-const route = useRoute();
-const { $repositories, $services } = useNuxtApp() as any;
+  data() {
+    return {
+      drawerLeft: null,
+      isProjectAdmin: false
+    }
+  },
 
-watch(
-    () => route.query,
-    () => {
-        $services.option.save(route.params.id, route.query);
-    },
-    { deep: true },
-);
+  computed: {
+    ...mapGetters('projects', ['currentProject'])
+  },
 
-onMounted(async () => {
-    const member = await $repositories.member.fetchMyRole(route.params.id);
-    isProjectAdmin.value = member.isProjectAdmin;
-});
+  watch: {
+    '$route.query'() {
+      this.$services.option.save(this.$route.params.id, this.$route.query)
+    }
+  },
+
+  async created() {
+    const member = await this.$repositories.member.fetchMyRole(this.$route.params.id)
+    this.isProjectAdmin = member.isProjectAdmin
+  }
+}
 </script>

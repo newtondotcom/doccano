@@ -1,10 +1,16 @@
 <template>
-    <v-app>
-        <the-header />
-        <nuxt />
-    </v-app>
+  <v-app>
+    <the-header />
+    <nuxt />
+  </v-app>
 </template>
 
-<script setup>
-import TheHeader from "@/components/layout/TheHeader";
+<script>
+import TheHeader from '~/components/layout/TheHeader'
+
+export default {
+  components: {
+    TheHeader
+  }
+}
 </script>
