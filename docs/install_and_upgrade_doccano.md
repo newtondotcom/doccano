@@ -171,7 +171,7 @@ docker pull doccano/doccano:nightly
 If you want to build a local image, run:
 
 ```bash
-docker build -t doccano:latest . -f docker/Dockerfile
+docker build -t doccano:latest . -f docker/Containerfile
 ```
 
 ### Use Flower
@@ -204,7 +204,7 @@ cd docker
 cp .env.example .env
 # Edit with the editor of your choice, in this example nano is used (ctrl+x, then "y" to save).
 nano .env
-docker-compose -f docker-compose.prod.yml --env-file .env up
+docker-compose -f compose.prod.yml --env-file .env up
 ```
 
 You can override the default setting by rewriting the `.env` file. See [./docker/.env.example](https://github.com/doccano/doccano/blob/master/docker/.env.example) in detail.
@@ -220,45 +220,41 @@ cd doccano
 
 ### Backend
 
-The doccano backend is built in Python 3.8+ and uses [Poetry](https://github.com/python-poetry/poetry) as a dependency manager. If you haven't installed them yet, please see [Python](https://www.python.org/downloads/) and [Poetry](https://python-poetry.org/docs/) documentation.
+The doccano backend is built in Python 3.8+ and uses [uv](https://github.com/astral-sh/uv) as a dependency manager. If you haven't installed them yet, please see [Python](https://www.python.org/downloads/) and [uv](https://docs.astral.sh/uv/) documentation.
 
 First, to install the defined dependencies for our project, just run the `install` command. After that, activate the virtual environment by running `shell` command:
 
 ```bash
 cd backend
-poetry install
-poetry shell
+uv sync
 ```
 
 Second, set up the database and run the development server. Doccano uses [Django](https://www.djangoproject.com/) and [Django Rest Framework](https://www.django-rest-framework.org/) as a backend. We can set up them by using Django command:
 
 ```bash
-python manage.py migrate
-python manage.py create_roles
-python manage.py create_admin --noinput --username "admin" --email "admin@example.com" --password "password"
-python manage.py runserver
+uv run manage.py migrate
+uv run manage.py create_roles
+uv run manage.py create_admin --noinput --username "admin" --email "admin@example.com" --password "password"
+uv run manage.py runserver
 ```
 
 In another terminal, you need to run Celery to use import/export dataset feature:
 
 ```bash
 cd doccano/backend
-celery --app=config worker --loglevel=INFO --concurrency=1
+uv run celery --app=config worker --loglevel=INFO --concurrency=1
 ```
 
 After you change the code, don't forget to run [mypy](https://mypy.readthedocs.io/en/stable/index.html), [flake8](https://flake8.pycqa.org/en/latest/), [black](https://github.com/psf/black), and [isort](https://github.com/PyCQA/isort). These ensure code consistency. To run them, just run the following commands:
 
 ```bash
-poetry run task mypy
-poetry run task flake8
-poetry run task black
-poetry run task isort
+uv run task mypy
 ```
 
 Similarly, you can run the test by executing the following command:
 
 ```bash
-poetry run task test
+uv run task test
 ```
 
 Did you pass the test? Great!
@@ -280,7 +276,7 @@ Then run the `dev` command to serve with hot reload at <localhost:3000>:
 yarn dev
 ```
 
-After you change the code, don't forget to run 
+After you change the code, don't forget to run
 the following commands to ensure code consistency:
 
 ```bash

@@ -1,6 +1,6 @@
 # Contributing
 
-When contributing to this repository, please first discuss the change you wish to make via issue with the owners of this repository before making a change. 
+When contributing to this repository, please first discuss the change you wish to make via issue with the owners of this repository before making a change.
 
 Please note we have a code of conduct, please follow it in all your interactions with the project.
 
@@ -70,18 +70,17 @@ Explain the suggestion and include additional details to help developers underst
         $ git pull develop master && git push origin develop
         $ git checkout -b my-descriptive-branch-name
 
-    At this point, you may want to install your version of `doccano`. It's usually best to do this within a dedicated virtual environment; We recomment to use `poetry` with Python 3.8+:
+    At this point, you may want to install your version of `doccano`. It's usually best to do this within a dedicated virtual environment; We recomment to use `uv` with Python 3.8+:
 
         $ cd backend
-        $ poetry install
-        $ poetry shell
+        $ uv sync
 
     Second, set up the database and run the development server. Doccano uses Django and Django Rest Framework as a backend. We can set up them by using Django command:
 
-        $ python manage.py migrate
-        $ python manage.py create_roles
-        $ python manage.py create_admin --noinput --username "admin" --email "admin@example.com" --password "password"
-        $ python manage.py runserver
+        $ uv run manage.py migrate
+        $ uv run manage.py create_roles
+        $ uv run manage.py create_admin --noinput --username "admin" --email "admin@example.com" --password "password"
+        $ uv run manage.py runserver
 
     In another terminal, you need to run Celery in `backend` directory to use import/export dataset feature:
 
@@ -100,13 +99,10 @@ Explain the suggestion and include additional details to help developers underst
 
     Now, you can access to the frontend at <http://127.0.0.1:3000/>.
 
-1. **Implement your changes:** Use your preferred text editor to modify the `doccano` source code. Be sure to keep your changes focused and in scope, and follow the coding conventions described below! Document your code as you write it. Run your changes against any existing tests and add new ones as needed to validate your changes; make sure you don’t accidentally break existing functionality! Several common commands can be accessed via the Poetry task:
+1. **Implement your changes:** Use your preferred text editor to modify the `doccano` source code. Be sure to keep your changes focused and in scope, and follow the coding conventions described below! Document your code as you write it. Run your changes against any existing tests and add new ones as needed to validate your changes; make sure you don’t accidentally break existing functionality! Several common commands can be accessed via the uv task:
 
-        $ poetry run task mypy
-        $ poetry run task flake8
-        $ poetry run task black
-        $ poetry run task isort
-        $ poetry run task test
+        $ uv run task mypy
+        $ uv run task test
 
     For the frontend, you can execute the following commands:
 

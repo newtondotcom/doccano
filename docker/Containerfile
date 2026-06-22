@@ -1,5 +1,7 @@
-ARG PYTHON_VERSION="3.10.19-slim-trixie"
+ARG PYTHON_VERSION="3.10-trixie"
 ARG NODE_VERSION="18.20-bullseye-slim"
+
+# FRONT BUILDING
 FROM node:${NODE_VERSION} AS frontend-builder
 
 COPY frontend/ /frontend/
@@ -14,7 +16,8 @@ RUN apt-get update \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-FROM python:${PYTHON_VERSION} AS backend-builder
+# BACK BUILDING
+FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION} AS backend-builder
 
 # hadolint ignore=DL3008
 RUN apt-get update \
@@ -28,17 +31,18 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp
-COPY backend/pyproject.toml backend/poetry.lock /tmp/
+COPY backend/pyproject.toml backend/uv.lock /tmp/
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN pip install -U --no-cache-dir pip==25.3 \
- && curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.5.1 python - \
  && export PATH="/root/.local/bin:$PATH" \
- && poetry export --without-hashes -o /requirements.txt \
+ && uv export --format requirements.txt --output-file requirements.txt \
  && echo "psycopg2-binary==2.8.6" >> /requirements.txt \
  && echo "django-heroku==0.3.1" >> /requirements.txt \
  && pip install --no-cache-dir -r /requirements.txt
 
+
+# FINAL IMAGE
 FROM python:${PYTHON_VERSION} AS runtime
 
 RUN apt-get update \
@@ -60,7 +64,7 @@ COPY --from=backend-builder /usr/local/bin/gunicorn /usr/local/bin/gunicorn
 COPY --chown=doccano:doccano . /doccano
 WORKDIR /doccano/backend
 COPY --from=frontend-builder /frontend/dist /doccano/backend/client/dist
-RUN python manage.py collectstatic --noinput \
+RUN uv run manage.py collectstatic --noinput \
  && chown -R doccano:doccano .
 
 VOLUME /data

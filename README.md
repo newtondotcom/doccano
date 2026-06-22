@@ -142,7 +142,7 @@ POSTGRES_DB=doccano
 After running the following command, access <http://127.0.0.1/>.
 
 ```bash
-docker-compose -f docker/docker-compose.prod.yml --env-file .env up
+docker-compose -f docker/compose.prod.yml --env-file .env up
 ```
 
 ### One-click Deployment

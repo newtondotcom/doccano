@@ -14,11 +14,11 @@ cp -r dist ../backend/client/
 
 # Install backend dependencies and collect static files
 cd ../backend
-poetry install
-poetry run task collectstatic
+uv sync
+uv run task collectstatic
 
 # Build Python package
 cd ..
 sed -e "s/, from = \"..\"//g" backend/pyproject.toml > pyproject.toml
-poetry build
+uv build
 rm pyproject.toml

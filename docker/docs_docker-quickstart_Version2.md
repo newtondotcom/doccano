@@ -12,7 +12,7 @@ cd doccano
 ## 2. Build and Start the Containers
 
 ```bash
-docker compose -f docker/docker-compose.yml up --build
+docker compose -f docker/compose.yml up --build
 ```
 
 This will start:
@@ -29,7 +29,7 @@ Open [http://localhost:8000](http://localhost:8000) in your browser.
 
 In a new terminal, run:
 ```bash
-docker compose -f docker/docker-compose.yml exec backend python manage.py createsuperuser
+docker compose -f docker/compose.yml exec backend python manage.py createsuperuser
 ```
 
 ## 5. Use Doccano
@@ -41,20 +41,20 @@ docker compose -f docker/docker-compose.yml exec backend python manage.py create
 
 To stop all services:
 ```bash
-docker compose -f docker/docker-compose.yml down
+docker compose -f docker/compose.yml down
 ```
 
 ---
 
 ## Troubleshooting
 
-- **Export not working?**  
-  The Celery worker must be running (it is included in the default Docker Compose setup).  
+- **Export not working?**
+  The Celery worker must be running (it is included in the default Docker Compose setup).
   If you see no exported file, check the logs of the `worker` service:
   ```bash
-  docker compose -f docker/docker-compose.yml logs worker
+  docker compose -f docker/compose.yml logs worker
   ```
-- **Persistent data:**  
+- **Persistent data:**
   By default, the database is stored in a Docker volume for persistence between runs.
 
 ---

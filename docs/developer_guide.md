@@ -11,7 +11,7 @@ The important doccano directories are:
 
 ## backend
 
-The `backend/` directory includes the backend's REST API code. These APIs are built by [Python 3.8+](https://www.python.org/) and [Django 4.0+](https://www.djangoproject.com). All of the packages are managed by Poetry, Python packaging, and dependency management software. The directory structure of the backend follows mainly the [Django](https://www.djangoproject.com) structure. The following table shows the main files and directories:
+The `backend/` directory includes the backend's REST API code. These APIs are built by [Python 3.8+](https://www.python.org/) and [Django 4.0+](https://www.djangoproject.com). All of the packages are managed by uv, Python packaging, and dependency management software. The directory structure of the backend follows mainly the [Django](https://www.djangoproject.com) structure. The following table shows the main files and directories:
 
 | file or directory |                                                                                                                                            description                                                                                                                                             |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -29,8 +29,8 @@ The `backend/` directory includes the backend's REST API code. These APIs are bu
 | users/            | Django application. This manages the feature related to users.                                                                                                                                                                                                                                     |
 | cli.py            | This defines the command line interfaces. If you install doccano by Python package, this file is used to setup database, create a superuser, run webserver and so on.                                                                                                                              |
 | manage.py         | Django management script. See [django-admin and manage.py](https://docs.djangoproject.com/en/4.0/ref/django-admin/) in detail.                                                                                                                                                                     |
-| poetry.lock       | Related to Poetry. This file prevents you from automatically getting the latest versions of your dependencies. See [Basic usage](https://python-poetry.org/docs/basic-usage/) in Poetry documentation.                                                                                             |
-| pyproject.toml    | This file contains build system requirements and information, which are used by pip to build the package. See [pyproject.toml](https://pip.pypa.io/en/stable/reference/build-system/pyproject-toml/) and [The pyproject.toml file in Poetry](https://python-poetry.org/docs/pyproject/) in detail. |
+| uv.lock       | Related to uv. This file prevents you from automatically getting the latest versions of your dependencies. See [Basic usage](https://docs.astral.sh/uv/getting-started/) in uv documentation.                                                                                             |
+| pyproject.toml    | This file contains build system requirements and information, which are used by pip to build the package. See [pyproject.toml](https://pip.pypa.io/en/stable/reference/build-system/pyproject-toml/) and [The pyproject.toml file in uv](https://docs.astral.sh/uv/guides/projects/#pyprojecttoml) in detail. |
 
 If you want to set up the backend environment, see the [Installation guide](./install_and_upgrade_doccano.md#install-from-source).
 
@@ -50,19 +50,19 @@ Also, you can set the following environment variables:
 
 |          file          |                                                       description                                                        |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| nginx/                  | The `nginx` directory contains a NGINX configuration files. They are used only in `docker-compose.prod.yml`.             |
-| .env.example            | The example of `.env` file. This is used only in `docker-compose.prod.yml`.                                              |
-| docker-compose.prod.yml | This file contains Docker Compose configuration to run a production environment. We adopted the three tier architecture. |
-| Dockerfile              | The dockerfile. You can pull the image from [doccano/doccano](https://hub.docker.com/r/doccano/doccano).                 |
-| Dockerfile.heroku       | The dockerfile for Heroku.                                                                                               |
-| Dockerfile.nginx        | The dockerfile to build nginx container. This is used only in `docker-compose.prod.yml`.                                 |
-| Dockerfile.prod         | The dockerfile to build application container. This is used only in `docker-compose.prod.yml`.                           |
+| nginx/                  | The `nginx` directory contains a NGINX configuration files. They are used only in `compose.prod.yml`.             |
+| .env.example            | The example of `.env` file. This is used only in `compose.prod.yml`.                                              |
+| compose.prod.yml | This file contains Docker Compose configuration to run a production environment. We adopted the three tier architecture. |
+| Containerfile              | The Containerfile. You can pull the image from [doccano/doccano](https://hub.docker.com/r/doccano/doccano).                 |
+| Containerfile.heroku       | The Containerfile for Heroku.                                                                                               |
+| Containerfile.nginx        | The Containerfile to build nginx container. This is used only in `compose.prod.yml`.                                 |
+| Containerfile.prod         | The Containerfile to build application container. This is used only in `compose.prod.yml`.                           |
 
-The architecture of the `docker-compose.prod.yml` is as follows:
+The architecture of the `compose.prod.yml` is as follows:
 
 ![](images/developer_guide/architecture_docker_compose.png)
 
-On the other hand, the one of the `Dockerfile` is as follows:
+On the other hand, the one of the `Containerfile` is as follows:
 
 ![](images/developer_guide/architecture_docker.png)
 
@@ -76,12 +76,12 @@ The `tools` directory contains some shell scripts. They are mainly used in Docke
 
 |       file        |                                                     description                                                      |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------- |
-| create-package.sh | This script creates doccano's Python package. Note that yarn and poetry must already be installed.                   |
+| create-package.sh | This script creates doccano's Python package. Note that yarn and uv must already be installed.                   |
 | heroku.sh         | This script is used to create django's superuser in Heroku.                                                          |
-| prod-celery.sh    | This script is used to run celery in `docker-compose.prod.yml`.                                                      |
-| prod-flower.sh    | This script is used to run Flower in `docker-compose.prod.yml`.                                                      |
-| prod-django.sh    | This script is used to run gunicorn in `docker-compose.prod.yml`. In addition, create roles, superuser, and migrate. |
-| run.sh            | This script is used in `Dockerfile`. After creating roles and superuser, run gunicorn and celery.                    |
+| prod-celery.sh    | This script is used to run celery in `compose.prod.yml`.                                                      |
+| prod-flower.sh    | This script is used to run Flower in `compose.prod.yml`.                                                      |
+| prod-django.sh    | This script is used to run gunicorn in `compose.prod.yml`. In addition, create roles, superuser, and migrate. |
+| run.sh            | This script is used in `Containerfile`. After creating roles and superuser, run gunicorn and celery.                    |
 
 ## Architecture of Python package
 
