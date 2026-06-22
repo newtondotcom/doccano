@@ -3,6 +3,7 @@ name: Test installation and doccano commands
 on:
     schedule:
         - cron: "15 22 * * *"
+    workflow_dispatch:
 
 jobs:
     test:
