@@ -2,7 +2,24 @@ import uuid
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db.models import (
+    CASCADE,
+    BooleanField,
+    CheckConstraint,
+    DateTimeField,
+    F,
+    FloatField,
+    ForeignKey,
+    IntegerField,
+    JSONField,
+    Model,
+    Q,
+    TextField,
+    UUIDField,
+)
+
+from examples.models import Example
+from label_types.models import CategoryType, RelationType, SpanType
 
 from .managers import (
     BoundingBoxManager,
@@ -13,19 +30,17 @@ from .managers import (
     SpanManager,
     TextLabelManager,
 )
-from examples.models import Example
-from label_types.models import CategoryType, RelationType, SpanType
 
 
-class Label(models.Model):
+class Label(Model):
     objects = LabelManager()
 
-    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
-    prob = models.FloatField(default=0.0)
-    manual = models.BooleanField(default=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    uuid = UUIDField(default=uuid.uuid4, unique=True)
+    prob = FloatField(default=0.0)
+    manual = BooleanField(default=False)
+    user = ForeignKey(User, on_delete=CASCADE)
+    created_at = DateTimeField(auto_now_add=True)
+    updated_at = DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
@@ -33,8 +48,8 @@ class Label(models.Model):
 
 class Category(Label):
     objects = CategoryManager()
-    example = models.ForeignKey(to=Example, on_delete=models.CASCADE, related_name="categories")
-    label = models.ForeignKey(to=CategoryType, on_delete=models.CASCADE)
+    example = ForeignKey(to=Example, on_delete=CASCADE, related_name="categories")
+    label = ForeignKey(to=CategoryType, on_delete=CASCADE)
 
     class Meta:
         unique_together = ("example", "user", "label")
@@ -42,10 +57,10 @@ class Category(Label):
 
 class Span(Label):
     objects = SpanManager()
-    example = models.ForeignKey(to=Example, on_delete=models.CASCADE, related_name="spans")
-    label = models.ForeignKey(to=SpanType, on_delete=models.CASCADE)
-    start_offset = models.IntegerField()
-    end_offset = models.IntegerField()
+    example = ForeignKey(to=Example, on_delete=CASCADE, related_name="spans")
+    label = ForeignKey(to=SpanType, on_delete=CASCADE)
+    start_offset = IntegerField()
+    end_offset = IntegerField()
 
     def __str__(self):
         text = self.example.text[self.start_offset : self.end_offset]
@@ -62,19 +77,27 @@ class Span(Label):
             Span.objects.exclude(id=self.id)
             .filter(example=self.example)
             .filter(
-                models.Q(start_offset__gte=self.start_offset, start_offset__lt=self.end_offset)
-                | models.Q(end_offset__gt=self.start_offset, end_offset__lte=self.end_offset)
-                | models.Q(start_offset__lte=self.start_offset, end_offset__gte=self.end_offset)
+                Q(start_offset__gte=self.start_offset, start_offset__lt=self.end_offset)
+                | Q(end_offset__gt=self.start_offset, end_offset__lte=self.end_offset)
+                | Q(
+                    start_offset__lte=self.start_offset, end_offset__gte=self.end_offset
+                )
             )
         )
         if is_collaborative:
             if overlapping_span.exists():
-                raise ValidationError("This overlapping is not allowed in this project.")
+                raise ValidationError(
+                    "This overlapping is not allowed in this project."
+                )
         else:
             if overlapping_span.filter(user=self.user).exists():
-                raise ValidationError("This overlapping is not allowed in this project.")
+                raise ValidationError(
+                    "This overlapping is not allowed in this project."
+                )
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
         self.full_clean()
         super().save(force_insert, force_update, using, update_fields)
 
@@ -82,21 +105,26 @@ class Span(Label):
         return (
             (other.start_offset <= self.start_offset < other.end_offset)
             or (other.start_offset < self.end_offset <= other.end_offset)
-            or (self.start_offset < other.start_offset and other.end_offset < self.end_offset)
+            or (
+                self.start_offset < other.start_offset
+                and other.end_offset < self.end_offset
+            )
         )
 
     class Meta:
         constraints = [
-            models.CheckConstraint(check=models.Q(start_offset__gte=0), name="startOffset >= 0"),
-            models.CheckConstraint(check=models.Q(end_offset__gte=0), name="endOffset >= 0"),
-            models.CheckConstraint(check=models.Q(start_offset__lt=models.F("end_offset")), name="start < end"),
+            CheckConstraint(condition=Q(start_offset__gte=0), name="startOffset >= 0"),
+            CheckConstraint(condition=Q(end_offset__gte=0), name="endOffset >= 0"),
+            CheckConstraint(
+                condition=Q(start_offset__lt=F("end_offset")), name="start < end"
+            ),
         ]
 
 
 class TextLabel(Label):
     objects = TextLabelManager()
-    example = models.ForeignKey(to=Example, on_delete=models.CASCADE, related_name="texts")
-    text = models.TextField()
+    example = ForeignKey(to=Example, on_delete=CASCADE, related_name="texts")
+    text = TextField()
 
     def is_same_text(self, other: "TextLabel"):
         return self.text == other.text
@@ -107,10 +135,10 @@ class TextLabel(Label):
 
 class Relation(Label):
     objects = RelationManager()
-    from_id = models.ForeignKey(Span, on_delete=models.CASCADE, related_name="from_relations")
-    to_id = models.ForeignKey(Span, on_delete=models.CASCADE, related_name="to_relations")
-    type = models.ForeignKey(RelationType, on_delete=models.CASCADE)
-    example = models.ForeignKey(to=Example, on_delete=models.CASCADE, related_name="relations")
+    from_id = ForeignKey(Span, on_delete=CASCADE, related_name="from_relations")
+    to_id = ForeignKey(Span, on_delete=CASCADE, related_name="to_relations")
+    type = ForeignKey(RelationType, on_delete=CASCADE)
+    example = ForeignKey(to=Example, on_delete=CASCADE, related_name="relations")
 
     def __str__(self):
         text = self.example.text
@@ -119,7 +147,9 @@ class Relation(Label):
         type_text = self.type.text
         return f"{from_span} - ({type_text}) -> {to_span}"
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
         self.full_clean()
         super().save(force_insert, force_update, using, update_fields)
 
@@ -132,24 +162,24 @@ class Relation(Label):
 
 class BoundingBox(Label):
     objects = BoundingBoxManager()
-    x = models.FloatField()
-    y = models.FloatField()
-    width = models.FloatField()
-    height = models.FloatField()
-    label = models.ForeignKey(to=CategoryType, on_delete=models.CASCADE)
-    example = models.ForeignKey(to=Example, on_delete=models.CASCADE, related_name="bboxes")
+    x = FloatField()
+    y = FloatField()
+    width = FloatField()
+    height = FloatField()
+    label = ForeignKey(to=CategoryType, on_delete=CASCADE)
+    example = ForeignKey(to=Example, on_delete=CASCADE, related_name="bboxes")
 
     class Meta:
         constraints = [
-            models.CheckConstraint(check=models.Q(x__gte=0), name="x >= 0"),
-            models.CheckConstraint(check=models.Q(y__gte=0), name="y >= 0"),
-            models.CheckConstraint(check=models.Q(width__gte=0), name="width >= 0"),
-            models.CheckConstraint(check=models.Q(height__gte=0), name="height >= 0"),
+            CheckConstraint(condition=Q(x__gte=0), name="x >= 0"),
+            CheckConstraint(condition=Q(y__gte=0), name="y >= 0"),
+            CheckConstraint(condition=Q(width__gte=0), name="width >= 0"),
+            CheckConstraint(condition=Q(height__gte=0), name="height >= 0"),
         ]
 
 
 class Segmentation(Label):
     objects = SegmentationManager()
-    points = models.JSONField(default=list)
-    label = models.ForeignKey(to=CategoryType, on_delete=models.CASCADE)
-    example = models.ForeignKey(to=Example, on_delete=models.CASCADE, related_name="segmentations")
+    points = JSONField(default=list)
+    label = ForeignKey(to=CategoryType, on_delete=CASCADE)
+    example = ForeignKey(to=Example, on_delete=CASCADE, related_name="segmentations")

@@ -67,10 +67,10 @@ INSTALLED_APPS = [
     "django_celery_results",
     "django_drf_filepond",
     "health_check",
-    "health_check.cache",
-    "health_check.storage",
-    "health_check.contrib.migrations",
-    "health_check.contrib.celery",
+    # "health_check.cache",
+    # "health_check.storage",
+    # "health_check.contrib.migrations",
+    # "health_check.contrib.celery",
     "django_cleanup",
 ]
 
@@ -85,6 +85,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    "allauth.account.middleware.AccountMiddleware"
 ]
 
 

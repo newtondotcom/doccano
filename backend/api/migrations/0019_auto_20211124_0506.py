@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("api", "0018_alter_label_background_color"),
     ]
@@ -17,16 +16,23 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name="span",
-            constraint=models.CheckConstraint(check=models.Q(("start_offset__gte", 0)), name="startOffset >= 0"),
-        ),
-        migrations.AddConstraint(
-            model_name="span",
-            constraint=models.CheckConstraint(check=models.Q(("end_offset__gte", 0)), name="endOffset >= 0"),
+            constraint=models.CheckConstraint(
+                condition=models.Q(("start_offset__gte", 0)), name="startOffset >= 0"
+            ),
         ),
         migrations.AddConstraint(
             model_name="span",
             constraint=models.CheckConstraint(
-                check=models.Q(("start_offset__lt", django.db.models.expressions.F("end_offset"))), name="start < end"
+                condition=models.Q(("end_offset__gte", 0)), name="endOffset >= 0"
+            ),
+        ),
+        migrations.AddConstraint(
+            model_name="span",
+            constraint=models.CheckConstraint(
+                condition=models.Q(
+                    ("start_offset__lt", django.db.models.expressions.F("end_offset"))
+                ),
+                name="start < end",
             ),
         ),
     ]
