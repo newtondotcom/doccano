@@ -1,6 +1,6 @@
 import uuid
 
-from model_mommy import mommy
+from model_bakery import baker
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -72,7 +72,7 @@ class TestBBoxList(TestLabelList, CRUDMixin):
 
     @classmethod
     def make_annotation(cls, doc, member):
-        mommy.make("BoundingBox", example=doc, user=member, x=0, y=0, width=0, height=0)
+        baker.make("BoundingBox", example=doc, user=member, x=0, y=0, width=0, height=0)
 
 
 class TestSegmentationList(TestLabelList, CRUDMixin):
@@ -82,7 +82,7 @@ class TestSegmentationList(TestLabelList, CRUDMixin):
 
     @classmethod
     def make_annotation(cls, doc, member):
-        mommy.make("Segmentation", example=doc, user=member, points=[0, 1])
+        baker.make("Segmentation", example=doc, user=member, points=[0, 1])
 
 
 class TestTextList(TestLabelList, CRUDMixin):
@@ -133,7 +133,13 @@ class TestSharedSpanList(TestSharedLabelList, CRUDMixin):
 
     @classmethod
     def make_annotation(cls, doc, member):
-        make_annotation(cls.task, doc=doc, user=member, start_offset=cls.start_offset, end_offset=cls.start_offset + 1)
+        make_annotation(
+            cls.task,
+            doc=doc,
+            user=member,
+            start_offset=cls.start_offset,
+            end_offset=cls.start_offset + 1,
+        )
         cls.start_offset += 1
 
 
@@ -152,7 +158,9 @@ class TestDataLabeling:
         self.non_member = make_user()
         self.doc = make_doc(self.project.item)
         self.data = self.create_data()
-        self.url = reverse(viewname=self.view_name, args=[self.project.item.id, self.doc.id])
+        self.url = reverse(
+            viewname=self.view_name, args=[self.project.item.id, self.doc.id]
+        )
 
     def create_data(self):
         label = make_label(self.project.item)
@@ -187,9 +195,9 @@ class TestRelationCreation(TestDataLabeling, CRUDMixin):
     view_name = "relation_list"
 
     def create_data(self):
-        relation_type = mommy.make("RelationType", project=self.project.item)
-        from_id = mommy.make("Span", example=self.doc, start_offset=0, end_offset=1)
-        to_id = mommy.make("Span", example=self.doc, start_offset=1, end_offset=2)
+        relation_type = baker.make("RelationType", project=self.project.item)
+        from_id = baker.make("Span", example=self.doc, start_offset=0, end_offset=1)
+        to_id = baker.make("Span", example=self.doc, start_offset=1, end_offset=2)
         return {"type": relation_type.id, "from_id": from_id.id, "to_id": to_id.id}
 
 
@@ -206,7 +214,7 @@ class TestBoundingBoxCreation(TestDataLabeling, CRUDMixin):
     view_name = "bbox_list"
 
     def create_data(self):
-        label = mommy.make("CategoryType", project=self.project.item)
+        label = baker.make("CategoryType", project=self.project.item)
         return {"x": 0, "y": 0, "width": 0, "height": 0, "label": label.id}
 
     def test_allows_project_member_to_annotate(self):
@@ -220,7 +228,7 @@ class TestSegmentationCreation(TestDataLabeling, CRUDMixin):
     view_name = "segmentation_list"
 
     def create_data(self):
-        label = mommy.make("CategoryType", project=self.project.item)
+        label = baker.make("CategoryType", project=self.project.item)
         return {"points": [1, 2], "label": label.id}
 
     def test_allows_project_member_to_annotate(self):
@@ -240,10 +248,18 @@ class TestLabelDetail:
         label = make_label(self.project.item)
         annotation = self.create_annotation_data(doc=doc)
         self.data = {"label": label.id}
-        self.url = reverse(viewname=self.view_name, args=[self.project.item.id, doc.id, annotation.id])
+        self.url = reverse(
+            viewname=self.view_name, args=[self.project.item.id, doc.id, annotation.id]
+        )
 
     def create_annotation_data(self, doc):
-        return make_annotation(task=self.task, doc=doc, user=self.project.admin, start_offset=0, end_offset=1)
+        return make_annotation(
+            task=self.task,
+            doc=doc,
+            user=self.project.admin,
+            start_offset=0,
+            end_offset=1,
+        )
 
     def test_allows_owner_to_get_annotation(self):
         self.assert_fetch(self.project.admin, status.HTTP_200_OK)
@@ -309,7 +325,15 @@ class TestBBoxDetail(TestLabelDetail, CRUDMixin):
     view_name = "bbox_detail"
 
     def create_annotation_data(self, doc):
-        return mommy.make("BoundingBox", example=doc, user=self.project.admin, x=0, y=0, width=0, height=0)
+        return baker.make(
+            "BoundingBox",
+            example=doc,
+            user=self.project.admin,
+            x=0,
+            y=0,
+            width=0,
+            height=0,
+        )
 
 
 class TestSegmentationDetail(TestLabelDetail, CRUDMixin):
@@ -317,7 +341,9 @@ class TestSegmentationDetail(TestLabelDetail, CRUDMixin):
     view_name = "segmentation_detail"
 
     def create_annotation_data(self, doc):
-        return mommy.make("Segmentation", example=doc, user=self.project.admin, points=[1, 2])
+        return baker.make(
+            "Segmentation", example=doc, user=self.project.admin, points=[1, 2]
+        )
 
 
 class TestSharedLabelDetail:
@@ -330,7 +356,9 @@ class TestSharedLabelDetail:
         annotation = self.make_annotation(doc, self.project.admin)
         label = make_label(self.project.item)
         self.data = {"label": label.id}
-        self.url = reverse(viewname=self.view_name, args=[self.project.item.id, doc.id, annotation.id])
+        self.url = reverse(
+            viewname=self.view_name, args=[self.project.item.id, doc.id, annotation.id]
+        )
 
     def make_annotation(self, doc, member):
         return make_annotation(self.task, doc=doc, user=member)
@@ -356,7 +384,9 @@ class TestSharedSpanDetail(TestSharedLabelDetail, CRUDMixin):
     view_name = "span_detail"
 
     def make_annotation(self, doc, member):
-        return make_annotation(self.task, doc=doc, user=member, start_offset=0, end_offset=1)
+        return make_annotation(
+            self.task, doc=doc, user=member, start_offset=0, end_offset=1
+        )
 
 
 class TestSharedTextDetail(TestSharedLabelDetail, CRUDMixin):

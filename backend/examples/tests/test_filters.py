@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 
 from django.test import TestCase
-from model_mommy import mommy
+from model_bakery import baker
 
 from .utils import make_doc, make_example_state
 from examples.filters import ExampleFilter
@@ -54,8 +54,10 @@ class TestLabelFilter(TestFilterMixin):
     def setUp(self):
         self.project = prepare_project(task=ProjectType.DOCUMENT_CLASSIFICATION)
         self.prepare(project=self.project)
-        self.label_type = mommy.make("CategoryType", project=self.project.item, text="positive")
-        mommy.make("Category", example=self.example, label=self.label_type)
+        self.label_type = baker.make(
+            "CategoryType", project=self.project.item, text="positive"
+        )
+        baker.make("Category", example=self.example, label=self.label_type)
 
     def test_returns_example_with_positive_label(self):
         self.assert_filter(data={"label": self.label_type.text}, expected=1)
@@ -63,7 +65,9 @@ class TestLabelFilter(TestFilterMixin):
 
 class TestExampleFilterOnCollaborative(TestFilterMixin):
     def setUp(self):
-        self.project = prepare_project(task="DocumentClassification", collaborative_annotation=True)
+        self.project = prepare_project(
+            task="DocumentClassification", collaborative_annotation=True
+        )
         self.prepare(project=self.project)
 
     def test_returns_example_if_confirmed_is_true(self):

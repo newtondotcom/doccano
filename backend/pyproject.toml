@@ -41,6 +41,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "django-debug-toolbar>=7.0.0",
+    "model-bakery>=1.23.5",
     "taskipy>=1.14.1",
     "unittest-xml-reporting>=4.0.0",
 ]

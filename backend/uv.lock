@@ -558,6 +558,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "django-debug-toolbar" },
+    { name = "model-bakery" },
     { name = "taskipy" },
     { name = "unittest-xml-reporting" },
 ]
@@ -598,6 +599,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "django-debug-toolbar", specifier = ">=7.0.0" },
+    { name = "model-bakery", specifier = ">=1.23.5" },
     { name = "taskipy", specifier = ">=1.14.1" },
     { name = "unittest-xml-reporting", specifier = ">=4.0.0" },
 ]
@@ -986,6 +988,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/25/7e/1dbd4096eb7c148cd2841841916f78820bb85a4d80a0c25c02d30815a7fb/marshmallow-4.3.0.tar.gz", hash = "sha256:fb43c53b3fe240b8f6af37223d6ef1636f927ad9bea8ab323afad95dff090880", size = 224485, upload-time = "2026-04-03T21:46:32.72Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f4/e0/ff24e25218bb59eb6290a530cea40651b14068b6e3659b20f9c175179632/marshmallow-4.3.0-py3-none-any.whl", hash = "sha256:46c4fe6984707e3cbd485dfebbf0a59874f58d695aad05c1668d15e8c6e13b46", size = 49148, upload-time = "2026-04-03T21:46:31.241Z" },
+]
+
+[[package]]
+name = "model-bakery"
+version = "1.23.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/10/05/81985c4e1cc90e88a3518baa3f9df4662286483195e26fd981f9ffa22575/model_bakery-1.23.5.tar.gz", hash = "sha256:20d5cb84d4e46d010b83bb6c06f6a5df381105981030534ff3213aabae42cffd", size = 27787, upload-time = "2026-06-08T14:33:35.96Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/13/b3/87dad1129e6ec7300bb9aba7a17a7d0ad7d79d7c3e57ff42b021660ccf59/model_bakery-1.23.5-py3-none-any.whl", hash = "sha256:2fa5acab266209d50a4cf54f8338b4984b952d58553d35b5bd8b717e974bb6ae", size = 30319, upload-time = "2026-06-08T14:33:34.795Z" },
 ]
 
 [[package]]

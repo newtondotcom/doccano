@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from model_mommy import mommy
+from model_bakery import baker
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -17,7 +17,11 @@ class TestMemberListAPI(CRUDMixin):
         self.project = prepare_project()
         self.non_member = make_user()
         admin_role = Role.objects.get(name=settings.ROLE_PROJECT_ADMIN)
-        self.data = {"user": self.non_member.id, "role": admin_role.id, "project": self.project.item.id}
+        self.data = {
+            "user": self.non_member.id,
+            "role": admin_role.id,
+            "project": self.project.item.id,
+        }
         self.url = reverse(viewname="member_list", args=[self.project.item.id])
 
     def test_allows_project_admin_to_know_members(self):
@@ -75,7 +79,9 @@ class TestMemberRoleDetailAPI(CRUDMixin):
         self.non_member = make_user()
         admin_role = Role.objects.get(name=settings.ROLE_PROJECT_ADMIN)
         member = Member.objects.get(user=self.project.approver)
-        self.url = reverse(viewname="member_detail", args=[self.project.item.id, member.id])
+        self.url = reverse(
+            viewname="member_detail", args=[self.project.item.id, member.id]
+        )
         self.data = {"role": admin_role.id}
 
     def test_allows_project_admin_to_known_member(self):
@@ -149,7 +155,7 @@ class TestMemberManager(CRUDMixin):
 
 class TestMember(TestCase):
     def test_clean(self):
-        member = mommy.make("Member")
+        member = baker.make("Member")
         same_user = Member(project=member.project, user=member.user, role=member.role)
         with self.assertRaises(ValidationError):
             same_user.clean()

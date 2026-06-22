@@ -1,7 +1,7 @@
 from typing import List
 
 from django.conf import settings
-from model_mommy import mommy
+from model_bakery import baker
 
 from projects.models import Member, ProjectType, Role
 from roles.tests.utils import create_default_roles
@@ -41,11 +41,19 @@ def assign_user_to_role(project_member, project, role_name):
         mapping.role = role
         mapping.save()
     else:
-        mapping = Member.objects.get_or_create(role_id=role.id, user_id=project_member.id, project_id=project.id)
+        mapping = Member.objects.get_or_create(
+            role_id=role.id, user_id=project_member.id, project_id=project.id
+        )
     return mapping
 
 
-def make_project(task: str, users: List[str], roles: List[str], collaborative_annotation=False, **kwargs):
+def make_project(
+    task: str,
+    users: List[str],
+    roles: List[str],
+    collaborative_annotation=False,
+    **kwargs,
+):
     create_default_roles()
 
     # create users.
@@ -63,7 +71,7 @@ def make_project(task: str, users: List[str], roles: List[str], collaborative_an
         ProjectType.SEGMENTATION: "SegmentationProject",
         ProjectType.IMAGE_CAPTIONING: "ImageCaptioningProject",
     }.get(task, "Project")
-    project = mommy.make(
+    project = baker.make(
         _model=project_model,
         project_type=task,
         collaborative_annotation=collaborative_annotation,
@@ -79,7 +87,7 @@ def make_project(task: str, users: List[str], roles: List[str], collaborative_an
 
 
 def make_tag(project):
-    return mommy.make("Tag", project=project)
+    return baker.make("Tag", project=project)
 
 
 def prepare_project(task: str = "Any", collaborative_annotation=False, **kwargs):

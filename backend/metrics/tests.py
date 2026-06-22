@@ -1,4 +1,4 @@
-from model_mommy import mommy
+from model_bakery import baker
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -17,13 +17,19 @@ class TestMemberProgress(CRUDMixin):
 
     def test_fetch_initial_progress(self):
         response = self.assert_fetch(self.project.admin, status.HTTP_200_OK)
-        expected_progress = [{"user": member.username, "done": 0} for member in self.project.members]
+        expected_progress = [
+            {"user": member.username, "done": 0} for member in self.project.members
+        ]
         self.assertEqual(response.data, {"total": 1, "progress": expected_progress})
 
     def test_fetch_progress(self):
-        mommy.make("ExampleState", example=self.example, confirmed_by=self.project.admin)
+        baker.make(
+            "ExampleState", example=self.example, confirmed_by=self.project.admin
+        )
         response = self.assert_fetch(self.project.admin, status.HTTP_200_OK)
-        expected_progress = [{"user": member.username, "done": 0} for member in self.project.members]
+        expected_progress = [
+            {"user": member.username, "done": 0} for member in self.project.members
+        ]
         expected_progress[0]["done"] = 1
         self.assertEqual(response.data, {"total": 1, "progress": expected_progress})
 
@@ -33,10 +39,13 @@ class TestProgressHelper(CRUDMixin):
 
     def setUp(self):
         self.project = prepare_project(
-            ProjectType.DOCUMENT_CLASSIFICATION, collaborative_annotation=self.collaborative_annotation
+            ProjectType.DOCUMENT_CLASSIFICATION,
+            collaborative_annotation=self.collaborative_annotation,
         )
         self.example = make_doc(self.project.item)
-        mommy.make("ExampleState", example=self.example, confirmed_by=self.project.admin)
+        baker.make(
+            "ExampleState", example=self.example, confirmed_by=self.project.admin
+        )
         self.url = reverse(viewname="progress", args=[self.project.item.id])
 
 
@@ -70,25 +79,42 @@ class TestCategoryDistribution(CRUDMixin):
         self.project = prepare_project(ProjectType.DOCUMENT_CLASSIFICATION)
         self.example = make_doc(self.project.item)
         self.label = make_label(self.project.item, text="label")
-        mommy.make("Category", example=self.example, label=self.label, user=self.project.admin)
-        self.url = reverse(viewname="category_distribution", args=[self.project.item.id])
+        baker.make(
+            "Category", example=self.example, label=self.label, user=self.project.admin
+        )
+        self.url = reverse(
+            viewname="category_distribution", args=[self.project.item.id]
+        )
 
     def test_fetch_distribution(self):
         response = self.assert_fetch(self.project.admin, status.HTTP_200_OK)
-        expected = {member.username: {self.label.text: 0} for member in self.project.members}
+        expected = {
+            member.username: {self.label.text: 0} for member in self.project.members
+        }
         expected[self.project.admin.username][self.label.text] = 1
         self.assertEqual(response.data, expected)
 
     def test_fetch_distribution_with_removed_user(self):
         # Create a category by annotator
-        mommy.make("Category", example=self.example, label=self.label, user=self.project.annotator)
+        baker.make(
+            "Category",
+            example=self.example,
+            label=self.label,
+            user=self.project.annotator,
+        )
         # Remove the annotator from the project
-        Member.objects.filter(user=self.project.annotator, project=self.project.item).delete()
+        Member.objects.filter(
+            user=self.project.annotator, project=self.project.item
+        ).delete()
         # Should not raise KeyError
         response = self.assert_fetch(self.project.admin, status.HTTP_200_OK)
         # The response should only include current members (after removal)
-        current_members = Member.objects.filter(project=self.project.item).select_related("user")
-        expected = {member.user.username: {self.label.text: 0} for member in current_members}
+        current_members = Member.objects.filter(
+            project=self.project.item
+        ).select_related("user")
+        expected = {
+            member.user.username: {self.label.text: 0} for member in current_members
+        }
         expected[self.project.admin.username][self.label.text] = 1
         # The removed user's annotations should not be in the distribution
         self.assertEqual(response.data, expected)

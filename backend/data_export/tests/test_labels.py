@@ -1,5 +1,5 @@
 from django.test import TestCase
-from model_mommy import mommy
+from model_bakery import baker
 
 from ..pipeline.labels import Categories
 from data_export.models import ExportedExample
@@ -10,9 +10,11 @@ from projects.tests.utils import prepare_project
 class TestLabels(TestCase):
     def setUp(self):
         self.project = prepare_project(task=ProjectType.DOCUMENT_CLASSIFICATION)
-        self.example1 = mommy.make("ExportedExample", project=self.project.item)
-        self.example2 = mommy.make("ExportedExample", project=self.project.item)
-        self.category1 = mommy.make("ExportedCategory", example=self.example1, user=self.project.admin)
+        self.example1 = baker.make("ExportedExample", project=self.project.item)
+        self.example2 = baker.make("ExportedExample", project=self.project.item)
+        self.category1 = baker.make(
+            "ExportedCategory", example=self.example1, user=self.project.admin
+        )
         self.examples = ExportedExample.objects.all()
 
     def test_find_by(self):

@@ -1,4 +1,4 @@
-from model_mommy import mommy
+from model_bakery import baker
 
 from projects.models import ProjectType
 
@@ -10,4 +10,4 @@ def make_annotation(task, doc, user, **kwargs):
         ProjectType.SEQ2SEQ: "TextLabel",
         ProjectType.SPEECH2TEXT: "TextLabel",
     }.get(task)
-    return mommy.make(annotation_model, example=doc, user=user, **kwargs)
+    return baker.make(annotation_model, example=doc, user=user, **kwargs)

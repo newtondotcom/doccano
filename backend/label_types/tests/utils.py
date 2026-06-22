@@ -1,4 +1,4 @@
-from model_mommy import mommy
+from model_bakery import baker
 
 from projects.models import ProjectType
 
@@ -8,6 +8,6 @@ def make_label(project, **kwargs):
         ProjectType.BOUNDING_BOX,
         ProjectType.SEGMENTATION,
     }:
-        return mommy.make("CategoryType", project=project, **kwargs)
+        return baker.make("CategoryType", project=project, **kwargs)
     else:
-        return mommy.make("SpanType", project=project, **kwargs)
+        return baker.make("SpanType", project=project, **kwargs)

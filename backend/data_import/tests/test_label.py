@@ -2,7 +2,7 @@ import uuid
 from unittest.mock import MagicMock
 
 from django.test import TestCase
-from model_mommy import mommy
+from model_bakery import baker
 
 from data_import.pipeline.label import (
     CategoryLabel,
@@ -25,7 +25,9 @@ class TestLabel(TestCase):
     def setUp(self):
         self.project = prepare_project(self.task)
         self.user = self.project.admin
-        self.example = mommy.make("Example", project=self.project.item, text="hello world")
+        self.example = baker.make(
+            "Example", project=self.project.item, text="hello world"
+        )
 
 
 class TestCategoryLabel(TestLabel):
@@ -55,7 +57,9 @@ class TestCategoryLabel(TestLabel):
     def test_create(self):
         category = CategoryLabel(label="A", example_uuid=uuid.uuid4())
         types = MagicMock()
-        types.__getitem__.return_value = mommy.make(CategoryType, project=self.project.item)
+        types.__getitem__.return_value = baker.make(
+            CategoryType, project=self.project.item
+        )
         category_model = category.create(self.user, self.example, types)
         self.assertIsInstance(category_model, CategoryModel)
 
@@ -64,8 +68,12 @@ class TestSpanLabel(TestLabel):
     task = ProjectType.SEQUENCE_LABELING
 
     def test_comparison(self):
-        span1 = SpanLabel(label="A", start_offset=0, end_offset=1, example_uuid=uuid.uuid4())
-        span2 = SpanLabel(label="A", start_offset=1, end_offset=2, example_uuid=uuid.uuid4())
+        span1 = SpanLabel(
+            label="A", start_offset=0, end_offset=1, example_uuid=uuid.uuid4()
+        )
+        span2 = SpanLabel(
+            label="A", start_offset=1, end_offset=2, example_uuid=uuid.uuid4()
+        )
         self.assertLess(span1, span2)
 
     def test_parse_tuple(self):
@@ -77,18 +85,24 @@ class TestSpanLabel(TestLabel):
 
     def test_parse_dict(self):
         example_uuid = uuid.uuid4()
-        span = SpanLabel.parse(example_uuid, obj={"label": "A", "start_offset": 0, "end_offset": 1})
+        span = SpanLabel.parse(
+            example_uuid, obj={"label": "A", "start_offset": 0, "end_offset": 1}
+        )
         self.assertEqual(span.label, "A")
         self.assertEqual(span.start_offset, 0)
         self.assertEqual(span.end_offset, 1)
 
     def test_invalid_negative_offset(self):
         with self.assertRaises(ValueError):
-            SpanLabel(label="A", start_offset=-1, end_offset=1, example_uuid=uuid.uuid4())
+            SpanLabel(
+                label="A", start_offset=-1, end_offset=1, example_uuid=uuid.uuid4()
+            )
 
     def test_invalid_offset(self):
         with self.assertRaises(ValueError):
-            SpanLabel(label="A", start_offset=1, end_offset=0, example_uuid=uuid.uuid4())
+            SpanLabel(
+                label="A", start_offset=1, end_offset=0, example_uuid=uuid.uuid4()
+            )
 
     def test_parse_invalid_dict(self):
         example_uuid = uuid.uuid4()
@@ -96,15 +110,19 @@ class TestSpanLabel(TestLabel):
             SpanLabel.parse(example_uuid, obj={"label": "A", "start_offset": 0})
 
     def test_create_type(self):
-        span = SpanLabel(label="A", start_offset=0, end_offset=1, example_uuid=uuid.uuid4())
+        span = SpanLabel(
+            label="A", start_offset=0, end_offset=1, example_uuid=uuid.uuid4()
+        )
         span_type = span.create_type(self.project.item)
         self.assertIsInstance(span_type, SpanType)
         self.assertEqual(span_type.text, "A")
 
     def test_create(self):
-        span = SpanLabel(label="A", start_offset=0, end_offset=1, example_uuid=uuid.uuid4())
+        span = SpanLabel(
+            label="A", start_offset=0, end_offset=1, example_uuid=uuid.uuid4()
+        )
         types = MagicMock()
-        types.__getitem__.return_value = mommy.make(SpanType, project=self.project.item)
+        types.__getitem__.return_value = baker.make(SpanType, project=self.project.item)
         span_model = span.create(self.user, self.example, types)
         self.assertIsInstance(span_model, SpanModel)
 
@@ -143,13 +161,19 @@ class TestRelationLabel(TestLabel):
     task = ProjectType.SEQUENCE_LABELING
 
     def test_comparison(self):
-        relation1 = RelationLabel(type="A", from_id=0, to_id=1, example_uuid=uuid.uuid4())
-        relation2 = RelationLabel(type="A", from_id=1, to_id=1, example_uuid=uuid.uuid4())
+        relation1 = RelationLabel(
+            type="A", from_id=0, to_id=1, example_uuid=uuid.uuid4()
+        )
+        relation2 = RelationLabel(
+            type="A", from_id=1, to_id=1, example_uuid=uuid.uuid4()
+        )
         self.assertLess(relation1, relation2)
 
     def test_parse(self):
         example_uuid = uuid.uuid4()
-        relation = RelationLabel.parse(example_uuid, obj={"type": "A", "from_id": 0, "to_id": 1})
+        relation = RelationLabel.parse(
+            example_uuid, obj={"type": "A", "from_id": 0, "to_id": 1}
+        )
         self.assertEqual(relation.type, "A")
         self.assertEqual(relation.from_id, 0)
         self.assertEqual(relation.to_id, 1)
@@ -160,18 +184,30 @@ class TestRelationLabel(TestLabel):
             RelationLabel.parse(example_uuid, obj={"type": "A", "from_id": 0})
 
     def test_create_type(self):
-        relation = RelationLabel(type="A", from_id=0, to_id=1, example_uuid=uuid.uuid4())
+        relation = RelationLabel(
+            type="A", from_id=0, to_id=1, example_uuid=uuid.uuid4()
+        )
         relation_type = relation.create_type(self.project.item)
         self.assertIsInstance(relation_type, RelationType)
         self.assertEqual(relation_type.text, "A")
 
     def test_create(self):
-        relation = RelationLabel(type="A", from_id=0, to_id=1, example_uuid=self.example.uuid)
+        relation = RelationLabel(
+            type="A", from_id=0, to_id=1, example_uuid=self.example.uuid
+        )
         types = MagicMock()
-        types.__getitem__.return_value = mommy.make(RelationType, project=self.project.item)
+        types.__getitem__.return_value = baker.make(
+            RelationType, project=self.project.item
+        )
         id_to_span = {
-            (0, str(self.example.uuid)): mommy.make(SpanModel, start_offset=0, end_offset=1, example=self.example),
-            (1, str(self.example.uuid)): mommy.make(SpanModel, start_offset=2, end_offset=3, example=self.example),
+            (0, str(self.example.uuid)): baker.make(
+                SpanModel, start_offset=0, end_offset=1, example=self.example
+            ),
+            (1, str(self.example.uuid)): baker.make(
+                SpanModel, start_offset=2, end_offset=3, example=self.example
+            ),
         }
-        relation_model = relation.create(self.user, self.example, types, id_to_span=id_to_span)
+        relation_model = relation.create(
+            self.user, self.example, types, id_to_span=id_to_span
+        )
         self.assertIsInstance(relation_model, RelationModel)

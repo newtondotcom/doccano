@@ -1,5 +1,5 @@
 from django.test import TestCase
-from model_mommy import mommy
+from model_bakery import baker
 
 from data_import.pipeline.label_types import LabelTypes
 from label_types.models import CategoryType
@@ -11,7 +11,7 @@ class TestCategoryLabel(TestCase):
     def setUp(self):
         self.project = prepare_project(ProjectType.DOCUMENT_CLASSIFICATION)
         self.user = self.project.admin
-        self.example = mommy.make("Example", project=self.project.item)
+        self.example = baker.make("Example", project=self.project.item)
 
     def test_create(self):
         label_types = LabelTypes(CategoryType)

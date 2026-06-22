@@ -2,7 +2,7 @@ import uuid
 from unittest.mock import MagicMock
 
 from django.test import TestCase
-from model_mommy import mommy
+from model_bakery import baker
 
 from data_import.models import DummyLabelType
 from data_import.pipeline.label import (
@@ -30,7 +30,7 @@ class TestCategories(TestCase):
             CategoryLabel(example_uuid=example_uuid, label="A"),
             CategoryLabel(example_uuid=example_uuid, label="B"),
         ]
-        example = mommy.make("Example", project=self.project.item, uuid=example_uuid)
+        example = baker.make("Example", project=self.project.item, uuid=example_uuid)
         self.examples = MagicMock()
         self.examples.__getitem__.return_value = example
         self.examples.__contains__.return_value = True
@@ -59,15 +59,23 @@ class TestCategories(TestCase):
 class TestSpans(TestCase):
     def setUp(self):
         self.types = LabelTypes(SpanType)
-        self.project = prepare_project(ProjectType.SEQUENCE_LABELING, allow_overlapping=True)
+        self.project = prepare_project(
+            ProjectType.SEQUENCE_LABELING, allow_overlapping=True
+        )
         self.user = self.project.admin
         example_uuid = uuid.uuid4()
         labels = [
-            SpanLabel(example_uuid=example_uuid, label="A", start_offset=0, end_offset=1),
-            SpanLabel(example_uuid=example_uuid, label="B", start_offset=0, end_offset=3),
-            SpanLabel(example_uuid=example_uuid, label="B", start_offset=3, end_offset=4),
+            SpanLabel(
+                example_uuid=example_uuid, label="A", start_offset=0, end_offset=1
+            ),
+            SpanLabel(
+                example_uuid=example_uuid, label="B", start_offset=0, end_offset=3
+            ),
+            SpanLabel(
+                example_uuid=example_uuid, label="B", start_offset=3, end_offset=4
+            ),
         ]
-        example = mommy.make("Example", project=self.project.item, uuid=example_uuid)
+        example = baker.make("Example", project=self.project.item, uuid=example_uuid)
         self.examples = MagicMock()
         self.examples.__getitem__.return_value = example
         self.examples.__contains__.return_value = True
@@ -91,11 +99,15 @@ class TestSpans(TestCase):
         example_uuid1 = uuid.uuid4()
         example_uuid2 = uuid.uuid4()
         labels = [
-            SpanLabel(example_uuid=example_uuid1, label="A", start_offset=0, end_offset=1),
-            SpanLabel(example_uuid=example_uuid2, label="B", start_offset=0, end_offset=3),
+            SpanLabel(
+                example_uuid=example_uuid1, label="A", start_offset=0, end_offset=1
+            ),
+            SpanLabel(
+                example_uuid=example_uuid2, label="B", start_offset=0, end_offset=3
+            ),
         ]
-        mommy.make("Example", project=self.project.item, uuid=example_uuid1)
-        mommy.make("Example", project=self.project.item, uuid=example_uuid2)
+        baker.make("Example", project=self.project.item, uuid=example_uuid1)
+        baker.make("Example", project=self.project.item, uuid=example_uuid2)
         spans = Spans(labels, self.types)
         spans.clean(self.project.item)
         self.assertEqual(len(spans), 2)
@@ -120,7 +132,7 @@ class TestTexts(TestCase):
             TextLabel(example_uuid=example_uuid, text="A"),
             TextLabel(example_uuid=example_uuid, text="B"),
         ]
-        example = mommy.make("Example", project=self.project.item, uuid=example_uuid)
+        example = baker.make("Example", project=self.project.item, uuid=example_uuid)
         self.examples = MagicMock()
         self.examples.__getitem__.return_value = example
         self.examples.__contains__.return_value = True
@@ -146,15 +158,25 @@ class TestRelations(TestCase):
         self.project = prepare_project(ProjectType.SEQUENCE_LABELING, use_relation=True)
         self.user = self.project.admin
         example_uuid = uuid.uuid4()
-        example = mommy.make("Example", project=self.project.item, uuid=example_uuid, text="hello world")
-        from_span = mommy.make("Span", example=example, start_offset=0, end_offset=1)
-        to_span = mommy.make("Span", example=example, start_offset=2, end_offset=3)
+        example = baker.make(
+            "Example", project=self.project.item, uuid=example_uuid, text="hello world"
+        )
+        from_span = baker.make("Span", example=example, start_offset=0, end_offset=1)
+        to_span = baker.make("Span", example=example, start_offset=2, end_offset=3)
         labels = [
-            RelationLabel(example_uuid=example_uuid, type="A", from_id=from_span.id, to_id=to_span.id),
+            RelationLabel(
+                example_uuid=example_uuid,
+                type="A",
+                from_id=from_span.id,
+                to_id=to_span.id,
+            ),
         ]
         self.relations = Relations(labels, self.types)
         self.spans = MagicMock()
-        self.spans.id_to_span = {(from_span.id, str(example_uuid)): from_span, (to_span.id, str(example_uuid)): to_span}
+        self.spans.id_to_span = {
+            (from_span.id, str(example_uuid)): from_span,
+            (to_span.id, str(example_uuid)): to_span,
+        }
         self.examples = MagicMock()
         self.examples.__getitem__.return_value = example
         self.examples.__contains__.return_value = True
