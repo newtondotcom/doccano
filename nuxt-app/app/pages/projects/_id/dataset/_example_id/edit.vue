@@ -19,50 +19,38 @@
   </v-card>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import { Project } from '~/domain/models/project/project'
-import { ExampleDTO } from '~/services/application/example/exampleData'
+<script setup lang="ts">
+import { ExampleDTO } from '@/services/application/example/exampleData'
 
-export default Vue.extend({
+definePageMeta({
   layout: 'project',
-
-  middleware: ['check-auth', 'auth', 'setCurrentProject', 'isProjectAdmin'],
-
-  validate({ params, store }) {
-    if (/^\d+$/.test(params.id) && /^\d+$/.test(params.example_id)) {
-      const project = store.getters['projects/project'] as Project
-      return project.isTextProject
-    }
-    return false
-  },
-
-  data() {
-    return {
-      editedItem: {} as ExampleDTO,
-      valid: true,
-      rules: {
-        required: (v: string) => !!v || 'Required'
-      }
-    }
-  },
-
-  computed: {
-    projectId(): string {
-      return this.$route.params.id
-    }
-  },
-
-  async created() {
-    const exampleId = parseInt(this.$route.params.example_id, 10)
-    this.editedItem = await this.$services.example.findById(this.projectId, exampleId)
-  },
-
-  methods: {
-    async save() {
-      await this.$services.example.update(this.projectId, this.editedItem)
-      this.$router.push(`/projects/${this.projectId}/dataset`)
-    }
+  middleware: ['check-auth', 'auth', 'setCurrentProject', 'isProjectAdmin', 'is-text-project'],
+  validate(route) {
+    return (
+      /^\d+$/.test(route.params.id as string) && /^\d+$/.test(route.params.example_id as string)
+    )
   }
 })
+
+const route = useRoute()
+const router = useRouter()
+const { $services } = useNuxtApp()
+
+const editedItem = ref({} as ExampleDTO)
+const valid = ref(true)
+const rules = {
+  required: (v: string) => !!v || 'Required'
+}
+
+const projectId = computed(() => route.params.id as string)
+
+onMounted(async () => {
+  const exampleId = parseInt(route.params.example_id as string, 10)
+  editedItem.value = await $services.example.findById(projectId.value, exampleId)
+})
+
+async function save() {
+  await $services.example.update(projectId.value, editedItem.value)
+  router.push(`/projects/${projectId.value}/dataset`)
+}
 </script>

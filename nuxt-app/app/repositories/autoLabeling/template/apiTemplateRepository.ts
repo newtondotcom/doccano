@@ -1,5 +1,5 @@
 import ApiService from '@/services/api.service'
-import { ConfigResponse, ConfigTemplateItem } from '~/domain/models/autoLabeling/template'
+import { type ConfigResponse, type ConfigTemplateItem } from '@/domain/models/autoLabeling/template'
 
 export class APITemplateRepository {
   constructor(private readonly request = ApiService) {}

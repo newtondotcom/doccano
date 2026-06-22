@@ -30,103 +30,94 @@
   />
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import Konva from 'konva'
 import Flatten from '@flatten-js/core'
 import { transform, inverseTransform } from '@/domain/models/tasks/shared/Scaler'
 import Point = Flatten.Point
 
-export default Vue.extend({
-  props: {
-    color: {
-      type: String,
-      default: '#00FF00'
-    },
-    point: {
-      type: Point,
-      required: true
-    },
-    index: {
-      type: Number,
-      required: true
-    },
-    maxWidth: {
-      type: Number,
-      default: 0
-    },
-    maxHeight: {
-      type: Number,
-      default: 0
-    },
-    scale: {
-      type: Number,
-      default: 1
-    }
-  },
-
-  data() {
-    return {
-      stageX: 0,
-      stageY: 0
-    }
-  },
-
-  methods: {
-    dragBoundFunc(pos: { x: number; y: number }) {
-      let x = transform(pos.x, this.stageX, this.scale)
-      let y = transform(pos.y, this.stageY, this.scale)
-      if (x < 0) x = 0
-      if (y < 0) y = 0
-      if (x > this.maxWidth) x = this.maxWidth
-      if (y > this.maxHeight) y = this.maxHeight
-      x = inverseTransform(x, this.stageX, this.scale)
-      y = inverseTransform(y, this.stageY, this.scale)
-      return { x, y }
-    },
-
-    onClick() {
-      this.$emit('click', this.index)
-    },
-
-    onDoubleClick() {
-      this.$emit('dblclick', this.index)
-    },
-
-    onDragStart(e: Konva.KonvaEventObject<DragEvent>) {
-      const { x = 0, y = 0 } = e.target.getStage()!.attrs
-      this.stageX = x
-      this.stageY = y
-      this.$emit('dragstart', this.index)
-    },
-
-    onDragMove(e: Konva.KonvaEventObject<DragEvent>) {
-      const { x, y } = e.target.attrs
-      this.$emit('dragmove', this.index, x, y)
-    },
-
-    onDragEnd(e: Konva.KonvaEventObject<DragEvent>) {
-      const { x, y } = e.target.attrs
-      this.$emit('dragend', this.index, x, y)
-    },
-
-    onMouseEnter(e: Konva.KonvaEventObject<MouseEvent>) {
-      e.target.getStage()!.container().style.cursor = 'crosshair'
-    },
-
-    onMouseLeave(e: Konva.KonvaEventObject<MouseEvent>) {
-      e.target.getStage()!.container().style.cursor = 'default'
-    },
-
-    onMouseOverStartPoint(e: Konva.KonvaEventObject<MouseEvent>) {
-      e.target.scale({ x: 2 / this.scale, y: 2 / this.scale })
-      this.$emit('mouseover')
-    },
-
-    onMouseOutStartPoint(e: Konva.KonvaEventObject<MouseEvent>) {
-      e.target.scale({ x: 1 / this.scale, y: 1 / this.scale })
-      this.$emit('mouseout')
-    }
+const props = withDefaults(
+  defineProps<{
+    color?: string
+    point: Point
+    index: number
+    maxWidth?: number
+    maxHeight?: number
+    scale?: number
+  }>(),
+  {
+    color: '#00FF00',
+    maxWidth: 0,
+    maxHeight: 0,
+    scale: 1
   }
-})
+)
+
+const emit = defineEmits<{
+  click: [index: number]
+  dblclick: [index: number]
+  dragstart: [index: number]
+  dragmove: [index: number, x: number, y: number]
+  dragend: [index: number, x: number, y: number]
+  mouseover: []
+  mouseout: []
+}>()
+
+const stageX = ref(0)
+const stageY = ref(0)
+
+function dragBoundFunc(pos: { x: number; y: number }) {
+  let x = transform(pos.x, stageX.value, props.scale)
+  let y = transform(pos.y, stageY.value, props.scale)
+  if (x < 0) x = 0
+  if (y < 0) y = 0
+  if (x > props.maxWidth) x = props.maxWidth
+  if (y > props.maxHeight) y = props.maxHeight
+  x = inverseTransform(x, stageX.value, props.scale)
+  y = inverseTransform(y, stageY.value, props.scale)
+  return { x, y }
+}
+
+function onClick() {
+  emit('click', props.index)
+}
+
+function onDoubleClick() {
+  emit('dblclick', props.index)
+}
+
+function onDragStart(e: Konva.KonvaEventObject<DragEvent>) {
+  const { x = 0, y = 0 } = e.target.getStage()!.attrs
+  stageX.value = x
+  stageY.value = y
+  emit('dragstart', props.index)
+}
+
+function onDragMove(e: Konva.KonvaEventObject<DragEvent>) {
+  const { x, y } = e.target.attrs
+  emit('dragmove', props.index, x, y)
+}
+
+function onDragEnd(e: Konva.KonvaEventObject<DragEvent>) {
+  const { x, y } = e.target.attrs
+  emit('dragend', props.index, x, y)
+}
+
+function onMouseEnter(e: Konva.KonvaEventObject<MouseEvent>) {
+  e.target.getStage()!.container().style.cursor = 'crosshair'
+}
+
+function onMouseLeave(e: Konva.KonvaEventObject<MouseEvent>) {
+  e.target.getStage()!.container().style.cursor = 'default'
+}
+
+function onMouseOverStartPoint(e: Konva.KonvaEventObject<MouseEvent>) {
+  e.target.scale({ x: 2 / props.scale, y: 2 / props.scale })
+  emit('mouseover')
+}
+
+function onMouseOutStartPoint(e: Konva.KonvaEventObject<MouseEvent>) {
+  e.target.scale({ x: 1 / props.scale, y: 1 / props.scale })
+  emit('mouseout')
+}
 </script>

@@ -4,8 +4,8 @@
       <v-container class="fill-height" fluid>
         <v-row align="center" justify="center">
           <v-col cols="12" sm="8" md="4">
-            <form-login :login="authenticateUser" />
-            <social-login :fetch-social-link="fetchSocialLink" />
+            <AuthFormLogin :login="authenticateUser" />
+            <AuthSocialLogin :fetch-social-link="fetchSocialLink" />
           </v-col>
         </v-row>
       </v-container>
@@ -13,20 +13,13 @@
   </v-app>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import { mapActions } from 'vuex'
-import FormLogin from '@/components/auth/FormLogin.vue'
-import SocialLogin from '@/components/auth/SocialLogin.vue'
+<script setup lang="ts">
+import { useMainStore as useAuthStore } from '@/store/auth'
 
-export default Vue.extend({
-  components: {
-    FormLogin,
-    SocialLogin
-  },
+const authStore = useAuthStore()
 
-  methods: {
-    ...mapActions('auth', ['authenticateUser', 'fetchSocialLink'])
-  }
-})
+const authenticateUser = (authData: { username: string; password: string }) =>
+  authStore.authenticateUser(authData)
+
+const fetchSocialLink = () => authStore.fetchSocialLink()
 </script>

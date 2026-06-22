@@ -1,5 +1,8 @@
-import ShortKey from "vue-shortkey";
+import ShortKey from 'vue3-shortkey'
 
-export default defineNuxtPlugin((nuxtApp) => {
-    nuxtApp.vueApp.use(ShortKey, { prevent: ["input", "textarea"] });
-});
+export default defineNuxtPlugin({
+  name: 'vue-shortkey',
+  setup(nuxtApp) {
+    nuxtApp.vueApp.use(ShortKey, { prevent: ['input', 'textarea'] })
+  }
+})

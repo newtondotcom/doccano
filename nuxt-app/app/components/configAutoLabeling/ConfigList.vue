@@ -23,22 +23,26 @@
           {{ $t('generic.delete') }}
         </v-btn>
         <v-dialog v-model="dialogCreate">
-          <config-creation-form
+          <ConfigAutoLabelingConfigCreationForm
             @onCreate="
-              onCreate()
-              dialogCreate = false
+            () => {
+                onCreate()
+                dialogCreate = false
+              }
             "
           />
         </v-dialog>
         <v-dialog v-model="dialogDelete">
-          <confirm-form
+          <UtilsConfirmForm
             :items="selected"
             title="Delete Config"
             message="Are you sure you want to delete these configs?"
             item-key="modelName"
             @ok="
-              remove()
-              dialogDelete = false
+              () => {
+                remove()
+                dialogDelete = false
+                }
             "
             @cancel="dialogDelete = false"
           />
@@ -48,64 +52,51 @@
   </v-data-table>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import ConfigCreationForm from './ConfigCreationForm.vue'
-import ConfirmForm from '@/components/utils/ConfirmForm.vue'
-import { ConfigItemResponse } from '@/repositories/autoLabeling/config/apiConfigRepository'
-import { ConfigItemList } from '~/domain/models/autoLabeling/config'
+<script setup lang="ts">
+import type { ConfigItemResponse } from '@/repositories/autoLabeling/config/apiConfigRepository'
+import { ConfigItemList } from '@/domain/models/autoLabeling/config'
 
-export default Vue.extend({
-  components: {
-    ConfirmForm,
-    ConfigCreationForm
-  },
+const route = useRoute()
+const { $repositories } = useNuxtApp()
 
-  data() {
-    return {
-      dialogCreate: false,
-      dialogDelete: false,
-      isLoading: false as Boolean,
-      items: ConfigItemList.valueOf([]) as ConfigItemList,
-      selected: [] as ConfigItemResponse[],
-      headers: [
-        {
-          text: 'Model name',
-          align: 'left',
-          value: 'modelName',
-          sortable: false
-        }
-      ]
-    }
-  },
-
-  async created(): Promise<void> {
-    this.isLoading = true
-    this.items = await this.$repositories.config.list(this.$route.params.id)
-    this.isLoading = false
-  },
-
-  methods: {
-    async remove(): Promise<void> {
-      this.isLoading = true
-      const projectId = this.$route.params.id
-      for (const item of this.selected) {
-        await this.$repositories.config.delete(projectId, item.id)
-      }
-      this.items = await this.$repositories.config.list(projectId)
-      this.selected = []
-      this.isLoading = false
-    },
-    isDeletable(): boolean {
-      return this.selected.length > 0
-    },
-    async onCreate() {
-      this.isLoading = true
-      this.items = await this.$repositories.config.list(this.$route.params.id)
-      this.isLoading = false
-    }
+const dialogCreate = ref(false)
+const dialogDelete = ref(false)
+const isLoading = ref(false)
+const items = ref(ConfigItemList.valueOf([]) as ConfigItemList)
+const selected = ref([] as ConfigItemResponse[])
+const headers = [
+  {
+    text: 'Model name',
+    align: 'left',
+    value: 'modelName',
+    sortable: false
   }
-})
+]
+
+isLoading.value = true
+items.value = await $repositories.config.list(route.params.id as string)
+isLoading.value = false
+
+async function remove() {
+  isLoading.value = true
+  const projectId = route.params.id as string
+  for (const item of selected.value) {
+    await $repositories.config.delete(projectId, item.id)
+  }
+  items.value = await $repositories.config.list(projectId)
+  selected.value = []
+  isLoading.value = false
+}
+
+function isDeletable(): boolean {
+  return selected.value.length > 0
+}
+
+async function onCreate() {
+  isLoading.value = true
+  items.value = await $repositories.config.list(route.params.id as string)
+  isLoading.value = false
+}
 </script>
 
 <style scoped>

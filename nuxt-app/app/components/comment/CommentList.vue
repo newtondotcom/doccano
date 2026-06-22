@@ -20,9 +20,7 @@
     @input="$emit('input', $event)"
   >
     <template #[`item.createdAt`]="{ item }">
-      <span>{{
-        item.createdAt | dateParse('YYYY-MM-DDTHH:mm:ss') | dateFormat('DD/MM/YYYY HH:mm')
-      }}</span>
+      <span>{{ formatDate(item.createdAt) }}</span>
     </template>
     <template #top>
       <v-text-field
@@ -48,101 +46,91 @@
   </v-data-table>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { mdiMagnify } from '@mdi/js'
-import VueFilterDateFormat from '@vuejs-community/vue-filter-date-format'
-import VueFilterDateParse from '@vuejs-community/vue-filter-date-parse'
 import type { PropType } from 'vue'
-import Vue from 'vue'
-import { DataOptions } from 'vuetify/types'
-import { CommentItem } from '~/domain/models/comment/comment'
-Vue.use(VueFilterDateFormat)
-Vue.use(VueFilterDateParse)
+import { ref, watch } from 'vue'
+import { CommentItem } from '@/domain/models/comment/comment'
+import { COMMENT_DATETIME_FORMAT, formatApiDateTime } from '@/utils/date'
 
-export default Vue.extend({
-  props: {
-    isLoading: {
-      type: Boolean,
-      default: false,
-      required: true
-    },
-    items: {
-      type: Array as PropType<CommentItem[]>,
-      default: () => [],
-      required: true
-    },
-    value: {
-      type: Array as PropType<CommentItem[]>,
-      default: () => [],
-      required: true
-    },
-    total: {
-      type: Number,
-      default: 0,
-      required: true
-    }
+defineProps({
+  isLoading: {
+    type: Boolean,
+    default: false,
+    required: true
   },
-
-  data() {
-    return {
-      search: '',
-      options: {} as DataOptions,
-      headers: [
-        { text: this.$t('dataset.text'), value: 'text', sortable: false },
-        { text: this.$t('user.username'), value: 'username', sortable: false },
-        { text: this.$t('comments.created_at'), value: 'createdAt', sortable: false },
-        { text: this.$t('dataset.action'), value: 'action', sortable: false },
-        { text: this.$t('comments.document'), value: 'example' }
-      ],
-      mdiMagnify
-    }
+  items: {
+    type: Array as PropType<CommentItem[]>,
+    default: () => [],
+    required: true
   },
-
-  watch: {
-    options: {
-      handler() {
-        this.updateQuery({
-          query: {
-            limit: this.options.itemsPerPage.toString(),
-            offset: ((this.options.page - 1) * this.options.itemsPerPage).toString(),
-            q: this.search
-          }
-        })
-      },
-      deep: true
-    },
-    search() {
-      this.updateQuery({
-        query: {
-          limit: this.options.itemsPerPage.toString(),
-          offset: '0',
-          q: this.search
-        }
-      })
-      this.options.page = 1
-    }
+  value: {
+    type: Array as PropType<CommentItem[]>,
+    default: () => [],
+    required: true
   },
-
-  methods: {
-    updateQuery(payload: any) {
-      const { sortBy, sortDesc } = this.options
-      if (sortBy.length === 1 && sortDesc.length === 1) {
-        payload.query.sortBy = sortBy[0]
-        payload.query.sortDesc = sortDesc[0]
-      } else {
-        payload.query.sortBy = 'createdAt'
-        payload.query.sortDesc = true
-      }
-      this.$emit('update:query', payload)
-    }
+  total: {
+    type: Number,
+    default: 0,
+    required: true
   }
+})
 
-  // methods: {
-  //   toLabeling(item: CommentReadDTO) {
-  //     const index = this.examples.findIndex((example: ExampleDTO) => example.id === item.example)
-  //     const page = (index + 1).toString()
-  //     this.$emit('click:labeling', { page, q: this.search })
-  //   }
-  // }
+const emit = defineEmits<{
+  input: [value: CommentItem[]]
+  'update:query': [payload: any]
+}>()
+
+const { t } = useI18n()
+
+const search = ref('')
+const options = ref({} as DataOptions)
+const headers = [
+  { text: t('dataset.text'), value: 'text', sortable: false },
+  { text: t('user.username'), value: 'username', sortable: false },
+  { text: t('comments.created_at'), value: 'createdAt', sortable: false },
+  { text: t('dataset.action'), value: 'action', sortable: false },
+  { text: t('comments.document'), value: 'example' }
+]
+
+function formatDate(date: string) {
+  return formatApiDateTime(date, COMMENT_DATETIME_FORMAT)
+}
+
+function updateQuery(payload: any) {
+  const { sortBy, sortDesc } = options.value
+  if (sortBy.length === 1 && sortDesc.length === 1) {
+    payload.query.sortBy = sortBy[0]
+    payload.query.sortDesc = sortDesc[0]
+  } else {
+    payload.query.sortBy = 'createdAt'
+    payload.query.sortDesc = true
+  }
+  emit('update:query', payload)
+}
+
+watch(
+  options,
+  () => {
+    updateQuery({
+      query: {
+        limit: options.value.itemsPerPage.toString(),
+        offset: ((options.value.page - 1) * options.value.itemsPerPage).toString(),
+        q: search.value
+      }
+    })
+  },
+  { deep: true }
+)
+
+watch(search, () => {
+  updateQuery({
+    query: {
+      limit: options.value.itemsPerPage.toString(),
+      offset: '0',
+      q: search.value
+    }
+  })
+  options.value.page = 1
 })
 </script>

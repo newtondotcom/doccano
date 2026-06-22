@@ -21,23 +21,16 @@
   </v-card>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { PropType } from 'vue'
-import Vue from 'vue'
-import { MyProgress } from '@/domain/models/metrics/metrics'
+import type { MyProgress } from '@/domain/models/metrics/metrics'
 
-export default Vue.extend({
-  props: {
-    progress: {
-      type: Object as PropType<MyProgress>,
-      required: true
-    }
-  },
-
-  computed: {
-    percentage(): number {
-      return Math.ceil((this.progress.complete / this.progress.total) * 100)
-    }
+const props = defineProps({
+  progress: {
+    type: Object as PropType<MyProgress>,
+    required: true
   }
 })
+
+const percentage = computed(() => Math.ceil((props.progress.complete / props.progress.total) * 100))
 </script>

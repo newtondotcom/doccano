@@ -9,24 +9,24 @@
   />
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import { validateMinLength } from '~/domain/models/project/project'
+<script setup lang="ts">
+import { validateMinLength } from '@/domain/models/project/project'
 
-export default Vue.extend({
-  props: {
-    value: {
-      type: String,
-      default: '',
-      required: true
-    }
-  },
-  data() {
-    return {
-      descriptionRules: [
-        (text: string) => validateMinLength(text) || this.$t('rules.description.required')
-      ]
-    }
+defineProps({
+  value: {
+    type: String,
+    default: '',
+    required: true
   }
 })
+
+defineEmits<{
+  input: [value: string]
+}>()
+
+const { t } = useI18n()
+
+const descriptionRules = [
+  (text: string) => validateMinLength(text) || t('rules.description.required')
+]
 </script>

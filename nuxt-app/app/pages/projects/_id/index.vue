@@ -10,7 +10,7 @@
         </v-stepper-step>
         <v-stepper-content :step="index + 1">
           <v-card v-if="e6 === index + 1" class="mb-12" width="560" height="315">
-            <youtube ref="youtube" :video-id="item.videoId" />
+            <Youtube ref="youtube" :video-id="item.videoId" />
           </v-card>
           <v-btn color="primary mt-5" @click="next">
             {{ $t('generic.continue') }}
@@ -24,47 +24,34 @@
   </v-card>
 </template>
 
-<script>
-export default {
+<script setup>
+definePageMeta({
   layout: 'project',
-
   middleware: ['check-auth', 'auth', 'setCurrentProject'],
-
-  validate({ params }) {
-    return /^\d+$/.test(params.id)
-  },
-
-  data() {
-    return {
-      e6: 1,
-      items: [
-        { title: this.$t('projectHome.importData'), videoId: 'dA4ID1DSxCE' },
-        { title: this.$t('projectHome.createLabels'), videoId: '1bSML270quU' },
-        { title: this.$t('projectHome.addMembers'), videoId: 'NI09dcBz-qA' },
-        {
-          title: this.$t('projectHome.defineGuideline'),
-          videoId: 'AvvX3Xs32nA'
-        },
-        {
-          title: this.$t('projectHome.annotateDataset'),
-          videoId: 'F3XoSdyiMhA'
-        },
-        {
-          title: this.$t('projectHome.viewStatistics'),
-          videoId: 'kfRpa0mNQMY'
-        },
-        { title: this.$t('projectHome.exportDataset'), videoId: 'Pfy_QcHEeQ4' }
-      ]
-    }
-  },
-
-  methods: {
-    next() {
-      this.e6 = Math.max(1, (this.e6 + 1) % (this.items.length + 1))
-    },
-    prev() {
-      this.e6 = Math.max(1, this.e6 - 1)
-    }
+  validate(route) {
+    return /^\d+$/.test(route.params.id)
   }
+})
+
+const { t } = useI18n()
+
+const e6 = ref(1)
+
+const items = computed(() => [
+  { title: t('projectHome.importData'), videoId: 'dA4ID1DSxCE' },
+  { title: t('projectHome.createLabels'), videoId: '1bSML270quU' },
+  { title: t('projectHome.addMembers'), videoId: 'NI09dcBz-qA' },
+  { title: t('projectHome.defineGuideline'), videoId: 'AvvX3Xs32nA' },
+  { title: t('projectHome.annotateDataset'), videoId: 'F3XoSdyiMhA' },
+  { title: t('projectHome.viewStatistics'), videoId: 'kfRpa0mNQMY' },
+  { title: t('projectHome.exportDataset'), videoId: 'Pfy_QcHEeQ4' }
+])
+
+function next() {
+  e6.value = Math.max(1, (e6.value + 1) % (items.value.length + 1))
+}
+
+function prev() {
+  e6.value = Math.max(1, e6.value - 1)
 }
 </script>

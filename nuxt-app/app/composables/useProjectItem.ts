@@ -1,16 +1,14 @@
-import { reactive, useContext } from '@nuxtjs/composition-api'
-import { Project } from '~/domain/models/project/project'
+import { Project } from '@/domain/models/project/project'
 
 export const useProjectItem = () => {
   const state = reactive({
     project: {} as Project
   })
 
-  const { app } = useContext()
-  const projectService = app.$services.project
+  const { $services } = useNuxtApp()
 
   const getProjectById = async (projectId: string) => {
-    state.project = await projectService.findById(projectId)
+    state.project = await $services.project.findById(projectId)
   }
 
   return {

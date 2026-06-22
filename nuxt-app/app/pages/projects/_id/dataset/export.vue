@@ -15,7 +15,7 @@
           item-text="name"
           label="File format"
           outlined
-          :rules="fileFormatRules($t('rules.fileFormatRules'))"
+          :rules="fileFormatRules(tm('rules.fileFormatRules'))"
         />
         <v-sheet
           v-if="selectedFormat"
@@ -36,85 +36,75 @@
   </v-card>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import { fileFormatRules } from '@/rules/index'
-import { Format } from '~/domain/models/download/format'
+import { Format } from '@/domain/models/download/format'
 
-export default Vue.extend({
+definePageMeta({
   layout: 'project',
-
   middleware: ['check-auth', 'auth', 'setCurrentProject', 'isProjectAdmin'],
-
-  validate({ params }) {
-    return /^\d+$/.test(params.id)
-  },
-
-  data() {
-    return {
-      exportApproved: false,
-      file: null,
-      fileFormatRules,
-      formats: [] as Format[],
-      isProcessing: false,
-      polling: null,
-      selectedFormat: null as any,
-      taskId: '',
-      valid: false
-    }
-  },
-
-  computed: {
-    projectId() {
-      return this.$route.params.id
-    },
-
-    example(): string {
-      const item = this.formats.find((item: Format) => item.name === this.selectedFormat)
-      return item!.example.trim()
-    }
-  },
-
-  async created() {
-    this.formats = await this.$repositories.downloadFormat.list(this.projectId)
-  },
-
-  beforeDestroy() {
-    // @ts-ignore
-    clearInterval(this.polling)
-  },
-
-  methods: {
-    reset() {
-      ;(this.$refs.form as HTMLFormElement).reset()
-      this.taskId = ''
-      this.exportApproved = false
-      this.selectedFormat = null
-      this.isProcessing = false
-    },
-
-    async downloadRequest() {
-      this.isProcessing = true
-      this.taskId = await this.$repositories.download.prepare(
-        this.projectId,
-        this.selectedFormat,
-        this.exportApproved
-      )
-      this.pollData()
-    },
-
-    pollData() {
-      // @ts-ignore
-      this.polling = setInterval(async () => {
-        if (this.taskId) {
-          const res = await this.$repositories.taskStatus.get(this.taskId)
-          if (res.ready) {
-            this.$repositories.download.download(this.projectId, this.taskId)
-            this.reset()
-          }
-        }
-      }, 1000)
-    }
+  validate(route) {
+    return /^\d+$/.test(route.params.id)
   }
 })
+
+const route = useRoute()
+const { tm } = useI18n()
+const { $repositories } = useNuxtApp()
+
+const exportApproved = ref(false)
+const formats = ref([] as Format[])
+const isProcessing = ref(false)
+const polling = ref<ReturnType<typeof setInterval> | null>(null)
+const selectedFormat = ref(null as any)
+const taskId = ref('')
+const valid = ref(false)
+const form = ref()
+
+const projectId = computed(() => route.params.id)
+
+const example = computed(() => {
+  const item = formats.value.find((item: Format) => item.name === selectedFormat.value)
+  return item!.example.trim()
+})
+
+onMounted(async () => {
+  formats.value = await $repositories.downloadFormat.list(projectId.value)
+})
+
+onBeforeUnmount(() => {
+  if (polling.value) {
+    clearInterval(polling.value)
+  }
+})
+
+function reset() {
+  form.value.reset()
+  taskId.value = ''
+  exportApproved.value = false
+  selectedFormat.value = null
+  isProcessing.value = false
+}
+
+async function downloadRequest() {
+  isProcessing.value = true
+  taskId.value = await $repositories.download.prepare(
+    projectId.value,
+    selectedFormat.value,
+    exportApproved.value
+  )
+  pollData()
+}
+
+function pollData() {
+  polling.value = setInterval(async () => {
+    if (taskId.value) {
+      const res = await $repositories.taskStatus.get(taskId.value)
+      if (res.ready) {
+        $repositories.download.download(projectId.value, taskId.value)
+        reset()
+      }
+    }
+  }, 1000)
+}
 </script>

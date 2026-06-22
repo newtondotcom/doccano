@@ -1,4 +1,3 @@
-import { computed, reactive } from '@nuxtjs/composition-api'
 import { LabelDTO } from '@/services/application/label/labelData'
 import { CreateLabelCommand, UpdateLabelCommand } from '@/services/application/label/labelCommand'
 import { LabelApplicationService } from '@/services/application/label/labelApplicationService'

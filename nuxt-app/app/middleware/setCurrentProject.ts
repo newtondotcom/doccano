@@ -1,13 +1,19 @@
-import { NuxtAppOptions } from '@nuxt/types'
-import _ from 'lodash'
+import { useMainStore as useProjectsStore } from '@/store/projects'
 
-export default _.debounce(async ({ app, route, redirect }: NuxtAppOptions) => {
-  const project = app.store.getters['projects/currentProject']
-  if (project.id !== route.params.id) {
+export default defineNuxtRouteMiddleware(async (to) => {
+  const projectId = to.params.id as string
+  if (!projectId) {
+    return
+  }
+
+  const projectsStore = useProjectsStore()
+  const current = projectsStore.currentProject
+
+  if (String(current?.id) !== projectId) {
     try {
-      await app.store.dispatch('projects/setCurrentProject', route.params.id)
-    } catch (e) {
-      redirect('/projects')
+      await projectsStore.setCurrentProject(projectId)
+    } catch {
+      return navigateTo('/projects')
     }
   }
-}, 1000)
+})

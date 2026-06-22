@@ -1,5 +1,5 @@
 <template>
-  <confirm-form
+  <UtilsConfirmForm
     :items="selected"
     :title="$t('comments.removeComment')"
     :message="$t('comments.removePrompt')"
@@ -9,20 +9,16 @@
   />
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import ConfirmForm from '@/components/utils/ConfirmForm.vue'
-
-export default Vue.extend({
-  components: {
-    ConfirmForm
-  },
-
-  props: {
-    selected: {
-      type: Array,
-      default: () => []
-    }
+<script setup lang="ts">
+defineProps({
+  selected: {
+    type: Array,
+    default: () => []
   }
 })
+
+defineEmits<{
+  remove: []
+  cancel: []
+}>()
 </script>

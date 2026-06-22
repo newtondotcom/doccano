@@ -8,7 +8,7 @@ export const useMainStore = defineStore("auth", {
         isStaff: false,
     }),
     getters: {
-        isAuthenticated(state) {
+        getIsAuthenticated(state) {
             return state.isAuthenticated;
         },
         getUsername(state) {
@@ -17,58 +17,40 @@ export const useMainStore = defineStore("auth", {
         getUserId(state) {
             return state.id;
         },
-        isStaff(state) {
+        getIsStaff(state) {
             return state.isStaff;
         },
     },
 
     actions: {
-        async authenticateUser({ commit }, authData) {
-            try {
-                await this.$repositories.auth.login(
-                    authData.username,
-                    authData.password,
-                );
-                commit("setAuthenticated", true);
-            } catch (error) {
-                throw new Error("The credential is invalid");
-            }
+        async authenticateUser(authData: { username: string; password: string }) {
+            const { $repositories } = useNuxtApp();
+            await $repositories.auth.login(authData.username, authData.password);
+            this.isAuthenticated = true;
         },
         async fetchSocialLink() {
-            return await this.$repositories.auth.socialLink();
+            const { $repositories } = useNuxtApp();
+            return await $repositories.auth.socialLink();
         },
-        async initAuth({ commit }) {
+        async initAuth() {
+            const { $repositories } = useNuxtApp();
             try {
-                const user = await this.$repositories.user.getProfile();
-                commit("setAuthenticated", true);
-                commit("setUsername", user.username);
-                commit("setUserId", user.id);
-                commit("setIsStaff", user.isStaff);
+                const user = await $repositories.user.getProfile();
+                this.isAuthenticated = true;
+                this.username = user.username;
+                this.id = user.id;
+                this.isStaff = user.isStaff;
             } catch {
-                commit("setAuthenticated", false);
-                commit("setIsStaff", false);
+                this.isAuthenticated = false;
+                this.isStaff = false;
             }
         },
-        async logout({ commit }) {
-            await this.$repositories.auth.logout();
-            commit("setAuthenticated", false);
-            commit("setIsStaff", false);
-            commit("clearUsername");
-        },
-        setUsername(state, username) {
-            state.username = username;
-        },
-        setUserId(state, userId) {
-            state.id = userId;
-        },
-        clearUsername(state) {
-            state.username = null;
-        },
-        setAuthenticated(state, isAuthenticated) {
-            state.isAuthenticated = isAuthenticated;
-        },
-        setIsStaff(state, isStaff) {
-            state.isStaff = isStaff;
+        async logout() {
+            const { $repositories } = useNuxtApp();
+            await $repositories.auth.logout();
+            this.isAuthenticated = false;
+            this.isStaff = false;
+            this.username = null;
         },
     },
 });

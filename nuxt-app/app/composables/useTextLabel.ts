@@ -1,5 +1,4 @@
-import { reactive } from '@nuxtjs/composition-api'
-import { TextLabel } from '~/domain/models/tasks/textLabel'
+import { TextLabel } from '@/domain/models/tasks/textLabel'
 
 export const useTextLabel = (repository: any, projectId: string) => {
   const state = reactive({

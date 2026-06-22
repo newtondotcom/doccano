@@ -1,6 +1,6 @@
 import { plainToInstance } from 'class-transformer'
 import ApiService from '@/services/api.service'
-import { Format } from '~/domain/models/download/format'
+import { Format } from '@/domain/models/download/format'
 
 export class APIDownloadFormatRepository {
   constructor(private readonly request = ApiService) {}

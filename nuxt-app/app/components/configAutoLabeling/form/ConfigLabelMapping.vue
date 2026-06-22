@@ -11,7 +11,7 @@
         <v-sheet :dark="!$vuetify.theme.dark" :light="$vuetify.theme.dark" class="mb-5 pa-5">
           <pre>{{ JSON.stringify(response, null, 4) }}</pre>
         </v-sheet>
-        <label-mapping v-model="mapping" />
+        <ConfigAutoLabelingFormLabelMapping v-model="mapping" />
         <v-alert v-for="(error, index) in errorMessages" :key="index" prominent type="error">
           <v-row align="center">
             <v-col class="grow">
@@ -38,54 +38,43 @@
   </v-stepper-content>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import LabelMapping from './LabelMapping.vue'
-
-export default Vue.extend({
-  components: {
-    LabelMapping
+<script setup lang="ts">
+const props = defineProps({
+  value: {
+    type: Array,
+    default: () => [],
+    required: true
   },
-
-  props: {
-    value: {
-      type: Array,
-      default: () => [],
-      required: true
-    },
-    errorMessages: {
-      type: Array,
-      default: () => [],
-      required: true
-    },
-    isPassed: {
-      type: Boolean,
-      default: false,
-      required: true
-    },
-    response: {
-      type: [String, Object, Array],
-      default: () => [],
-      required: true
-    },
-    result: {
-      type: Array,
-      default: () => [],
-      required: true
-    }
+  errorMessages: {
+    type: Array,
+    default: () => [],
+    required: true
   },
+  isPassed: {
+    type: Boolean,
+    default: false,
+    required: true
+  },
+  response: {
+    type: [String, Object, Array],
+    default: () => [],
+    required: true
+  },
+  result: {
+    type: Array,
+    default: () => [],
+    required: true
+  }
+})
 
-  computed: {
-    mapping: {
-      get() {
-        // @ts-ignore
-        return this.value
-      },
-      set(newVal) {
-        // @ts-ignore
-        this.$emit('input', newVal)
-      }
-    }
+const emit = defineEmits(['input', 'prev', 'next', 'onTest'])
+
+const mapping = computed({
+  get() {
+    return props.value
+  },
+  set(newVal) {
+    emit('input', newVal)
   }
 })
 </script>

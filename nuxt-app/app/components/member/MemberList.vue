@@ -37,44 +37,40 @@
   </v-data-table>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import { mdiMagnify, mdiPencil } from '@mdi/js'
+import { computed, ref } from 'vue'
 
-export default Vue.extend({
-  props: {
-    isLoading: {
-      type: Boolean,
-      default: false,
-      required: true
-    },
-    items: {
-      type: Array,
-      default: () => [],
-      required: true
-    },
-    value: {
-      type: Array,
-      default: () => [],
-      required: true
-    }
+defineProps({
+  isLoading: {
+    type: Boolean,
+    default: false,
+    required: true
   },
-  data() {
-    return {
-      search: '',
-      mdiMagnify,
-      mdiPencil
-    }
+  items: {
+    type: Array,
+    default: () => [],
+    required: true
   },
-
-  computed: {
-    headers() {
-      return [
-        { text: this.$t('generic.name'), value: 'username' },
-        { text: this.$t('members.role'), value: 'rolename' },
-        { text: 'Actions', value: 'actions', sortable: false }
-      ]
-    }
+  value: {
+    type: Array,
+    default: () => [],
+    required: true
   }
 })
+
+defineEmits<{
+  input: [value: unknown[]]
+  edit: [item: unknown]
+}>()
+
+const { t } = useI18n()
+
+const search = ref('')
+
+const headers = computed(() => [
+  { text: t('generic.name'), value: 'username' },
+  { text: t('members.role'), value: 'rolename' },
+  { text: 'Actions', value: 'actions', sortable: false }
+])
 </script>

@@ -1,4 +1,3 @@
-import { Plugin } from '@nuxt/types'
 import { APIAssignmentRepository } from '@/repositories/example/apiAssignmentRepository'
 import { APIAuthRepository } from '@/repositories/auth/apiAuthRepository'
 import { APIConfigRepository } from '@/repositories/autoLabeling/config/apiConfigRepository'
@@ -23,44 +22,30 @@ import { APITextLabelRepository } from '@/repositories/tasks/apiTextLabelReposit
 import { APICatalogRepository } from '@/repositories/upload/apiCatalogRepository'
 import { APIParseRepository } from '@/repositories/upload/apiParseRepository'
 import { APIUserRepository } from '@/repositories/user/apiUserRepository'
-import { APISegmentationRepository } from '~/repositories/tasks/apiSegmentationRepository'
+import { APISegmentationRepository } from '@/repositories/tasks/apiSegmentationRepository'
+
 export interface Repositories {
-  // User
   auth: APIAuthRepository
   user: APIUserRepository
-
-  // Project
   project: APIProjectRepository
   member: APIMemberRepository
   role: APIRoleRepository
   tag: APITagRepository
-
-  // Example
   example: APIExampleRepository
   comment: APICommentRepository
   taskStatus: APITaskStatusRepository
   metrics: APIMetricsRepository
   option: LocalStorageOptionRepository
   assignment: APIAssignmentRepository
-
-  // Auto Labeling
   config: APIConfigRepository
   template: APITemplateRepository
-
-  // Upload
   catalog: APICatalogRepository
   parse: APIParseRepository
-
-  // Download
   downloadFormat: APIDownloadFormatRepository
   download: APIDownloadRepository
-
-  // Label Type
   categoryType: APILabelRepository
   spanType: APILabelRepository
   relationType: APILabelRepository
-
-  // Label
   category: APICategoryRepository
   span: APISpanRepository
   relation: APIRelationRepository
@@ -69,49 +54,28 @@ export interface Repositories {
   segmentation: APISegmentationRepository
 }
 
-declare module 'vue/types/vue' {
-  interface Vue {
-    readonly $repositories: Repositories
-  }
-}
-
-const repositories: Repositories = {
-  // User
+export const repositories: Repositories = {
   auth: new APIAuthRepository(),
   user: new APIUserRepository(),
-
-  // Project
   project: new APIProjectRepository(),
   member: new APIMemberRepository(),
   role: new APIRoleRepository(),
   tag: new APITagRepository(),
-
-  // Example
   example: new APIExampleRepository(),
   comment: new APICommentRepository(),
   taskStatus: new APITaskStatusRepository(),
   metrics: new APIMetricsRepository(),
   option: new LocalStorageOptionRepository(),
   assignment: new APIAssignmentRepository(),
-
-  // Auto Labeling
   config: new APIConfigRepository(),
   template: new APITemplateRepository(),
-
-  // Upload
   catalog: new APICatalogRepository(),
   parse: new APIParseRepository(),
-
-  // Download
   downloadFormat: new APIDownloadFormatRepository(),
   download: new APIDownloadRepository(),
-
-  // Label Type
   categoryType: new APILabelRepository('category-type'),
   spanType: new APILabelRepository('span-type'),
   relationType: new APILabelRepository('relation-type'),
-
-  // Label
   category: new APICategoryRepository(),
   span: new APISpanRepository(),
   relation: new APIRelationRepository(),
@@ -120,9 +84,13 @@ const repositories: Repositories = {
   segmentation: new APISegmentationRepository()
 }
 
-const plugin: Plugin = (_, inject) => {
-  inject('repositories', repositories)
-}
-
-export default plugin
-export { repositories }
+export default defineNuxtPlugin({
+  name: 'doccano-repositories',
+  setup() {
+    return {
+      provide: {
+        repositories
+      }
+    }
+  }
+})

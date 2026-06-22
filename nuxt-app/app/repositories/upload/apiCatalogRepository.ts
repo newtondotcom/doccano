@@ -1,5 +1,5 @@
 import ApiService from '@/services/api.service'
-import { Catalog } from '~/domain/models/upload/catalog'
+import { Catalog } from '@/domain/models/upload/catalog'
 
 function toModel(item: { [key: string]: any }): Catalog {
   return new Catalog(

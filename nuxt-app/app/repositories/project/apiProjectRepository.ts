@@ -1,7 +1,7 @@
 import { Page } from '@/domain/models/page'
 import { Project } from '@/domain/models/project/project'
 import ApiService from '@/services/api.service'
-import { TagItem } from '~/domain/models/tag/tag'
+import { TagItem } from '@/domain/models/tag/tag'
 
 const sortableFieldList = ['name', 'projectType', 'createdAt', 'author'] as const
 type SortableFields = (typeof sortableFieldList)[number]

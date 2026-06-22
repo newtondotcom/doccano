@@ -1,5 +1,5 @@
 <template>
-  <action-menu
+  <UtilsActionMenu
     :items="items"
     :text="$t('dataset.actions')"
     @create="$emit('create')"
@@ -10,41 +10,40 @@
   />
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import { mdiAccountCheck, mdiUpload, mdiDownload, mdiUpdate } from '@mdi/js'
-import ActionMenu from '~/components/utils/ActionMenu.vue'
+import { computed } from 'vue'
 
-export default Vue.extend({
-  components: {
-    ActionMenu
+defineEmits<{
+  create: []
+  upload: []
+  download: []
+  assign: []
+  reset: []
+}>()
+
+const { t } = useI18n()
+
+const items = computed(() => [
+  {
+    title: t('dataset.importDataset'),
+    icon: mdiUpload,
+    event: 'upload'
   },
-
-  computed: {
-    items() {
-      return [
-        {
-          title: this.$t('dataset.importDataset'),
-          icon: mdiUpload,
-          event: 'upload'
-        },
-        {
-          title: this.$t('dataset.exportDataset'),
-          icon: mdiDownload,
-          event: 'download'
-        },
-        {
-          title: 'Assign to member',
-          icon: mdiAccountCheck,
-          event: 'assign'
-        },
-        {
-          title: 'Reset Assignment',
-          icon: mdiUpdate,
-          event: 'reset'
-        }
-      ]
-    }
+  {
+    title: t('dataset.exportDataset'),
+    icon: mdiDownload,
+    event: 'download'
+  },
+  {
+    title: 'Assign to member',
+    icon: mdiAccountCheck,
+    event: 'assign'
+  },
+  {
+    title: 'Reset Assignment',
+    icon: mdiUpdate,
+    event: 'reset'
   }
-})
+])
 </script>

@@ -1,5 +1,5 @@
 import { TagItem } from '@/domain/models/tag/tag'
-import { TagRepository } from '@/domain/models/tag/tagRepository'
+import { type TagRepository } from '@/domain/models/tag/tagRepository'
 import ApiService from '@/services/api.service'
 
 function toModel(item: { [key: string]: any }): TagItem {

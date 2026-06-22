@@ -13,16 +13,18 @@
   />
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { PropType } from 'vue'
-import Vue from 'vue'
-export default Vue.extend({
-  props: {
-    value: {
-      type: Array as PropType<string[]>,
-      default: () => [],
-      required: true
-    }
+
+defineProps({
+  value: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+    required: true
   }
 })
+
+defineEmits<{
+  input: [value: string[]]
+}>()
 </script>

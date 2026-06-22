@@ -1,7 +1,7 @@
 <template>
   <v-tooltip bottom>
-    <template #activator="{ on }">
-      <v-btn icon v-on="on" @click="$emit('click:open')">
+    <template #activator="{ props }">
+      <v-btn icon v-bind="props" @click="$emit('click:open')">
         <v-icon>
           {{ mdiKeyboardOutline }}
         </v-icon>
@@ -11,14 +11,8 @@
   </v-tooltip>
 </template>
 
-<script>
+<script setup>
 import { mdiKeyboardOutline } from '@mdi/js'
 
-export default {
-  data() {
-    return {
-      mdiKeyboardOutline
-    }
-  }
-}
+defineEmits(['click:open'])
 </script>

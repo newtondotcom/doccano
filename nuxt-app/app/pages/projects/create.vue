@@ -3,10 +3,10 @@
     <v-card-title>{{ $t('overview.createProjectTitle') }}</v-card-title>
     <v-card-text>
       <v-form v-model="valid">
-        <project-type-field v-model="editedItem.projectType" />
-        <project-name-field v-model="editedItem.name" outlined autofocus />
-        <project-description-field v-model="editedItem.description" outlined />
-        <tag-list v-model="editedItem.tags" outlined />
+        <ProjectTypeField v-model="editedItem.projectType" />
+        <ProjectNameField v-model="editedItem.name" outlined autofocus />
+        <ProjectDescriptionField v-model="editedItem.description" outlined />
+        <ProjectTagList v-model="editedItem.tags" outlined />
         <v-checkbox
           v-if="showExclusiveCategories"
           v-model="editedItem.exclusiveCategories"
@@ -20,7 +20,7 @@
         <template v-if="isSequenceLabelingProject">
           <v-checkbox v-model="editedItem.allowOverlappingSpans" label="Allow overlapping spans" />
           <v-img
-            :src="require('~/assets/project/creation.gif')"
+            :src="require('@/assets/project/creation.gif')"
             height="200"
             position="left"
             contain
@@ -31,12 +31,12 @@
               <div>
                 Count
                 <v-tooltip bottom>
-                  <template #activator="{ on }">
+                  <template #activator="{ props }">
                     <a
                       target="_blank"
                       href="https://unicode.org/reports/tr29/"
                       @click.stop
-                      v-on="on"
+                      v-bind="props"
                     >
                       grapheme clusters
                     </a>
@@ -48,8 +48,8 @@
             </template>
           </v-checkbox>
         </template>
-        <random-order-field v-model="editedItem.enableRandomOrder" />
-        <sharing-mode-field v-model="editedItem.enableSharingMode" />
+        <ProjectRandomOrderField v-model="editedItem.enableRandomOrder" />
+        <ProjectSharingModeField v-model="editedItem.enableSharingMode" />
       </v-form>
     </v-card-text>
     <v-card-actions class="ps-4">
@@ -66,79 +66,55 @@
   </v-card>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import ProjectDescriptionField from '~/components/project/ProjectDescriptionField.vue'
-import ProjectNameField from '~/components/project/ProjectNameField.vue'
-import ProjectTypeField from '~/components/project/ProjectTypeField.vue'
-import RandomOrderField from '~/components/project/RandomOrderField.vue'
-import SharingModeField from '~/components/project/SharingModeField.vue'
-import TagList from '~/components/project/TagList.vue'
+<script setup lang="ts">
 import {
   DocumentClassification,
   ImageClassification,
   SequenceLabeling,
   canDefineLabel
-} from '~/domain/models/project/project'
+} from '@/domain/models/project/project'
 
-const initializeProject = () => {
-  return {
-    name: '',
-    description: '',
-    projectType: DocumentClassification,
-    enableRandomOrder: false,
-    enableSharingMode: false,
-    exclusiveCategories: false,
-    allowOverlappingSpans: false,
-    enableGraphemeMode: false,
-    useRelation: false,
-    tags: [] as string[],
-    guideline: '',
-    allowMemberToCreateLabelType: false
-  }
-}
-
-export default Vue.extend({
-  components: {
-    ProjectTypeField,
-    ProjectNameField,
-    ProjectDescriptionField,
-    RandomOrderField,
-    SharingModeField,
-    TagList
-  },
-
+definePageMeta({
   layout: 'projects',
-
-  middleware: ['check-auth', 'auth'],
-
-  data() {
-    return {
-      valid: false,
-      editedItem: initializeProject()
-    }
-  },
-
-  computed: {
-    showExclusiveCategories(): boolean {
-      return [DocumentClassification, ImageClassification].includes(this.editedItem.projectType)
-    },
-    isSequenceLabelingProject(): boolean {
-      return this.editedItem.projectType === SequenceLabeling
-    },
-    _canDefineLabel(): boolean {
-      return canDefineLabel(this.editedItem.projectType as any)
-    }
-  },
-
-  methods: {
-    async create() {
-      const project = await this.$services.project.create(this.editedItem)
-      this.$router.push(`/projects/${project.id}`)
-      this.$nextTick(() => {
-        this.editedItem = initializeProject()
-      })
-    }
-  }
+  middleware: ['check-auth', 'auth']
 })
+
+const router = useRouter()
+const { $services } = useNuxtApp()
+
+const initializeProject = () => ({
+  name: '',
+  description: '',
+  projectType: DocumentClassification,
+  enableRandomOrder: false,
+  enableSharingMode: false,
+  exclusiveCategories: false,
+  allowOverlappingSpans: false,
+  enableGraphemeMode: false,
+  useRelation: false,
+  tags: [] as string[],
+  guideline: '',
+  allowMemberToCreateLabelType: false
+})
+
+const valid = ref(false)
+const editedItem = ref(initializeProject())
+
+const showExclusiveCategories = computed(() =>
+  [DocumentClassification, ImageClassification].includes(editedItem.value.projectType)
+)
+
+const isSequenceLabelingProject = computed(
+  () => editedItem.value.projectType === SequenceLabeling
+)
+
+const _canDefineLabel = computed(() => canDefineLabel(editedItem.value.projectType as any))
+
+async function create() {
+  const project = await $services.project.create(editedItem.value)
+  router.push(`/projects/${project.id}`)
+  nextTick(() => {
+    editedItem.value = initializeProject()
+  })
+}
 </script>

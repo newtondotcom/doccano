@@ -1,7 +1,7 @@
-import { Page } from '~/domain/models/page'
-import { Project } from '~/domain/models/project/project'
-import { TagItem } from '~/domain/models/tag/tag'
-import { APIProjectRepository, SearchQuery } from '~/repositories/project/apiProjectRepository'
+import { Page } from '@/domain/models/page'
+import { Project } from '@/domain/models/project/project'
+import { TagItem } from '@/domain/models/tag/tag'
+import { APIProjectRepository, SearchQuery } from '@/repositories/project/apiProjectRepository'
 
 type ProjectFields = {
   name: string

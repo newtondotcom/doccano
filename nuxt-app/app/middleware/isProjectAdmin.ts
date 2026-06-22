@@ -1,10 +1,11 @@
-import { NuxtAppOptions } from '@nuxt/types'
-import _ from 'lodash'
+export default defineNuxtRouteMiddleware(async (to) => {
+  const { $repositories } = useNuxtApp()
+  const { localePath } = useI18n()
+  const projectId = to.params.id as string
 
-export default _.debounce(async ({ app, route, redirect }: NuxtAppOptions) => {
-  const member = await app.$repositories.member.fetchMyRole(route.params.id)
+  const member = await $repositories.member.fetchMyRole(projectId)
 
   if (!member.isProjectAdmin) {
-    return redirect(app.localePath('/projects/' + route.params.id))
+    return navigateTo(localePath('/projects/' + projectId))
   }
-}, 1000)
+})

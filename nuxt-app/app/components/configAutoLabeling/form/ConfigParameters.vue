@@ -21,7 +21,7 @@
               :label="item.name"
               outlined
             />
-            <object-field
+            <ConfigAutoLabelingFormObjectField
               v-if="item.type === 'objectField'"
               :key="item.name"
               v-model="item.value"
@@ -40,7 +40,7 @@
             outlined
             label="Sample Text"
           />
-          <file-field v-else v-model="payload" />
+          <ConfigAutoLabelingFormFileField v-else v-model="payload" />
           <v-alert v-for="(error, index) in errorMessages" :key="index" prominent type="error">
             <v-row align="center">
               <v-col class="grow">
@@ -73,50 +73,39 @@
   </v-stepper-content>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import FileField from './FileField.vue'
-import ObjectField from './ObjectField.vue'
-import { Project } from '~/domain/models/project/project'
+<script setup lang="ts">
+import type { Project } from '@/domain/models/project/project'
 
-export default Vue.extend({
-  components: {
-    ObjectField,
-    FileField
+defineProps({
+  value: {
+    type: Array,
+    default: () => [],
+    required: true
   },
-
-  props: {
-    value: {
-      type: Array,
-      default: () => [],
-      required: true
-    },
-    errorMessages: {
-      type: Array,
-      default: () => [],
-      required: true
-    },
-    isPassed: {
-      type: Boolean,
-      default: false,
-      required: true
-    },
-    response: {
-      type: [String, Array, Object],
-      default: () => [],
-      required: true
-    }
+  errorMessages: {
+    type: Array,
+    default: () => [],
+    required: true
   },
-
-  data() {
-    return {
-      payload: '',
-      project: {} as Project
-    }
+  isPassed: {
+    type: Boolean,
+    default: false,
+    required: true
   },
-
-  async created() {
-    this.project = await this.$services.project.findById(this.$route.params.id)
+  response: {
+    type: [String, Array, Object],
+    default: () => [],
+    required: true
   }
 })
+
+defineEmits(['prev', 'next', 'onTest'])
+
+const route = useRoute()
+const { $services } = useNuxtApp()
+
+const payload = ref('')
+const project = ref({} as Project)
+
+project.value = await $services.project.findById(route.params.id as string)
 </script>

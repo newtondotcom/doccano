@@ -1,5 +1,5 @@
 import ApiService from '@/services/api.service'
-import { Assignment } from '@/domain/models/example/example'
+import { type Assignment } from '@/domain/models/example/example'
 
 export class APIAssignmentRepository {
   constructor(private readonly request = ApiService) {}

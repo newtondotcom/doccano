@@ -1,5 +1,5 @@
 import ApiService from '@/services/api.service'
-import { ExampleRepository, SearchOption } from '@/domain/models/example/exampleRepository'
+import { type ExampleRepository, type SearchOption } from '@/domain/models/example/exampleRepository'
 import { ExampleItem, ExampleItemList } from '@/domain/models/example/example'
 
 function toModel(item: { [key: string]: any }): ExampleItem {

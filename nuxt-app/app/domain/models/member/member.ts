@@ -1,4 +1,4 @@
-import { RoleName } from '../role/role'
+import { type RoleName } from '../role/role'
 
 export class MemberItem {
   constructor(

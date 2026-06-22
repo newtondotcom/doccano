@@ -19,99 +19,74 @@
   />
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import Konva from 'konva'
-import type { PropType } from 'vue'
-import Vue from 'vue'
 import { inverseTransform, transform } from '@/domain/models/tasks/shared/Scaler'
 import Rectangle from '@/domain/models/tasks/boundingbox/Rectangle'
 
-export default Vue.extend({
-  props: {
-    rect: {
-      type: Object as PropType<Rectangle>,
-      required: true
-    },
-    color: {
-      type: String,
-      default: '#00FF00'
-    },
-    draggable: {
-      type: Boolean,
-      default: true
-    },
-    highlightId: {
-      type: String,
-      default: 'uuid'
-    },
-    opacity: {
-      type: Number,
-      default: 0.6
-    },
-    scale: {
-      type: Number,
-      required: true
-    },
-    maxWidth: {
-      type: Number,
-      required: true
-    },
-    maxHeight: {
-      type: Number,
-      required: true
-    }
-  },
-
-  data() {
-    return {
-      stageX: 0,
-      stageY: 0,
-      originX: 0,
-      originY: 0
-    }
-  },
-
-  computed: {
-    strokeColor() {
-      return this.rect.id === this.highlightId ? '#ff0000' : `${this.color}CC`
-    },
-
-    strokeWidth() {
-      return this.rect.id === this.highlightId ? 5 : 1
-    }
-  },
-
-  methods: {
-    dragBoundFunc(pos: { x: number; y: number }) {
-      const [minX, minY, maxX, maxY] = this.rect.minMaxPoints()
-      let x = transform(pos.x, this.stageX, this.scale)
-      let y = transform(pos.y, this.stageY, this.scale)
-      x -= this.originX
-      y -= this.originY
-      if (minY + y < 0) y = -minY
-      if (minX + x < 0) x = -minX
-      if (maxY + y > this.maxHeight) y = this.maxHeight - maxY
-      if (maxX + x > this.maxWidth) x = this.maxWidth - maxX
-      x += this.originX
-      y += this.originY
-      x = inverseTransform(x, this.stageX, this.scale)
-      y = inverseTransform(y, this.stageY, this.scale)
-      return { x, y }
-    },
-
-    onDragStart(e: Konva.KonvaEventObject<DragEvent>) {
-      this.originX = e.target.attrs.x
-      this.originY = e.target.attrs.y
-      const { x = 0, y = 0 } = e.target.getStage()!.attrs
-      this.stageX = x
-      this.stageY = y
-    },
-
-    onDragEnd(e: Konva.KonvaEventObject<DragEvent>) {
-      const { x, y } = e.target.attrs
-      const newRect = this.rect.transform(x, y, this.rect.width, this.rect.height)
-      this.$emit('dragend', newRect)
-    }
+const props = withDefaults(
+  defineProps<{
+    rect: Rectangle
+    color?: string
+    draggable?: boolean
+    highlightId?: string
+    opacity?: number
+    scale: number
+    maxWidth: number
+    maxHeight: number
+  }>(),
+  {
+    color: '#00FF00',
+    draggable: true,
+    highlightId: 'uuid',
+    opacity: 0.6
   }
-})
+)
+
+const emit = defineEmits<{
+  dragend: [rect: Rectangle]
+  transformend: [event: Konva.KonvaEventObject<Event>]
+}>()
+
+const stageX = ref(0)
+const stageY = ref(0)
+const originX = ref(0)
+const originY = ref(0)
+
+const strokeColor = computed(() =>
+  props.rect.id === props.highlightId ? '#ff0000' : `${props.color}CC`
+)
+
+const strokeWidth = computed(() => (props.rect.id === props.highlightId ? 5 : 1))
+
+function dragBoundFunc(pos: { x: number; y: number }) {
+  const [minX, minY, maxX, maxY] = props.rect.minMaxPoints()
+  let x = transform(pos.x, stageX.value, props.scale)
+  let y = transform(pos.y, stageY.value, props.scale)
+  x -= originX.value
+  y -= originY.value
+  if (minY + y < 0) y = -minY
+  if (minX + x < 0) x = -minX
+  if (maxY + y > props.maxHeight) y = props.maxHeight - maxY
+  if (maxX + x > props.maxWidth) x = props.maxWidth - maxX
+  x += originX.value
+  y += originY.value
+  x = inverseTransform(x, stageX.value, props.scale)
+  y = inverseTransform(y, stageY.value, props.scale)
+  return { x, y }
+}
+
+function onDragStart(e: Konva.KonvaEventObject<DragEvent>) {
+  originX.value = e.target.attrs.x
+  originY.value = e.target.attrs.y
+  const { x = 0, y = 0 } = e.target.getStage()!.attrs
+  stageX.value = x
+  stageY.value = y
+}
+
+function onDragEnd(e: Konva.KonvaEventObject<DragEvent>) {
+  const { x, y } = e.target.attrs
+  const newRect = props.rect.transform(x, y, props.rect.width, props.rect.height)
+  emit('dragend', newRect)
+}
 </script>

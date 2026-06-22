@@ -1,4 +1,4 @@
-import { Fields, ParametersForUI } from '~/domain/models/autoLabeling/config'
+import { type Fields, type ParametersForUI } from '@/domain/models/autoLabeling/config'
 
 export interface Schema {
   title: string

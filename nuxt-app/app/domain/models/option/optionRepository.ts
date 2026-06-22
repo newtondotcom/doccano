@@ -1,4 +1,4 @@
-import { OptionItem } from '~/domain/models/option/option'
+import { OptionItem } from '@/domain/models/option/option'
 
 export interface OptionRepository {
   findById(projectId: string): OptionItem

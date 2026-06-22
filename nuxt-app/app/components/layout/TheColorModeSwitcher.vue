@@ -1,37 +1,17 @@
 <template>
-  <v-btn icon fab @click="isDark = !isDark">
-    <v-icon v-if="isDark">
+  <v-btn icon fab>
+    <v-icon v-if="theme.global.name.value === 'dark'" @click="theme.change('light')">
       {{ mdiMoonWaxingCrescent }}
     </v-icon>
-    <v-icon v-else>
+    <v-icon v-if="theme.global.name.value === 'light'" @click="theme.change('dark')"">
       {{ mdiWhiteBalanceSunny }}
     </v-icon>
   </v-btn>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import { mdiMoonWaxingCrescent, mdiWhiteBalanceSunny } from '@mdi/js'
+import { useTheme } from 'vuetify'
 
-export default Vue.extend({
-  data() {
-    return {
-      isDark: false,
-      mdiMoonWaxingCrescent,
-      mdiWhiteBalanceSunny
-    }
-  },
-
-  watch: {
-    isDark() {
-      this.$vuetify.theme.dark = this.isDark
-      localStorage.setItem('dark', JSON.stringify(this.isDark))
-    }
-  },
-
-  created() {
-    const dark = localStorage.getItem('dark')
-    this.isDark = dark ? JSON.parse(dark) : false
-  }
-})
+const theme = useTheme()
 </script>

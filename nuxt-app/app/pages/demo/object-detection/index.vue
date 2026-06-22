@@ -26,7 +26,7 @@
               </v-chip-group>
             </v-card-title>
             <v-divider />
-            <v-bounding-box
+            <TasksBoundingBoxVBoundingBox
               :rectangles="filteredRectangles"
               :highlight-id="highlightId"
               :image-url="imageUrl"
@@ -42,8 +42,8 @@
           </v-card>
         </v-col>
         <v-col cols="12" md="3">
-          <list-metadata :metadata="meta" />
-          <region-list
+          <TasksMetadataListMetadata :metadata="meta" />
+          <TasksImageRegionList
             class="mt-4"
             :regions="regionList"
             @change-visibility="changeVisibility"
@@ -57,167 +57,132 @@
   </v-main>
 </template>
 
-<script>
-import VBoundingBox from '@/components/tasks/boundingBox/VBoundingBox.vue'
-import ListMetadata from '@/components/tasks/metadata/ListMetadata'
-import RegionList from '@/components/tasks/image/RegionList.vue'
+<script setup>
+definePageMeta({
+  layout: 'demo'
+})
 
-export default {
-  components: {
-    ListMetadata,
-    VBoundingBox,
-    RegionList
-  },
-
-  layout: 'demo',
-
-  data() {
-    return {
-      imageUrl: require('~/assets/images/demo/cat.jpeg'),
-      rectangles: [
-        {
-          id: 'uuid',
-          label: 1,
-          x: 10,
-          y: 10,
-          width: 100,
-          height: 100
-        }
-      ],
-      labels: [
-        {
-          id: 1,
-          text: 'Cat',
-          prefixKey: null,
-          suffixKey: 'c',
-          backgroundColor: '#7c20e0',
-          textColor: '#ffffff'
-        },
-        {
-          id: 2,
-          text: 'Dog',
-          prefixKey: null,
-          suffixKey: 'd',
-          backgroundColor: '#fbb028',
-          textColor: '#000000'
-        }
-      ],
-      meta: { wikiPageId: 2 },
-      selectedLabelIndex: undefined,
-      selectedRectangle: undefined,
-      scale: 1,
-      visibilities: {},
-      highlightId: null
-    }
-  },
-
-  computed: {
-    bboxLabels() {
-      return this.labels.map((label) => {
-        return {
-          id: label.id,
-          name: label.text,
-          color: label.backgroundColor
-        }
-      })
-    },
-
-    selectedLabel() {
-      if (this.selectedLabelIndex !== undefined) {
-        return this.labels[this.selectedLabelIndex]
-      } else {
-        return undefined
-      }
-    },
-
-    regionList() {
-      return this.rectangles.map((rectangle) => {
-        return {
-          id: rectangle.id,
-          category: this.labels.find((label) => rectangle.label === label.id).text,
-          color: this.labels.find((label) => rectangle.label === label.id).backgroundColor,
-          visibility: rectangle.id in this.visibilities ? this.visibilities[rectangle.id] : true
-        }
-      })
-    },
-
-    filteredRectangles() {
-      return this.rectangles.filter((rectangle) => this.visibilities[rectangle.id] !== false)
-    }
-  },
-
-  watch: {
-    selectedLabel(newLabel) {
-      if (newLabel !== undefined && !!this.selectedRectangle) {
-        const rect = this.rectangles.find((r) => r.id === this.selectedRectangle.id)
-        rect.label = newLabel.id
-        this.updateRectangle(rect)
-      }
-    }
-  },
-
-  methods: {
-    addRectangle(rectangle) {
-      console.log('addRectangle', rectangle)
-      this.rectangles.push(rectangle)
-      this.visibilities[rectangle.id] = true
-      this.selectedLabelIndex = undefined
-    },
-
-    updateRectangle(rectangle) {
-      console.log('updateRectangle', rectangle)
-      const index = this.rectangles.findIndex((r) => r.id === rectangle.id)
-      if (index !== -1) {
-        this.$set(this.rectangles, index, rectangle)
-      }
-    },
-
-    deleteRectangle(rectangleId) {
-      console.log('deleteRectangle', rectangleId)
-      this.rectangles = this.rectangles.filter((r) => r.id !== rectangleId)
-      delete this.visibilities[rectangleId]
-    },
-
-    changeVisibility(regionId, visibility) {
-      console.log('changeVisibility', regionId, visibility)
-      this.$set(this.visibilities, regionId, visibility)
-      this.visibilities = Object.assign({}, this.visibilities)
-    },
-
-    hoverRegion(regionId) {
-      console.log('hoverRegion', regionId)
-      this.highlightId = regionId
-    },
-
-    unhoverRegion(regionId) {
-      console.log('unhoverRegion', regionId)
-      this.highlightId = null
-    },
-
-    selectRectangle(rectangleId) {
-      console.log('selectRectangle', rectangleId)
-      if (rectangleId) {
-        this.selectedRectangle = this.rectangles.find((r) => r.id === rectangleId)
-        this.selectedLabelIndex = this.labels.findIndex(
-          (l) => l.id === this.selectedRectangle.label
-        )
-      } else {
-        this.selectedRectangle = undefined
-        this.selectedLabelIndex = undefined
-      }
-    },
-
-    zoomOut() {
-      this.scale -= 0.1
-    },
-
-    zoomIn() {
-      this.scale += 0.1
-    },
-
-    updateScale(scale) {
-      this.scale = scale
-    }
+const imageUrl = require('@/assets/images/demo/cat.jpeg')
+const rectangles = ref([
+  {
+    id: 'uuid',
+    label: 1,
+    x: 10,
+    y: 10,
+    width: 100,
+    height: 100
   }
+])
+const labels = [
+  {
+    id: 1,
+    text: 'Cat',
+    prefixKey: null,
+    suffixKey: 'c',
+    backgroundColor: '#7c20e0',
+    textColor: '#ffffff'
+  },
+  {
+    id: 2,
+    text: 'Dog',
+    prefixKey: null,
+    suffixKey: 'd',
+    backgroundColor: '#fbb028',
+    textColor: '#000000'
+  }
+]
+const meta = { wikiPageId: 2 }
+const selectedLabelIndex = ref(undefined)
+const selectedRectangle = ref(undefined)
+const scale = ref(1)
+const visibilities = ref({})
+const highlightId = ref(null)
+
+const bboxLabels = computed(() =>
+  labels.map((label) => ({
+    id: label.id,
+    name: label.text,
+    color: label.backgroundColor
+  }))
+)
+
+const selectedLabel = computed(() => {
+  if (selectedLabelIndex.value !== undefined) {
+    return labels[selectedLabelIndex.value]
+  }
+  return undefined
+})
+
+const regionList = computed(() =>
+  rectangles.value.map((rectangle) => ({
+    id: rectangle.id,
+    category: labels.find((label) => rectangle.label === label.id).text,
+    color: labels.find((label) => rectangle.label === label.id).backgroundColor,
+    visibility: rectangle.id in visibilities.value ? visibilities.value[rectangle.id] : true
+  }))
+)
+
+const filteredRectangles = computed(() =>
+  rectangles.value.filter((rectangle) => visibilities.value[rectangle.id] !== false)
+)
+
+watch(selectedLabel, (newLabel) => {
+  if (newLabel !== undefined && !!selectedRectangle.value) {
+    const rect = rectangles.value.find((r) => r.id === selectedRectangle.value.id)
+    rect.label = newLabel.id
+    updateRectangle(rect)
+  }
+})
+
+function addRectangle(rectangle) {
+  console.log('addRectangle', rectangle)
+  rectangles.value.push(rectangle)
+  visibilities.value[rectangle.id] = true
+  selectedLabelIndex.value = undefined
+}
+
+function updateRectangle(rectangle) {
+  console.log('updateRectangle', rectangle)
+  const index = rectangles.value.findIndex((r) => r.id === rectangle.id)
+  if (index !== -1) {
+    rectangles.value[index] = rectangle
+  }
+}
+
+function deleteRectangle(rectangleId) {
+  console.log('deleteRectangle', rectangleId)
+  rectangles.value = rectangles.value.filter((r) => r.id !== rectangleId)
+  delete visibilities.value[rectangleId]
+}
+
+function changeVisibility(regionId, visibility) {
+  console.log('changeVisibility', regionId, visibility)
+  visibilities.value[regionId] = visibility
+  visibilities.value = { ...visibilities.value }
+}
+
+function hoverRegion(regionId) {
+  console.log('hoverRegion', regionId)
+  highlightId.value = regionId
+}
+
+function unhoverRegion(regionId) {
+  console.log('unhoverRegion', regionId)
+  highlightId.value = null
+}
+
+function selectRectangle(rectangleId) {
+  console.log('selectRectangle', rectangleId)
+  if (rectangleId) {
+    selectedRectangle.value = rectangles.value.find((r) => r.id === rectangleId)
+    selectedLabelIndex.value = labels.findIndex((l) => l.id === selectedRectangle.value.label)
+  } else {
+    selectedRectangle.value = undefined
+    selectedLabelIndex.value = undefined
+  }
+}
+
+function updateScale(newScale) {
+  scale.value = newScale
 }
 </script>

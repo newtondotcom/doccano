@@ -15,51 +15,47 @@
   </v-chip-group>
 </template>
 
-<script>
+<script setup>
 import _ from 'lodash'
 
-export default {
-  props: {
-    labels: {
-      type: Array,
-      default: () => [],
-      required: true
-    },
-    annotations: {
-      type: Array,
-      default: () => [],
-      required: true
-    }
+const props = defineProps({
+  labels: {
+    type: Array,
+    default: () => [],
+    required: true
   },
-
-  computed: {
-    annotatedLabel() {
-      const labelIds = this.annotations.map((item) => item.label)
-      return labelIds.map((id) => this.labels.findIndex((item) => item.id === id))
-    }
-  },
-
-  methods: {
-    addOrRemove(indexes) {
-      if (indexes.length > this.annotatedLabel.length) {
-        const index = _.difference(indexes, this.annotatedLabel)
-        const label = this.labels[index]
-        this.add(label)
-      } else {
-        const index = _.difference(this.annotatedLabel, indexes)
-        const label = this.labels[index]
-        this.remove(label)
-      }
-    },
-
-    add(label) {
-      this.$emit('add', label.id)
-    },
-
-    remove(label) {
-      const annotation = this.annotations.find((item) => item.label === label.id)
-      this.$emit('remove', annotation.id)
-    }
+  annotations: {
+    type: Array,
+    default: () => [],
+    required: true
   }
+})
+
+const emit = defineEmits(['add', 'remove'])
+
+const annotatedLabel = computed(() => {
+  const labelIds = props.annotations.map((item) => item.label)
+  return labelIds.map((id) => props.labels.findIndex((item) => item.id === id))
+})
+
+function addOrRemove(indexes) {
+  if (indexes.length > annotatedLabel.value.length) {
+    const index = _.difference(indexes, annotatedLabel.value)
+    const label = props.labels[index]
+    add(label)
+  } else {
+    const index = _.difference(annotatedLabel.value, indexes)
+    const label = props.labels[index]
+    remove(label)
+  }
+}
+
+function add(label) {
+  emit('add', label.id)
+}
+
+function remove(label) {
+  const annotation = props.annotations.find((item) => item.label === label.id)
+  emit('remove', annotation.id)
 }
 </script>

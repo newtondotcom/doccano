@@ -1,6 +1,6 @@
 <template>
   <v-group>
-    <v-polygon
+    <TasksSegmentationVPolygon
       :polygon="writablePolygon"
       :closed="true"
       :color="color"
@@ -43,7 +43,7 @@
         @mouseleave="hideAnchorPoint"
         @click="handleClickLine($event, writablePolygon, insertIndex + 1)"
       />
-      <v-point
+      <TasksSegmentationVPoint
         v-for="(point, index) in writablePolygon.toPoints()"
         :key="`${writablePolygon.id}-${index}`"
         :color="index === selectedPoint ? color : 'white'"
@@ -62,132 +62,107 @@
   </v-group>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import Konva from 'konva'
 import Flatten from '@flatten-js/core'
-import VPolygon from './VPolygon.vue'
-import VPoint from './VPoint.vue'
 import Polygon from '@/domain/models/tasks/segmentation/Polygon'
 import LineSegment from '@/domain/models/tasks/segmentation/LineSegment'
 import { transform } from '@/domain/models/tasks/shared/Scaler'
 import Point = Flatten.Point
 
-export default Vue.extend({
-  components: {
-    VPolygon,
-    VPoint
-  },
-
-  props: {
-    polygon: {
-      type: Polygon,
-      required: true
-    },
-    color: {
-      type: String,
-      default: '#00FF00'
-    },
-    maxWidth: {
-      type: Number,
-      default: 0
-    },
-    maxHeight: {
-      type: Number,
-      default: 0
-    },
-    scale: {
-      type: Number,
-      default: 1
-    },
-    highlightId: {
-      type: String,
-      default: ''
-    },
-    isSelected: {
-      type: Boolean,
-      default: false
-    },
-    selectedPoint: {
-      type: Number,
-      default: -1
-    }
-  },
-
-  data() {
-    return {
-      isMoving: false,
-      writablePolygon: this.polygon
-    }
-  },
-
-  computed: {
-    anchor() {
-      return (this.$refs.anchorRef as Konva.ShapeConfig).getNode()
-    }
-  },
-
-  watch: {
-    polygon: {
-      handler(newPolygon: Polygon) {
-        this.writablePolygon = newPolygon
-      },
-      immediate: true,
-      deep: true
-    }
-  },
-
-  methods: {
-    onDragStart() {
-      this.isMoving = true
-    },
-
-    onDragEnd(polygon: Polygon, dx: number, dy: number) {
-      this.isMoving = false
-      this.$emit('drag-end-polygon', polygon, dx, dy)
-    },
-
-    handleDragMovePoint(index: number, x: number, y: number) {
-      this.writablePolygon.movePoint(index, x, y)
-      this.writablePolygon = this.writablePolygon.clone()
-    },
-
-    handleDragEndPoint(index: number, x: number, y: number) {
-      this.$emit('drag-end-point', this.polygon, index, x, y)
-    },
-
-    handleDoubleClickPoint(index: number) {
-      this.$emit('double-click-point', this.polygon, index)
-    },
-
-    onMouseMoveLine(e: Konva.KonvaEventObject<MouseEvent>, lineSegment: LineSegment) {
-      const { offsetX, offsetY } = e.evt
-      const { x: stageX = 0, y: stageY = 0 } = e.target.getStage()!.attrs
-      const x = transform(offsetX, stageX, this.scale)
-      const y = transform(offsetY, stageY, this.scale)
-      const point = new Point(x, y)
-      const closestPoint = lineSegment.getClosestPoint(point)
-      this.showAnchorPoint(closestPoint.x, closestPoint.y)
-    },
-
-    handleClickLine(e: Konva.KonvaEventObject<MouseEvent>, polygon: Polygon, index: number) {
-      const { offsetX, offsetY } = e.evt
-      const { x: stageX = 0, y: stageY = 0 } = e.target.getStage()!.attrs
-      const x = transform(offsetX, stageX, this.scale)
-      const y = transform(offsetY, stageY, this.scale)
-      this.hideAnchorPoint()
-      this.$emit('click-line', polygon, index, x, y)
-    },
-
-    showAnchorPoint(x: number, y: number) {
-      this.anchor.to({ x, y, duration: 0 })
-      this.anchor.show()
-    },
-
-    hideAnchorPoint() {
-      this.anchor.to({ x: -10, y: -10, duration: 0 })
-      this.anchor.hide()
-    }
+const props = withDefaults(
+  defineProps<{
+    polygon: Polygon
+    color?: string
+    maxWidth?: number
+    maxHeight?: number
+    scale?: number
+    highlightId?: string
+    isSelected?: boolean
+    selectedPoint?: number
+  }>(),
+  {
+    color: '#00FF00',
+    maxWidth: 0,
+    maxHeight: 0,
+    scale: 1,
+    highlightId: '',
+    isSelected: false,
+    selectedPoint: -1
   }
-})
+)
+
+const emit = defineEmits<{
+  'click-polygon': [polygon: Polygon]
+  'click-point': [index: number]
+  'drag-end-polygon': [polygon: Polygon, dx: number, dy: number]
+  'drag-end-point': [polygon: Polygon, index: number, x: number, y: number]
+  'double-click-point': [polygon: Polygon, index: number]
+  'click-line': [polygon: Polygon, index: number, x: number, y: number]
+}>()
+
+const isMoving = ref(false)
+const writablePolygon = ref(props.polygon)
+const anchorRef = ref<{ getNode: () => Konva.Shape }>()
+
+const anchor = computed(() => anchorRef.value!.getNode())
+
+watch(
+  () => props.polygon,
+  (newPolygon: Polygon) => {
+    writablePolygon.value = newPolygon
+  },
+  { immediate: true, deep: true }
+)
+
+function onDragStart() {
+  isMoving.value = true
+}
+
+function onDragEnd(polygon: Polygon, dx: number, dy: number) {
+  isMoving.value = false
+  emit('drag-end-polygon', polygon, dx, dy)
+}
+
+function handleDragMovePoint(index: number, x: number, y: number) {
+  writablePolygon.value.movePoint(index, x, y)
+  writablePolygon.value = writablePolygon.value.clone()
+}
+
+function handleDragEndPoint(index: number, x: number, y: number) {
+  emit('drag-end-point', props.polygon, index, x, y)
+}
+
+function handleDoubleClickPoint(index: number) {
+  emit('double-click-point', props.polygon, index)
+}
+
+function onMouseMoveLine(e: Konva.KonvaEventObject<MouseEvent>, lineSegment: LineSegment) {
+  const { offsetX, offsetY } = e.evt
+  const { x: stageX = 0, y: stageY = 0 } = e.target.getStage()!.attrs
+  const x = transform(offsetX, stageX, props.scale)
+  const y = transform(offsetY, stageY, props.scale)
+  const point = new Point(x, y)
+  const closestPoint = lineSegment.getClosestPoint(point)
+  showAnchorPoint(closestPoint.x, closestPoint.y)
+}
+
+function handleClickLine(e: Konva.KonvaEventObject<MouseEvent>, polygon: Polygon, index: number) {
+  const { offsetX, offsetY } = e.evt
+  const { x: stageX = 0, y: stageY = 0 } = e.target.getStage()!.attrs
+  const x = transform(offsetX, stageX, props.scale)
+  const y = transform(offsetY, stageY, props.scale)
+  hideAnchorPoint()
+  emit('click-line', polygon, index, x, y)
+}
+
+function showAnchorPoint(x: number, y: number) {
+  anchor.value.to({ x, y, duration: 0 })
+  anchor.value.show()
+}
+
+function hideAnchorPoint() {
+  anchor.value.to({ x: -10, y: -10, duration: 0 })
+  anchor.value.hide()
+}
 </script>

@@ -7,10 +7,10 @@
     @mousemove="onMouseMove"
   >
     <v-layer>
-      <base-image :image-url="imageUrl" @loaded="imageLoaded" />
+      <TasksImageBaseImage :image-url="imageUrl" @loaded="imageLoaded" />
     </v-layer>
     <v-layer>
-      <v-rectangle
+      <TasksBoundingBoxVRectangle
         v-for="rect in annotationsToDraw"
         :key="rect.id"
         :rect="rect"
@@ -35,313 +35,282 @@
   </v-stage>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import Konva from 'konva'
 import { Box } from 'konva/lib/shapes/Transformer.d'
-import type { PropType } from 'vue'
-import Vue from 'vue'
-import VRectangle from './VRectangle.vue'
-import BaseImage from '@/components/tasks/image/BaseImage.vue'
 import Rectangle from '@/domain/models/tasks/boundingbox/Rectangle'
 import RectangleProps from '@/domain/models/tasks/boundingbox/RectangleProps'
 import LabelProps from '@/domain/models/tasks/shared/LabelProps'
 import { inverseTransform, transform } from '@/domain/models/tasks/shared/Scaler'
 
-export default Vue.extend({
-  name: 'VBoundingBox',
+const props = withDefaults(
+  defineProps<{
+    imageUrl: string
+    labels: LabelProps[]
+    rectangles: RectangleProps[]
+    selectedLabel?: LabelProps
+    scale: number
+    highlightId?: string
+  }>(),
+  {
+    selectedLabel: undefined,
+    highlightId: 'uuid'
+  }
+)
 
-  components: {
-    BaseImage,
-    VRectangle
-  },
+const emit = defineEmits<{
+  'select-rectangle': [id: string | null]
+  'add-rectangle': [props: RectangleProps]
+  'update-rectangle': [props: RectangleProps]
+  'delete-rectangle': [id: string]
+  'update-scale': [scale: number]
+}>()
 
-  props: {
-    imageUrl: {
-      type: String,
-      required: true
-    },
-    labels: {
-      type: Array as PropType<LabelProps[]>,
-      required: true
-    },
-    rectangles: {
-      type: Array as PropType<RectangleProps[]>,
-      required: true
-    },
-    selectedLabel: {
-      type: Object as PropType<LabelProps | undefined>,
-      default: undefined
-    },
-    scale: {
-      type: Number,
-      required: true
-    },
-    highlightId: {
-      type: String,
-      required: false,
-      default: 'uuid'
-    }
-  },
+const selectedRectangle = ref<string | null>(null)
+const newRectangle = ref<Rectangle | null>(null)
+const imageSize = reactive({
+  width: 0,
+  height: 0
+})
+const configStage = reactive({
+  width: window.innerWidth,
+  height: window.innerHeight,
+  draggable: true
+})
+const stageRef = ref<{ getNode: () => Konva.Stage; $el: HTMLElement }>()
+const transformerRef = ref<{ getNode: () => Konva.Transformer }>()
+const stage = ref({} as Konva.Stage)
 
-  data() {
-    return {
-      selectedRectangle: null as string | null,
-      newRectangle: null as Rectangle | null,
-      imageSize: {
-        width: 0,
-        height: 0
-      },
-      configStage: {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        draggable: true
-      },
-      stage: {} as Konva.Stage
-    }
-  },
+const annotations = computed(() =>
+  props.rectangles.map((r) => new Rectangle(r.label, r.x, r.y, r.width, r.height, r.id))
+)
 
-  computed: {
-    annotations(): Rectangle[] {
-      return this.rectangles.map((r) => new Rectangle(r.label, r.x, r.y, r.width, r.height, r.id))
-    },
+const transformer = computed(() => transformerRef.value!.getNode())
 
-    transformer(): Konva.Transformer {
-      return (this.$refs.transformerRef as unknown as Konva.TransformerConfig).getNode()
-    },
+const annotationsToDraw = computed(() => {
+  if (newRectangle.value) {
+    return annotations.value.concat(newRectangle.value)
+  }
+  return annotations.value
+})
 
-    annotationsToDraw(): Rectangle[] {
-      if (this.newRectangle) {
-        return this.annotations.concat(this.newRectangle)
-      }
-      return this.annotations
-    }
-  },
+const rootEl = computed(() => stageRef.value?.$el)
 
-  watch: {
-    scale() {
-      this.setZoom()
-    },
+watch(
+  () => props.scale,
+  () => {
+    setZoom()
+  }
+)
 
-    imageUrl() {
-      this.selectedRectangle = null
-      this.updateTransformer()
-    }
-  },
+watch(
+  () => props.imageUrl,
+  () => {
+    selectedRectangle.value = null
+    updateTransformer()
+  }
+)
 
-  mounted() {
-    document.addEventListener('keydown', this.removeRectangle)
-    window.addEventListener('resize', this.setZoom)
-    this.stage = (this.$refs.stageRef as unknown as Konva.StageConfig).getNode()
-  },
+onMounted(() => {
+  document.addEventListener('keydown', removeRectangle)
+  window.addEventListener('resize', setZoom)
+  stage.value = stageRef.value!.getNode()
+})
 
-  beforeDestroy() {
-    document.removeEventListener('keydown', this.removeRectangle)
-    window.removeEventListener('resize', this.setZoom)
-  },
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', removeRectangle)
+  window.removeEventListener('resize', setZoom)
+})
 
-  methods: {
-    updateTransformer() {
-      // here we need to manually attach or detach Transformer node
-      const selectedNode = this.stage.findOne(`#${this.selectedRectangle}`)
-      // do nothing if selected node is already attached
-      if (selectedNode === this.transformer.getNode()) {
-        return
-      }
+function updateTransformer() {
+  const selectedNode = stage.value.findOne(`#${selectedRectangle.value}`)
+  if (selectedNode === transformer.value.getNode()) {
+    return
+  }
 
-      if (selectedNode) {
-        // attach to another node
-        this.transformer.nodes([selectedNode])
-      } else {
-        // remove transformer
-        this.transformer.nodes([])
-      }
-      this.$emit('select-rectangle', this.selectedRectangle)
-    },
+  if (selectedNode) {
+    transformer.value.nodes([selectedNode])
+  } else {
+    transformer.value.nodes([])
+  }
+  emit('select-rectangle', selectedRectangle.value)
+}
 
-    boundBoxFunc(_: Box, newBoundBox: Box) {
-      const box = { ...newBoundBox }
-      const { x: stageX = 0, y: stageY = 0 } = this.stage.attrs
-      box.x = transform(box.x, stageX, this.scale)
-      box.y = transform(box.y, stageY, this.scale)
-      box.width = transform(box.width, 0, this.scale)
-      box.height = transform(box.height, 0, this.scale)
-      if (box.x < 0) {
-        box.width += box.x
-        box.x = 0
-      }
-      if (box.y < 0) {
-        box.height += box.y
-        box.y = 0
-      }
-      if (box.x + box.width > this.imageSize.width) box.width = this.imageSize.width - box.x
-      if (box.y + box.height > this.imageSize.height) box.height = this.imageSize.height - box.y
-      box.x = inverseTransform(box.x, stageX, this.scale)
-      box.y = inverseTransform(box.y, stageY, this.scale)
-      box.width = inverseTransform(box.width, 0, this.scale)
-      box.height = inverseTransform(box.height, 0, this.scale)
-      return box
-    },
+function boundBoxFunc(_: Box, newBoundBox: Box) {
+  const box = { ...newBoundBox }
+  const { x: stageX = 0, y: stageY = 0 } = stage.value.attrs
+  box.x = transform(box.x, stageX, props.scale)
+  box.y = transform(box.y, stageY, props.scale)
+  box.width = transform(box.width, 0, props.scale)
+  box.height = transform(box.height, 0, props.scale)
+  if (box.x < 0) {
+    box.width += box.x
+    box.x = 0
+  }
+  if (box.y < 0) {
+    box.height += box.y
+    box.y = 0
+  }
+  if (box.x + box.width > imageSize.width) box.width = imageSize.width - box.x
+  if (box.y + box.height > imageSize.height) box.height = imageSize.height - box.y
+  box.x = inverseTransform(box.x, stageX, props.scale)
+  box.y = inverseTransform(box.y, stageY, props.scale)
+  box.width = inverseTransform(box.width, 0, props.scale)
+  box.height = inverseTransform(box.height, 0, props.scale)
+  return box
+}
 
-    onMouseDown(e: Konva.KonvaEventObject<MouseEvent>) {
-      if (e.target instanceof Konva.Image) {
-        // while new polygon is creating, prevent to select polygon.
-        const clickedOutsideOfRectangle = !!this.selectedRectangle
-        this.selectedRectangle = null
-        this.updateTransformer()
-        if (clickedOutsideOfRectangle) {
-          return
-        }
-      }
-      // prevent multiple event.
-      if (e.target instanceof HTMLCanvasElement) {
-        return
-      }
-
-      // clicked on transformer - do nothing
-      const clickedOnTransformer = e.target.getParent().className === 'Transformer'
-      if (clickedOnTransformer) {
-        return
-      }
-
-      // prevent to create circle on Polygon.
-      if (e.target instanceof Konva.Rect) {
-        const rectId = e.target.id()
-        const rect = this.annotations.find((r) => r.id === rectId)
-        if (rect && !this.selectedRectangle) {
-          this.selectedRectangle = rectId
-        } else {
-          this.selectedRectangle = null
-        }
-        this.updateTransformer()
-        return
-      }
-
-      if (!this.newRectangle && !!this.selectedLabel) {
-        this.configStage.draggable = false
-        const pos = this.stage.getPointerPosition()!
-        const { x: stageX = 0, y: stageY = 0 } = this.stage.attrs
-        pos.x = transform(pos.x, stageX, this.scale)
-        pos.y = transform(pos.y, stageY, this.scale)
-        this.newRectangle = new Rectangle(this.selectedLabel.id, pos.x, pos.y, 0, 0)
-      }
-    },
-
-    onMouseUp() {
-      if (this.newRectangle && this.newRectangle.exists()) {
-        const pos = this.stage.getPointerPosition()!
-        const { x: stageX = 0, y: stageY = 0 } = this.stage.attrs
-        pos.x = transform(pos.x, stageX, this.scale)
-        pos.y = transform(pos.y, stageY, this.scale)
-        let x = this.newRectangle.x
-        let y = this.newRectangle.y
-        let width = pos.x - x
-        let height = pos.y - y
-        if (width < 0) {
-          x += width
-          width = -width
-        }
-        if (height < 0) {
-          y += height
-          height = -height
-        }
-        const annotationToAdd = this.newRectangle.transform(x, y, width, height)
-        this.newRectangle = null
-        this.configStage.draggable = true
-        this.$emit('add-rectangle', annotationToAdd.toProps())
-      }
-    },
-
-    onMouseMove() {
-      if (this.newRectangle) {
-        const sx = this.newRectangle.x
-        const sy = this.newRectangle.y
-        const pos = this.stage.getPointerPosition()!
-        const { x: stageX = 0, y: stageY = 0 } = this.stage.attrs
-        pos.x = transform(pos.x, stageX, this.scale)
-        pos.y = transform(pos.y, stageY, this.scale)
-        this.newRectangle = this.newRectangle.transform(sx, sy, pos.x - sx, pos.y - sy)
-      }
-    },
-
-    handleTransformEnd(e: Konva.KonvaEventObject<MouseEvent>) {
-      // shape is transformed, let us save new attrs back to the node
-      // find element in our state
-      const rect = this.annotations.find((r) => r.id === this.selectedRectangle)
-      // update the state
-      if (rect) {
-        const x = e.target.x()
-        const y = e.target.y()
-        const width = rect.width * e.target.scaleX()
-        const height = rect.height * e.target.scaleY()
-        const newRect = rect.transform(x, y, width, height)
-        e.target.scaleX(1)
-        e.target.scaleY(1)
-        this.$emit('update-rectangle', newRect.toProps())
-      }
-    },
-
-    onDragEnd(rect: Rectangle) {
-      this.$emit('update-rectangle', rect.toProps())
-    },
-
-    removeRectangle(e: KeyboardEvent) {
-      if (e.key === 'Backspace' || e.key === 'Delete') {
-        if (this.selectedRectangle !== null) {
-          this.$emit('delete-rectangle', this.selectedRectangle)
-          this.selectedRectangle = null
-          this.updateTransformer()
-        }
-      }
-    },
-
-    dragBoundFunc(pos: { x: number; y: number }) {
-      const { stageX = 0, stageY = 0 } = this.stage.attrs
-      let x = pos.x - stageX
-      let y = pos.y - stageY
-      const paddingX = this.imageSize.width * this.scale - this.configStage.width
-      const paddingY = this.imageSize.height * this.scale - this.configStage.height
-      if (paddingX + x < 0) x = -paddingX
-      if (paddingY + y < 0) y = -paddingY
-      if (this.configStage.width + paddingX + x > this.imageSize.width * this.scale) x = 0
-      if (this.configStage.height + paddingY + y > this.imageSize.height * this.scale) y = 0
-      x += stageX
-      y += stageY
-      return { x, y }
-    },
-
-    imageLoaded(width: number, height: number) {
-      const maxScale = this.$el.clientWidth / width
-      const imageIsSmallerThanContainer = maxScale > 1
-      this.imageSize.width = width
-      this.imageSize.height = height
-      if (imageIsSmallerThanContainer) {
-        this.configStage.width = width
-        this.configStage.height = height
-        this.stage.scale({ x: 1, y: 1 })
-        this.$emit('update-scale', 1)
-      } else {
-        this.configStage.width = width * maxScale
-        this.configStage.height = height * maxScale
-        this.stage.scale({ x: maxScale, y: maxScale })
-        this.$emit('update-scale', maxScale)
-      }
-      this.stage.draw()
-    },
-
-    setZoom() {
-      if (this.scale < 0) {
-        return
-      }
-      const maxScale = this.$el.clientWidth / this.imageSize.width
-      this.stage.scale({ x: this.scale, y: this.scale })
-      if (this.scale <= maxScale) {
-        this.configStage.width = this.imageSize.width * this.scale
-      } else {
-        this.configStage.width = this.imageSize.width * maxScale
-      }
-      this.configStage.height = this.imageSize.height * this.scale
-      this.$el.setAttribute('style', `min-height: ${this.configStage.height}px`)
+function onMouseDown(e: Konva.KonvaEventObject<MouseEvent>) {
+  if (e.target instanceof Konva.Image) {
+    const clickedOutsideOfRectangle = !!selectedRectangle.value
+    selectedRectangle.value = null
+    updateTransformer()
+    if (clickedOutsideOfRectangle) {
+      return
     }
   }
-})
+  if (e.target instanceof HTMLCanvasElement) {
+    return
+  }
+
+  const clickedOnTransformer = e.target.getParent().className === 'Transformer'
+  if (clickedOnTransformer) {
+    return
+  }
+
+  if (e.target instanceof Konva.Rect) {
+    const rectId = e.target.id()
+    const rect = annotations.value.find((r) => r.id === rectId)
+    if (rect && !selectedRectangle.value) {
+      selectedRectangle.value = rectId
+    } else {
+      selectedRectangle.value = null
+    }
+    updateTransformer()
+    return
+  }
+
+  if (!newRectangle.value && !!props.selectedLabel) {
+    configStage.draggable = false
+    const pos = stage.value.getPointerPosition()!
+    const { x: stageX = 0, y: stageY = 0 } = stage.value.attrs
+    pos.x = transform(pos.x, stageX, props.scale)
+    pos.y = transform(pos.y, stageY, props.scale)
+    newRectangle.value = new Rectangle(props.selectedLabel.id, pos.x, pos.y, 0, 0)
+  }
+}
+
+function onMouseUp() {
+  if (newRectangle.value && newRectangle.value.exists()) {
+    const pos = stage.value.getPointerPosition()!
+    const { x: stageX = 0, y: stageY = 0 } = stage.value.attrs
+    pos.x = transform(pos.x, stageX, props.scale)
+    pos.y = transform(pos.y, stageY, props.scale)
+    let x = newRectangle.value.x
+    let y = newRectangle.value.y
+    let width = pos.x - x
+    let height = pos.y - y
+    if (width < 0) {
+      x += width
+      width = -width
+    }
+    if (height < 0) {
+      y += height
+      height = -height
+    }
+    const annotationToAdd = newRectangle.value.transform(x, y, width, height)
+    newRectangle.value = null
+    configStage.draggable = true
+    emit('add-rectangle', annotationToAdd.toProps())
+  }
+}
+
+function onMouseMove() {
+  if (newRectangle.value) {
+    const sx = newRectangle.value.x
+    const sy = newRectangle.value.y
+    const pos = stage.value.getPointerPosition()!
+    const { x: stageX = 0, y: stageY = 0 } = stage.value.attrs
+    pos.x = transform(pos.x, stageX, props.scale)
+    pos.y = transform(pos.y, stageY, props.scale)
+    newRectangle.value = newRectangle.value.transform(sx, sy, pos.x - sx, pos.y - sy)
+  }
+}
+
+function handleTransformEnd(e: Konva.KonvaEventObject<MouseEvent>) {
+  const rect = annotations.value.find((r) => r.id === selectedRectangle.value)
+  if (rect) {
+    const x = e.target.x()
+    const y = e.target.y()
+    const width = rect.width * e.target.scaleX()
+    const height = rect.height * e.target.scaleY()
+    const newRect = rect.transform(x, y, width, height)
+    e.target.scaleX(1)
+    e.target.scaleY(1)
+    emit('update-rectangle', newRect.toProps())
+  }
+}
+
+function onDragEnd(rect: Rectangle) {
+  emit('update-rectangle', rect.toProps())
+}
+
+function removeRectangle(e: KeyboardEvent) {
+  if (e.key === 'Backspace' || e.key === 'Delete') {
+    if (selectedRectangle.value !== null) {
+      emit('delete-rectangle', selectedRectangle.value)
+      selectedRectangle.value = null
+      updateTransformer()
+    }
+  }
+}
+
+function dragBoundFunc(pos: { x: number; y: number }) {
+  const { stageX = 0, stageY = 0 } = stage.value.attrs
+  let x = pos.x - stageX
+  let y = pos.y - stageY
+  const paddingX = imageSize.width * props.scale - configStage.width
+  const paddingY = imageSize.height * props.scale - configStage.height
+  if (paddingX + x < 0) x = -paddingX
+  if (paddingY + y < 0) y = -paddingY
+  if (configStage.width + paddingX + x > imageSize.width * props.scale) x = 0
+  if (configStage.height + paddingY + y > imageSize.height * props.scale) y = 0
+  x += stageX
+  y += stageY
+  return { x, y }
+}
+
+function imageLoaded(width: number, height: number) {
+  const maxScale = rootEl.value!.clientWidth / width
+  const imageIsSmallerThanContainer = maxScale > 1
+  imageSize.width = width
+  imageSize.height = height
+  if (imageIsSmallerThanContainer) {
+    configStage.width = width
+    configStage.height = height
+    stage.value.scale({ x: 1, y: 1 })
+    emit('update-scale', 1)
+  } else {
+    configStage.width = width * maxScale
+    configStage.height = height * maxScale
+    stage.value.scale({ x: maxScale, y: maxScale })
+    emit('update-scale', maxScale)
+  }
+  stage.value.draw()
+}
+
+function setZoom() {
+  if (props.scale < 0) {
+    return
+  }
+  const maxScale = rootEl.value!.clientWidth / imageSize.width
+  stage.value.scale({ x: props.scale, y: props.scale })
+  if (props.scale <= maxScale) {
+    configStage.width = imageSize.width * props.scale
+  } else {
+    configStage.width = imageSize.width * maxScale
+  }
+  configStage.height = imageSize.height * props.scale
+  rootEl.value!.setAttribute('style', `min-height: ${configStage.height}px`)
+}
 </script>

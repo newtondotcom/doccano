@@ -1,4 +1,4 @@
-import { TagRepository } from '~/domain/models/tag/tagRepository'
+import { type TagRepository } from '@/domain/models/tag/tagRepository'
 
 export class TagApplicationService {
   constructor(private readonly repository: TagRepository) {}

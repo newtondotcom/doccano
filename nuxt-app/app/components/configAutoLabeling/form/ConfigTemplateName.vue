@@ -27,71 +27,55 @@
   </v-stepper-content>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import { templateNameRules } from '@/rules/index'
-import { Project } from '~/domain/models/project/project'
+import type { Project } from '@/domain/models/project/project'
 
-export default Vue.extend({
-  data() {
-    return {
-      project: {} as Project,
-      selectedTask: '',
-      templateName: null,
-      templateNames: [] as string[],
-      templateNameRules,
-      valid: false
-    }
-  },
+const route = useRoute()
+const { $repositories, $services } = useNuxtApp()
 
-  computed: {
-    projectId() {
-      return this.$route.params.id
-    },
+const emit = defineEmits(['input', 'next'])
 
-    taskNames(): string[] {
-      return this.project.taskNames
-    },
+const project = ref({} as Project)
+const selectedTask = ref('')
+const templateName = ref<string | null>(null)
+const templateNames = ref<string[]>([])
+const valid = ref(false)
+const form = ref()
 
-    taskType(): string {
-      return {
-        DocumentClassification: 'Category',
-        SequenceLabeling: 'Span',
-        Seq2seq: 'Text',
-        ImageClassification: 'Category',
-        Speech2text: 'Text'
-      }[this.selectedTask]!
-    }
-  },
+const projectId = computed(() => route.params.id as string)
+const taskNames = computed(() => project.value.taskNames)
+const taskType = computed(
+  () =>
+    ({
+      DocumentClassification: 'Category',
+      SequenceLabeling: 'Span',
+      Seq2seq: 'Text',
+      ImageClassification: 'Category',
+      Speech2text: 'Text'
+    })[selectedTask.value]!
+)
 
-  watch: {
-    async templateName(val) {
-      if (val) {
-        const response = await this.$repositories.template.find(this.projectId, val)
-        const field = response.toObject()
-        field.taskType = this.taskType
-        this.$emit('input', field)
-      }
-    },
-
-    async selectedTask() {
-      this.templateName = null
-      await this.fetchTemplateNames()
-      // @ts-ignore
-      this.$refs.form.resetValidation()
-    }
-  },
-
-  async created() {
-    this.project = await this.$services.project.findById(this.projectId)
-    this.selectedTask = this.taskNames[0]
-    await this.fetchTemplateNames()
-  },
-
-  methods: {
-    async fetchTemplateNames() {
-      this.templateNames = await this.$repositories.template.list(this.projectId, this.selectedTask)
-    }
+watch(templateName, async (val) => {
+  if (val) {
+    const response = await $repositories.template.find(projectId.value, val)
+    const field = response.toObject()
+    field.taskType = taskType.value
+    emit('input', field)
   }
 })
+
+watch(selectedTask, async () => {
+  templateName.value = null
+  await fetchTemplateNames()
+  form.value?.resetValidation()
+})
+
+async function fetchTemplateNames() {
+  templateNames.value = await $repositories.template.list(projectId.value, selectedTask.value)
+}
+
+project.value = await $services.project.findById(projectId.value)
+selectedTask.value = taskNames.value[0]
+await fetchTemplateNames()
 </script>

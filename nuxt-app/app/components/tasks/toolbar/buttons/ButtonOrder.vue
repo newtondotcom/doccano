@@ -1,9 +1,9 @@
 <template>
   <v-menu>
-    <template #activator="{ on: menu }">
+    <template #activator="{ props: menuProps }">
       <v-tooltip bottom>
-        <template #activator="{ on: tooltip }">
-          <v-btn icon v-on="{ ...tooltip, ...menu }">
+        <template #activator="{ props: tooltipProps }">
+          <v-btn icon v-bind="{ ...menuProps, ...tooltipProps }">
             <v-icon>
               {{ mdiSort }}
             </v-icon>
@@ -13,62 +13,51 @@
       </v-tooltip>
     </template>
     <v-list>
-      <v-list-item-group v-model="selected">
-        <v-list-item v-for="(item, i) in items" :key="i">
-          <v-list-item-icon>
-            <v-icon v-if="selected === i">
-              {{ mdiCheck }}
-            </v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>
-              {{ item.title }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list-item-group>
+      <v-list-item
+        v-for="(item, i) in items"
+        :key="i"
+        :active="selected === i"
+        @click="selected = i"
+      >
+        <template #prepend>
+          <v-icon v-if="selected === i">{{ mdiCheck }}</v-icon>
+        </template>
+        <v-list-item-title>{{ item.title }}</v-list-item-title>
+      </v-list-item>
     </v-list>
   </v-menu>
 </template>
 
-<script>
+<script setup>
 import { mdiSort, mdiCheck } from '@mdi/js'
 
-export default {
-  props: {
-    value: {
-      type: String,
-      default: '',
-      required: true
-    }
-  },
+const props = defineProps({
+  value: {
+    type: String,
+    default: '',
+    required: true
+  }
+})
 
-  data() {
-    return {
-      items: [
-        { title: 'Lowest score first', param: 'score' },
-        { title: 'Highest score first', param: '-score' }
-      ],
-      mdiSort,
-      mdiCheck
-    }
-  },
+const emit = defineEmits(['click:order'])
 
-  computed: {
-    selected: {
-      get() {
-        const index = this.items.findIndex((item) => item.param === this.value)
-        return index === -1 ? undefined : index
-      },
-      set(value) {
-        console.log(value)
-        if (value !== undefined) {
-          this.$emit('click:order', this.items[value].param)
-        } else {
-          this.$emit('click:order', '')
-        }
-      }
+const items = [
+  { title: 'Lowest score first', param: 'score' },
+  { title: 'Highest score first', param: '-score' }
+]
+
+const selected = computed({
+  get() {
+    const index = items.findIndex((item) => item.param === props.value)
+    return index === -1 ? undefined : index
+  },
+  set(value) {
+    console.log(value)
+    if (value !== undefined) {
+      emit('click:order', items[value].param)
+    } else {
+      emit('click:order', '')
     }
   }
-}
+})
 </script>

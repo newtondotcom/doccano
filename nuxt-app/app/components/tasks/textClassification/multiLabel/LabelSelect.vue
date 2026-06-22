@@ -38,60 +38,52 @@
   </v-combobox>
 </template>
 
-<script>
-export default {
-  props: {
-    labels: {
-      type: Array,
-      default: () => [],
-      required: true
-    },
-    annotations: {
-      type: Array,
-      default: () => [],
-      required: true
-    }
+<script setup>
+const props = defineProps({
+  labels: {
+    type: Array,
+    default: () => [],
+    required: true
   },
+  annotations: {
+    type: Array,
+    default: () => [],
+    required: true
+  }
+})
 
-  data() {
-    return {
-      search: ''
-    }
+const emit = defineEmits(['add', 'remove'])
+
+const search = ref('')
+
+const annotatedLabels = computed({
+  get() {
+    const labelIds = props.annotations.map((item) => item.label)
+    return props.labels.filter((item) => labelIds.includes(item.id))
   },
-
-  computed: {
-    annotatedLabels: {
-      get() {
-        const labelIds = this.annotations.map((item) => item.label)
-        return this.labels.filter((item) => labelIds.includes(item.id))
-      },
-      set(newValue) {
-        if (newValue.length > this.annotations.length) {
-          const label = newValue[newValue.length - 1]
-          if (typeof label === 'object') {
-            this.add(label)
-          } else {
-            newValue.pop()
-          }
-        } else {
-          const label = this.annotatedLabels.find((x) => !newValue.some((y) => y.id === x.id))
-          if (typeof label === 'object') {
-            this.remove(label)
-          }
-        }
+  set(newValue) {
+    if (newValue.length > props.annotations.length) {
+      const label = newValue[newValue.length - 1]
+      if (typeof label === 'object') {
+        add(label)
+      } else {
+        newValue.pop()
+      }
+    } else {
+      const label = annotatedLabels.value.find((x) => !newValue.some((y) => y.id === x.id))
+      if (typeof label === 'object') {
+        remove(label)
       }
     }
-  },
-
-  methods: {
-    add(label) {
-      this.$emit('add', label.id)
-    },
-
-    remove(label) {
-      const annotation = this.annotations.find((item) => item.label === label.id)
-      this.$emit('remove', annotation.id)
-    }
   }
+})
+
+function add(label) {
+  emit('add', label.id)
+}
+
+function remove(label) {
+  const annotation = props.annotations.find((item) => item.label === label.id)
+  emit('remove', annotation.id)
 }
 </script>

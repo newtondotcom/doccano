@@ -1,6 +1,6 @@
 <template>
   <v-group>
-    <v-polygon
+    <TasksSegmentationVPolygon
       :polygon="polygon"
       :closed="false"
       :color="color"
@@ -10,7 +10,7 @@
       :scale="scale"
       @dragend="onDragEnd"
     />
-    <v-point
+    <TasksSegmentationVPoint
       v-for="(point, index) in polygon.toPoints()"
       :key="index"
       color="white"
@@ -27,62 +27,51 @@
   </v-group>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import VPolygon from './VPolygon.vue'
-import VPoint from './VPoint.vue'
+<script setup lang="ts">
 import Polygon from '@/domain/models/tasks/segmentation/Polygon'
 
-export default Vue.extend({
-  components: {
-    VPolygon,
-    VPoint
-  },
-
-  props: {
-    polygon: {
-      type: Polygon,
-      required: true
-    },
-    color: {
-      type: String,
-      default: '#00FF00'
-    },
-    maxWidth: {
-      type: Number,
-      default: 0
-    },
-    maxHeight: {
-      type: Number,
-      default: 0
-    },
-    scale: {
-      type: Number,
-      default: 1
-    }
-  },
-
-  methods: {
-    onDragEnd(polygon: Polygon, dx: number, dy: number) {
-      this.$emit('drag-end-polygon', polygon, dx, dy)
-    },
-
-    onMouseOverStartPoint() {
-      if (!this.polygon.canBeClosed()) return
-      this.$emit('mouse-over-start-point')
-    },
-
-    onMouseOutStartPoint() {
-      this.$emit('mouse-out-start-point')
-    },
-
-    handleDragMovePoint(index: number, x: number, y: number) {
-      this.$emit('drag-point', this.polygon, index, x, y)
-    },
-
-    handleDoubleClickPoint(index: number) {
-      this.$emit('double-click-point', this.polygon, index)
-    }
+const props = withDefaults(
+  defineProps<{
+    polygon: Polygon
+    color?: string
+    maxWidth?: number
+    maxHeight?: number
+    scale?: number
+  }>(),
+  {
+    color: '#00FF00',
+    maxWidth: 0,
+    maxHeight: 0,
+    scale: 1
   }
-})
+)
+
+const emit = defineEmits<{
+  'drag-end-polygon': [polygon: Polygon, dx: number, dy: number]
+  'mouse-over-start-point': []
+  'mouse-out-start-point': []
+  'drag-point': [polygon: Polygon, index: number, x: number, y: number]
+  'double-click-point': [polygon: Polygon, index: number]
+}>()
+
+function onDragEnd(polygon: Polygon, dx: number, dy: number) {
+  emit('drag-end-polygon', polygon, dx, dy)
+}
+
+function onMouseOverStartPoint() {
+  if (!props.polygon.canBeClosed()) return
+  emit('mouse-over-start-point')
+}
+
+function onMouseOutStartPoint() {
+  emit('mouse-out-start-point')
+}
+
+function handleDragMovePoint(index: number, x: number, y: number) {
+  emit('drag-point', props.polygon, index, x, y)
+}
+
+function handleDoubleClickPoint(index: number) {
+  emit('double-click-point', props.polygon, index)
+}
 </script>

@@ -42,55 +42,52 @@
   </v-data-table>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { mdiMagnify, mdiPencil } from '@mdi/js'
 import type { PropType } from 'vue'
-import Vue from 'vue'
-import { LabelDTO } from '~/services/application/label/labelData'
+import { computed, ref } from 'vue'
+import { LabelDTO } from '@/services/application/label/labelData'
 
-export default Vue.extend({
-  props: {
-    isLoading: {
-      type: Boolean,
-      default: false,
-      required: true
-    },
-    items: {
-      type: Array as PropType<LabelDTO[]>,
-      default: () => [],
-      required: true
-    },
-    value: {
-      type: Array as PropType<LabelDTO[]>,
-      default: () => [],
-      required: true
-    },
-    disableEdit: {
-      type: Boolean,
-      default: false
-    }
+const props = defineProps({
+  isLoading: {
+    type: Boolean,
+    default: false,
+    required: true
   },
-
-  data() {
-    return {
-      search: '',
-      mdiPencil,
-      mdiMagnify
-    }
+  items: {
+    type: Array as PropType<LabelDTO[]>,
+    default: () => [],
+    required: true
   },
-
-  computed: {
-    headers() {
-      const headers = [
-        { text: this.$t('generic.name'), value: 'text', sortable: true },
-        { text: this.$t('labels.shortkey'), value: 'suffixKey', sortable: true },
-        { text: this.$t('labels.color'), value: 'backgroundColor', sortable: true }
-      ]
-      if (!this.disableEdit) {
-        headers.push({ text: 'Actions', value: 'actions', sortable: false })
-      }
-      return headers
-    }
+  value: {
+    type: Array as PropType<LabelDTO[]>,
+    default: () => [],
+    required: true
+  },
+  disableEdit: {
+    type: Boolean,
+    default: false
   }
+})
+
+defineEmits<{
+  input: [value: LabelDTO[]]
+  edit: [item: LabelDTO]
+}>()
+
+const { t } = useI18n()
+
+const search = ref('')
+
+const headers = computed(() => {
+  const headerList = [
+    { text: t('generic.name'), value: 'text', sortable: true },
+    { text: t('labels.shortkey'), value: 'suffixKey', sortable: true },
+    { text: t('labels.color'), value: 'backgroundColor', sortable: true }
+  ]
+  if (!props.disableEdit) {
+    headerList.push({ text: 'Actions', value: 'actions', sortable: false })
+  }
+  return headerList
 })
 </script>

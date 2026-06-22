@@ -11,7 +11,7 @@
       </template>
     </v-tabs>
     <v-card-title>
-      <action-menu
+      <LabelActionMenu
         :add-only="canOnlyAdd"
         @create="$router.push('labels/add?type=' + labelType)"
         @upload="$router.push('labels/import?type=' + labelType)"
@@ -27,10 +27,10 @@
         {{ $t('generic.delete') }}
       </v-btn>
       <v-dialog v-model="dialogDelete">
-        <form-delete :selected="selected" @cancel="dialogDelete = false" @remove="remove" />
+        <LabelFormDelete :selected="selected" @cancel="dialogDelete = false" @remove="remove" />
       </v-dialog>
     </v-card-title>
-    <label-list
+    <LabelList
       v-model="selected"
       :items="items"
       :is-loading="isLoading"
@@ -40,149 +40,112 @@
   </v-card>
 </template>
 
-<script lang="ts">
-import { mapGetters } from 'vuex'
-import Vue from 'vue'
-import ActionMenu from '@/components/label/ActionMenu.vue'
-import FormDelete from '@/components/label/FormDelete.vue'
-import LabelList from '@/components/label/LabelList.vue'
-import { LabelDTO } from '~/services/application/label/labelData'
-import { MemberItem } from '~/domain/models/member/member'
+<script setup lang="ts">
+import { useMainStore as useProjectsStore } from '@/store/projects'
+import { LabelDTO } from '@/services/application/label/labelData'
+import { MemberItem } from '@/domain/models/member/member'
 
-export default Vue.extend({
-  components: {
-    ActionMenu,
-    FormDelete,
-    LabelList
-  },
-
+definePageMeta({
   layout: 'project',
-
-  middleware: ['check-auth', 'auth', 'setCurrentProject'],
-
-  validate({ params, app, store }) {
-    if (/^\d+$/.test(params.id)) {
-      const project = store.getters['projects/project']
-      if (!project.canDefineLabel) {
-        return false
-      }
-      return app.$repositories.member.fetchMyRole(params.id).then((member: MemberItem) => {
-        if (member.isProjectAdmin) {
-          return true
-        }
-        return project.allowMemberToCreateLabelType
-      })
-    }
-    return false
-  },
-
-  data() {
-    return {
-      dialogDelete: false,
-      items: [] as LabelDTO[],
-      selected: [] as LabelDTO[],
-      isLoading: false,
-      tab: 0,
-      member: {} as MemberItem
-    }
-  },
-
-  computed: {
-    ...mapGetters('projects', ['project']),
-
-    canOnlyAdd(): boolean {
-      if (this.member.isProjectAdmin) {
-        return false
-      }
-      return this.project.allowMemberToCreateLabelType
-    },
-
-    canDelete(): boolean {
-      return this.selected.length > 0
-    },
-
-    projectId(): string {
-      return this.$route.params.id
-    },
-
-    hasMultiType(): boolean {
-      if ('projectType' in this.project) {
-        return this.isIntentDetectionAndSlotFilling || !!this.project.useRelation
-      } else {
-        return false
-      }
-    },
-
-    isIntentDetectionAndSlotFilling(): boolean {
-      return this.project.projectType === 'IntentDetectionAndSlotFilling'
-    },
-
-    labelType(): string {
-      if (this.hasMultiType) {
-        if (this.isIntentDetectionAndSlotFilling) {
-          return ['category', 'span'][this.tab!]
-        } else {
-          return ['span', 'relation'][this.tab!]
-        }
-      } else if (this.project.canDefineCategory) {
-        return 'category'
-      } else {
-        return 'span'
-      }
-    },
-
-    service(): any {
-      if (!('projectType' in this.project)) {
-        return
-      }
-      if (this.hasMultiType) {
-        if (this.isIntentDetectionAndSlotFilling) {
-          return [this.$services.categoryType, this.$services.spanType][this.tab!]
-        } else {
-          return [this.$services.spanType, this.$services.relationType][this.tab!]
-        }
-      } else if (this.project.canDefineCategory) {
-        return this.$services.categoryType
-      } else {
-        return this.$services.spanType
-      }
-    }
-  },
-
-  watch: {
-    tab() {
-      this.list()
-    }
-  },
-
-  async created() {
-    this.member = await this.$repositories.member.fetchMyRole(this.projectId)
-    await this.list()
-  },
-
-  methods: {
-    async list() {
-      this.isLoading = true
-      this.items = await this.service.list(this.projectId)
-      this.isLoading = false
-    },
-
-    async remove() {
-      await this.service.bulkDelete(this.projectId, this.selected)
-      this.list()
-      this.dialogDelete = false
-      this.selected = []
-    },
-
-    async download() {
-      await this.service.export(this.projectId)
-    },
-
-    editItem(item: LabelDTO) {
-      this.$router.push(`labels/${item.id}/edit?type=${this.labelType}`)
-    }
+  middleware: ['check-auth', 'auth', 'set-current-project', 'can-access-labels'],
+  validate(route) {
+    return /^\d+$/.test(route.params.id as string)
   }
 })
+
+const route = useRoute()
+const router = useRouter()
+const { $services, $repositories } = useNuxtApp()
+const projectsStore = useProjectsStore()
+
+const dialogDelete = ref(false)
+const items = ref([] as LabelDTO[])
+const selected = ref([] as LabelDTO[])
+const isLoading = ref(false)
+const tab = ref(0)
+const member = ref({} as MemberItem)
+
+const project = computed(() => projectsStore.project)
+
+const canOnlyAdd = computed(() => {
+  if (member.value.isProjectAdmin) {
+    return false
+  }
+  return project.value.allowMemberToCreateLabelType
+})
+
+const canDelete = computed(() => selected.value.length > 0)
+const projectId = computed(() => route.params.id as string)
+
+const hasMultiType = computed(() => {
+  if ('projectType' in project.value) {
+    return isIntentDetectionAndSlotFilling.value || !!project.value.useRelation
+  }
+  return false
+})
+
+const isIntentDetectionAndSlotFilling = computed(
+  () => project.value.projectType === 'IntentDetectionAndSlotFilling'
+)
+
+const labelType = computed(() => {
+  if (hasMultiType.value) {
+    if (isIntentDetectionAndSlotFilling.value) {
+      return ['category', 'span'][tab.value!]
+    }
+    return ['span', 'relation'][tab.value!]
+  }
+  if (project.value.canDefineCategory) {
+    return 'category'
+  }
+  return 'span'
+})
+
+const service = computed(() => {
+  if (!('projectType' in project.value)) {
+    return
+  }
+  if (hasMultiType.value) {
+    if (isIntentDetectionAndSlotFilling.value) {
+      return [$services.categoryType, $services.spanType][tab.value!]
+    }
+    return [$services.spanType, $services.relationType][tab.value!]
+  }
+  if (project.value.canDefineCategory) {
+    return $services.categoryType
+  }
+  return $services.spanType
+})
+
+watch(tab, () => {
+  list()
+})
+
+onMounted(async () => {
+  member.value = await $repositories.member.fetchMyRole(projectId.value)
+  await list()
+})
+
+async function list() {
+  isLoading.value = true
+  items.value = await service.value.list(projectId.value)
+  isLoading.value = false
+}
+
+async function remove() {
+  await service.value.bulkDelete(projectId.value, selected.value)
+  list()
+  dialogDelete.value = false
+  selected.value = []
+}
+
+async function download() {
+  await service.value.export(projectId.value)
+}
+
+function editItem(item: LabelDTO) {
+  router.push(`labels/${item.id}/edit?type=${labelType.value}`)
+}
 </script>
 
 <style scoped>

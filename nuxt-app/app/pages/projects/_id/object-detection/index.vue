@@ -1,7 +1,7 @@
 <template>
-  <layout-text v-if="image.id">
+  <TasksLayoutText v-if="image.id">
     <template #header>
-      <toolbar-laptop
+      <TasksToolbarLaptop
         :doc-id="image.id"
         :enable-auto-labeling.sync="enableAutoLabeling"
         :guideline-text="project.guideline"
@@ -11,9 +11,9 @@
         @click:clear-label="clear"
         @click:review="confirm"
       >
-        <button-zoom class="ms-2" @zoom-in="zoomIn" @zoom-out="zoomOut" />
-      </toolbar-laptop>
-      <toolbar-mobile :total="images.count" class="d-flex d-sm-none" />
+        <TasksToolbarButtonsButtonZoom class="ms-2" @zoom-in="zoomIn" @zoom-out="zoomOut" />
+      </TasksToolbarLaptop>
+      <TasksToolbarMobile :total="images.count" class="d-flex d-sm-none" />
     </template>
     <template #content>
       <v-card>
@@ -39,7 +39,7 @@
           </v-chip-group>
         </v-card-title>
         <v-divider />
-        <v-bounding-box
+        <TasksBoundingBoxVBoundingBox
           :rectangles="filteredRegions"
           :highlight-id="highlightId"
           :image-url="image.url"
@@ -55,9 +55,9 @@
       </v-card>
     </template>
     <template #sidebar>
-      <annotation-progress :progress="progress" />
-      <list-metadata :metadata="image.meta" class="mt-4" />
-      <region-list
+      <TasksSidebarAnnotationProgress :progress="progress" />
+      <TasksMetadataListMetadata :metadata="image.meta" class="mt-4" />
+      <TasksImageRegionList
         v-if="annotations.length > 0"
         class="mt-4"
         :regions="regionList"
@@ -67,258 +67,209 @@
         @unhover-region="unhoverRegion"
       />
     </template>
-  </layout-text>
+  </TasksLayoutText>
 </template>
 
-<script>
-import { mdiFormatListBulleted, mdiText } from '@mdi/js'
-import { toRefs, useContext } from '@nuxtjs/composition-api'
+<script setup>
 import _ from 'lodash'
-import VBoundingBox from '@/components/tasks/boundingBox/VBoundingBox.vue'
-import RegionList from '@/components/tasks/image/RegionList.vue'
-import LayoutText from '@/components/tasks/layout/LayoutText'
-import ListMetadata from '@/components/tasks/metadata/ListMetadata'
-import AnnotationProgress from '@/components/tasks/sidebar/AnnotationProgress.vue'
-import ButtonZoom from '@/components/tasks/toolbar/buttons/ButtonZoom.vue'
-import ToolbarLaptop from '@/components/tasks/toolbar/ToolbarLaptop'
-import ToolbarMobile from '@/components/tasks/toolbar/ToolbarMobile'
 import { useLabelList } from '@/composables/useLabelList'
 
-export default {
-  components: {
-    AnnotationProgress,
-    ButtonZoom,
-    LayoutText,
-    ListMetadata,
-    RegionList,
-    ToolbarLaptop,
-    ToolbarMobile,
-    VBoundingBox
-  },
+definePageMeta({
   layout: 'workspace',
-
-  validate({ params, query }) {
-    return /^\d+$/.test(params.id) && /^\d+$/.test(query.page)
-  },
-
-  setup() {
-    const { app } = useContext()
-    const { state, getLabelList, shortKeys } = useLabelList(app.$services.categoryType)
-
-    return {
-      ...toRefs(state),
-      getLabelList,
-      shortKeys
-    }
-  },
-
-  data() {
-    return {
-      annotations: [],
-      images: [],
-      project: {},
-      enableAutoLabeling: false,
-      mdiText,
-      mdiFormatListBulleted,
-      progress: {},
-      highlightId: null,
-      selectedLabelIndex: undefined,
-      selectedRegion: undefined,
-      visibilities: {},
-      scale: 1
-    }
-  },
-
-  async fetch() {
-    this.images = await this.$services.example.fetchOne(
-      this.projectId,
-      this.$route.query.page,
-      this.$route.query.q,
-      this.$route.query.isChecked,
-      this.$route.query.ordering
-    )
-    const image = this.images.items[0]
-    if (this.enableAutoLabeling) {
-      await this.autoLabel(image.id)
-    }
-    await this.list(image.id)
-  },
-
-  computed: {
-    projectId() {
-      return this.$route.params.id
-    },
-
-    image() {
-      if (_.isEmpty(this.images) || this.images.items.length === 0) {
-        return {}
-      } else {
-        return this.images.items[0]
-      }
-    },
-
-    bboxLabels() {
-      return this.labels.map((label) => {
-        return {
-          id: label.id,
-          name: label.text,
-          color: label.backgroundColor
-        }
-      })
-    },
-
-    selectedLabel() {
-      if (this.selectedLabelIndex !== undefined) {
-        return this.labels[this.selectedLabelIndex]
-      } else {
-        return undefined
-      }
-    },
-
-    regionList() {
-      return this.annotations.map((annotation) => {
-        return {
-          id: annotation.uuid,
-          category: this.labels.find((label) => annotation.label === label.id).text,
-          color: this.labels.find((label) => annotation.label === label.id).backgroundColor,
-          visibility:
-            annotation.uuid in this.visibilities ? this.visibilities[annotation.uuid] : true
-        }
-      })
-    },
-
-    filteredRegions() {
-      return this.annotations
-        .filter((annotation) => this.visibilities[annotation.uuid] !== false)
-        .map((a) => {
-          return {
-            ...a,
-            id: a.uuid
-          }
-        })
-    }
-  },
-
-  watch: {
-    '$route.query': '$fetch',
-    async enableAutoLabeling(val) {
-      if (val && !this.image.isConfirmed) {
-        await this.autoLabel(this.image.id)
-        await this.list(this.image.id)
-      }
-    },
-
-    async selectedLabel(newLabel) {
-      if (newLabel !== undefined && !!this.selectedRegion) {
-        this.selectedRegion.label = newLabel.id
-        await this.$services.bbox.update(
-          this.projectId,
-          this.image.id,
-          this.selectedRegion.id,
-          this.selectedRegion
-        )
-        await this.list(this.image.id)
-      }
-    }
-  },
-
-  async created() {
-    this.getLabelList(this.projectId)
-    this.project = await this.$services.project.findById(this.projectId)
-    this.progress = await this.$repositories.metrics.fetchMyProgress(this.projectId)
-  },
-
-  methods: {
-    async list(imageId) {
-      this.annotations = await this.$services.bbox.list(this.projectId, imageId)
-    },
-
-    async remove(id) {
-      delete this.visibilities[id]
-      const bbox = this.annotations.find((a) => a.uuid === id)
-      await this.$services.bbox.delete(this.projectId, this.image.id, bbox.id)
-      await this.list(this.image.id)
-    },
-
-    async add(region) {
-      this.visibilities[region.id] = true
-      await this.$services.bbox.create(
-        this.projectId,
-        this.image.id,
-        region.id,
-        region.label,
-        region.x,
-        region.y,
-        region.width,
-        region.height
-      )
-      await this.list(this.image.id)
-    },
-
-    async update(region) {
-      const bbox = this.annotations.find((a) => a.uuid === region.id)
-      await this.$services.bbox.update(this.projectId, this.image.id, bbox.id, region)
-      await this.list(this.image.id)
-    },
-
-    changeVisibility(regionId, visibility) {
-      this.$set(this.visibilities, regionId, visibility)
-      this.visibilities = Object.assign({}, this.visibilities)
-    },
-
-    async clear() {
-      await this.$services.bbox.clear(this.projectId, this.image.id)
-      await this.list(this.image.id)
-    },
-
-    async autoLabel(imageId) {
-      try {
-        await this.$services.bbox.autoLabel(this.projectId, imageId)
-      } catch (e) {
-        console.log(e.response.data.detail)
-      }
-    },
-
-    async updateProgress() {
-      this.progress = await this.$repositories.metrics.fetchMyProgress(this.projectId)
-    },
-
-    async confirm() {
-      await this.$services.example.confirm(this.projectId, this.image.id)
-      await this.$fetch()
-      this.updateProgress()
-    },
-
-    hoverRegion(regionId) {
-      this.highlightId = regionId
-    },
-
-    unhoverRegion() {
-      this.highlightId = null
-    },
-
-    selectRegion(regionId) {
-      if (regionId) {
-        this.selectedRegion = this.annotations.find((r) => r.uuid === regionId)
-        this.selectedLabelIndex = this.labels.findIndex((l) => l.id === this.selectedRegion.label)
-      } else {
-        this.selectedRegion = undefined
-        this.selectedLabelIndex = undefined
-      }
-    },
-
-    updateScale(scale) {
-      this.scale = scale
-    },
-
-    zoomOut() {
-      this.scale -= 0.1
-    },
-
-    zoomIn() {
-      this.scale += 0.1
-    }
+  validate(route) {
+    return /^\d+$/.test(route.params.id) && /^\d+$/.test(route.query.page)
   }
+})
+
+const route = useRoute()
+const { $services, $repositories } = useNuxtApp()
+
+const { state: labelState, getLabelList } = useLabelList($services.categoryType)
+const { labels } = toRefs(labelState)
+
+const annotations = ref([])
+const images = ref([])
+const project = ref({})
+const enableAutoLabeling = ref(false)
+const progress = ref({})
+const highlightId = ref(null)
+const selectedLabelIndex = ref(undefined)
+const selectedRegion = ref(undefined)
+const visibilities = ref({})
+const scale = ref(1)
+
+const projectId = computed(() => route.params.id)
+
+const image = computed(() => {
+  if (_.isEmpty(images.value) || images.value.items.length === 0) {
+    return {}
+  }
+  return images.value.items[0]
+})
+
+const bboxLabels = computed(() =>
+  labels.value.map((label) => ({
+    id: label.id,
+    name: label.text,
+    color: label.backgroundColor
+  }))
+)
+
+const selectedLabel = computed(() => {
+  if (selectedLabelIndex.value !== undefined) {
+    return labels.value[selectedLabelIndex.value]
+  }
+  return undefined
+})
+
+const regionList = computed(() =>
+  annotations.value.map((annotation) => ({
+    id: annotation.uuid,
+    category: labels.value.find((label) => annotation.label === label.id).text,
+    color: labels.value.find((label) => annotation.label === label.id).backgroundColor,
+    visibility: annotation.uuid in visibilities.value ? visibilities.value[annotation.uuid] : true
+  }))
+)
+
+const filteredRegions = computed(() =>
+  annotations.value
+    .filter((annotation) => visibilities.value[annotation.uuid] !== false)
+    .map((a) => ({
+      ...a,
+      id: a.uuid
+    }))
+)
+
+async function load() {
+  images.value = await $services.example.fetchOne(
+    projectId.value,
+    route.query.page,
+    route.query.q,
+    route.query.isChecked,
+    route.query.ordering
+  )
+  const currentImage = images.value.items[0]
+  if (enableAutoLabeling.value) {
+    await autoLabel(currentImage.id)
+  }
+  await list(currentImage.id)
+}
+
+watch(() => route.query, load, { immediate: true, deep: true })
+watch(enableAutoLabeling, async (val) => {
+  if (val && !image.value.isConfirmed) {
+    await autoLabel(image.value.id)
+    await list(image.value.id)
+  }
+})
+
+watch(selectedLabel, async (newLabel) => {
+  if (newLabel !== undefined && !!selectedRegion.value) {
+    selectedRegion.value.label = newLabel.id
+    await $services.bbox.update(
+      projectId.value,
+      image.value.id,
+      selectedRegion.value.id,
+      selectedRegion.value
+    )
+    await list(image.value.id)
+  }
+})
+
+onMounted(async () => {
+  getLabelList(projectId.value)
+  project.value = await $services.project.findById(projectId.value)
+  progress.value = await $repositories.metrics.fetchMyProgress(projectId.value)
+})
+
+async function list(imageId) {
+  annotations.value = await $services.bbox.list(projectId.value, imageId)
+}
+
+async function remove(id) {
+  delete visibilities.value[id]
+  const bbox = annotations.value.find((a) => a.uuid === id)
+  await $services.bbox.delete(projectId.value, image.value.id, bbox.id)
+  await list(image.value.id)
+}
+
+async function add(region) {
+  visibilities.value[region.id] = true
+  await $services.bbox.create(
+    projectId.value,
+    image.value.id,
+    region.id,
+    region.label,
+    region.x,
+    region.y,
+    region.width,
+    region.height
+  )
+  await list(image.value.id)
+}
+
+async function update(region) {
+  const bbox = annotations.value.find((a) => a.uuid === region.id)
+  await $services.bbox.update(projectId.value, image.value.id, bbox.id, region)
+  await list(image.value.id)
+}
+
+function changeVisibility(regionId, visibility) {
+  visibilities.value[regionId] = visibility
+  visibilities.value = { ...visibilities.value }
+}
+
+async function clear() {
+  await $services.bbox.clear(projectId.value, image.value.id)
+  await list(image.value.id)
+}
+
+async function autoLabel(imageId) {
+  try {
+    await $services.bbox.autoLabel(projectId.value, imageId)
+  } catch (e) {
+    console.log(e.response.data.detail)
+  }
+}
+
+async function updateProgress() {
+  progress.value = await $repositories.metrics.fetchMyProgress(projectId.value)
+}
+
+async function confirm() {
+  await $services.example.confirm(projectId.value, image.value.id)
+  await load()
+  updateProgress()
+}
+
+function hoverRegion(regionId) {
+  highlightId.value = regionId
+}
+
+function unhoverRegion() {
+  highlightId.value = null
+}
+
+function selectRegion(regionId) {
+  if (regionId) {
+    selectedRegion.value = annotations.value.find((r) => r.uuid === regionId)
+    selectedLabelIndex.value = labels.value.findIndex((l) => l.id === selectedRegion.value.label)
+  } else {
+    selectedRegion.value = undefined
+    selectedLabelIndex.value = undefined
+  }
+}
+
+function updateScale(newScale) {
+  scale.value = newScale
+}
+
+function zoomOut() {
+  scale.value -= 0.1
+}
+
+function zoomIn() {
+  scale.value += 0.1
 }
 </script>
 

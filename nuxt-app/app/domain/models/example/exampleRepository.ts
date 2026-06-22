@@ -1,4 +1,4 @@
-import { ExampleItem, ExampleItemList } from '~/domain/models/example/example'
+import { ExampleItem, ExampleItemList } from '@/domain/models/example/example'
 
 export type SearchOption = { [key: string]: string | (string | null)[] }
 

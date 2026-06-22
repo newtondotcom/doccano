@@ -6,33 +6,26 @@
   />
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-
-export default Vue.extend({
-  props: {
-    imageUrl: {
-      type: String,
-      required: true
-    }
-  },
-
-  data() {
-    return {
-      image: new Image()
-    }
-  },
-
-  watch: {
-    imageUrl: {
-      handler() {
-        this.image.src = this.imageUrl
-        this.image.onload = () => {
-          this.$emit('loaded', this.image.width, this.image.height)
-        }
-      },
-      immediate: true
-    }
+<script setup lang="ts">
+const props = defineProps({
+  imageUrl: {
+    type: String,
+    required: true
   }
 })
+
+const emit = defineEmits(['loaded'])
+
+const image = ref(new Image())
+
+watch(
+  () => props.imageUrl,
+  () => {
+    image.value.src = props.imageUrl
+    image.value.onload = () => {
+      emit('loaded', image.value.width, image.value.height)
+    }
+  },
+  { immediate: true }
+)
 </script>

@@ -1,7 +1,7 @@
 <template>
-  <layout-text v-if="doc.id" v-shortkey="shortKeys" @shortkey="changeSelectedLabel">
+  <TasksLayoutText v-if="doc.id" v-shortkey="shortKeys" @shortkey="changeSelectedLabel">
     <template #header>
-      <toolbar-laptop
+      <TasksToolbarLaptop
         :doc-id="doc.id"
         :enable-auto-labeling.sync="enableAutoLabeling"
         :guideline-text="project.guideline"
@@ -11,12 +11,12 @@
         @click:clear-label="clear"
         @click:review="confirm"
       />
-      <toolbar-mobile :total="docs.count" class="d-flex d-sm-none" />
+      <TasksToolbarMobile :total="docs.count" class="d-flex d-sm-none" />
     </template>
     <template #content>
       <v-card>
         <div class="annotation-text pa-4">
-          <entity-editor
+          <TasksSequenceLabelingEntityEditor
             :dark="$vuetify.theme.dark"
             :rtl="isRTL"
             :text="doc.text"
@@ -39,7 +39,7 @@
       </v-card>
     </template>
     <template #sidebar>
-      <annotation-progress :progress="progress" />
+      <TasksSidebarAnnotationProgress :progress="progress" />
       <v-card class="mt-4">
         <v-card-title>
           Label Types
@@ -80,232 +80,194 @@
           </v-card-text>
         </v-expand-transition>
       </v-card>
-      <list-metadata :metadata="doc.meta" class="mt-4" />
+      <TasksMetadataListMetadata :metadata="doc.meta" class="mt-4" />
     </template>
-  </layout-text>
+  </TasksLayoutText>
 </template>
 
-<script>
+<script setup>
 import { mdiChevronDown, mdiChevronUp } from '@mdi/js'
 import _ from 'lodash'
-import { mapGetters } from 'vuex'
-import LayoutText from '@/components/tasks/layout/LayoutText'
-import ListMetadata from '@/components/tasks/metadata/ListMetadata'
-import EntityEditor from '@/components/tasks/sequenceLabeling/EntityEditor.vue'
-import AnnotationProgress from '@/components/tasks/sidebar/AnnotationProgress.vue'
-import ToolbarLaptop from '@/components/tasks/toolbar/ToolbarLaptop'
-import ToolbarMobile from '@/components/tasks/toolbar/ToolbarMobile'
+import { useMainStore as useConfigStore } from '@/store/config'
 
-export default {
-  components: {
-    AnnotationProgress,
-    EntityEditor,
-    LayoutText,
-    ListMetadata,
-    ToolbarLaptop,
-    ToolbarMobile
-  },
-
+definePageMeta({
   layout: 'workspace',
-
-  validate({ params, query }) {
-    return /^\d+$/.test(params.id) && /^\d+$/.test(query.page)
-  },
-
-  data() {
-    return {
-      annotations: [],
-      docs: [],
-      spanTypes: [],
-      relations: [],
-      relationTypes: [],
-      project: {},
-      enableAutoLabeling: false,
-      rtl: false,
-      selectedLabelIndex: null,
-      progress: {},
-      relationMode: false,
-      showLabelTypes: true,
-      mdiChevronUp,
-      mdiChevronDown
-    }
-  },
-
-  async fetch() {
-    this.docs = await this.$services.example.fetchOne(
-      this.projectId,
-      this.$route.query.page,
-      this.$route.query.q,
-      this.$route.query.isChecked,
-      this.$route.query.ordering
-    )
-    const doc = this.docs.items[0]
-    if (this.enableAutoLabeling && !doc.isConfirmed) {
-      await this.autoLabel(doc.id)
-    }
-    await this.list(doc.id)
-  },
-
-  computed: {
-    ...mapGetters('auth', ['isAuthenticated', 'getUsername', 'getUserId']),
-    ...mapGetters('config', ['isRTL']),
-
-    shortKeys() {
-      return Object.fromEntries(this.spanTypes.map((item) => [item.id, [item.suffixKey]]))
-    },
-
-    projectId() {
-      return this.$route.params.id
-    },
-
-    doc() {
-      if (_.isEmpty(this.docs) || this.docs.items.length === 0) {
-        return {}
-      } else {
-        return this.docs.items[0]
-      }
-    },
-
-    selectedLabel() {
-      if (Number.isInteger(this.selectedLabelIndex)) {
-        if (this.relationMode) {
-          return this.relationTypes[this.selectedLabelIndex]
-        } else {
-          return this.spanTypes[this.selectedLabelIndex]
-        }
-      } else {
-        return null
-      }
-    },
-
-    useRelationLabeling() {
-      return !!this.project.useRelation
-    },
-
-    labelTypes() {
-      if (this.relationMode) {
-        return this.relationTypes
-      } else {
-        return this.spanTypes
-      }
-    }
-  },
-
-  watch: {
-    '$route.query': '$fetch',
-    async enableAutoLabeling(val) {
-      if (val && !this.doc.isConfirmed) {
-        await this.autoLabel(this.doc.id)
-        await this.list(this.doc.id)
-      }
-    }
-  },
-
-  async created() {
-    this.spanTypes = await this.$services.spanType.list(this.projectId)
-    this.relationTypes = await this.$services.relationType.list(this.projectId)
-    this.project = await this.$services.project.findById(this.projectId)
-    this.progress = await this.$repositories.metrics.fetchMyProgress(this.projectId)
-  },
-
-  methods: {
-    async maybeFetchSpanTypes(annotations) {
-      const labelIds = new Set(this.spanTypes.map((label) => label.id))
-      if (annotations.some((item) => !labelIds.has(item.label))) {
-        this.spanTypes = await this.$services.spanType.list(this.projectId)
-      }
-    },
-
-    async list(docId) {
-      const annotations = await this.$services.sequenceLabeling.list(this.projectId, docId)
-      const relations = await this.$services.sequenceLabeling.listRelations(this.projectId, docId)
-      // In colab mode, if someone add a new label and annotate data
-      // with the label during your work, it occurs exception
-      // because there is no corresponding label.
-      await this.maybeFetchSpanTypes(annotations)
-      this.annotations = annotations
-      this.relations = relations
-    },
-
-    async deleteSpan(id) {
-      await this.$services.sequenceLabeling.delete(this.projectId, this.doc.id, id)
-      await this.list(this.doc.id)
-    },
-
-    async addSpan(startOffset, endOffset, labelId) {
-      await this.$services.sequenceLabeling.create(
-        this.projectId,
-        this.doc.id,
-        labelId,
-        startOffset,
-        endOffset
-      )
-      await this.list(this.doc.id)
-    },
-
-    async updateSpan(annotationId, labelId) {
-      await this.$services.sequenceLabeling.changeLabel(
-        this.projectId,
-        this.doc.id,
-        annotationId,
-        labelId
-      )
-      await this.list(this.doc.id)
-    },
-
-    async addRelation(fromId, toId, typeId) {
-      await this.$services.sequenceLabeling.createRelation(
-        this.projectId,
-        this.doc.id,
-        fromId,
-        toId,
-        typeId
-      )
-      await this.list(this.doc.id)
-    },
-
-    async updateRelation(relationId, typeId) {
-      await this.$services.sequenceLabeling.updateRelation(
-        this.projectId,
-        this.doc.id,
-        relationId,
-        typeId
-      )
-      await this.list(this.doc.id)
-    },
-
-    async deleteRelation(relationId) {
-      await this.$services.sequenceLabeling.deleteRelation(this.projectId, this.doc.id, relationId)
-      await this.list(this.doc.id)
-    },
-
-    async clear() {
-      await this.$services.sequenceLabeling.clear(this.projectId, this.doc.id)
-      await this.list(this.doc.id)
-    },
-
-    async autoLabel(docId) {
-      try {
-        await this.$services.sequenceLabeling.autoLabel(this.projectId, docId)
-      } catch (e) {
-        console.log(e.response.data.detail)
-      }
-    },
-
-    async updateProgress() {
-      this.progress = await this.$repositories.metrics.fetchMyProgress(this.projectId)
-    },
-
-    async confirm() {
-      await this.$services.example.confirm(this.projectId, this.doc.id)
-      await this.$fetch()
-      this.updateProgress()
-    },
-
-    changeSelectedLabel(event) {
-      this.selectedLabelIndex = this.spanTypes.findIndex((item) => item.suffixKey === event.srcKey)
-    }
+  validate(route) {
+    return /^\d+$/.test(route.params.id) && /^\d+$/.test(route.query.page)
   }
+})
+
+const route = useRoute()
+const { $services, $repositories } = useNuxtApp()
+const configStore = useConfigStore()
+
+const annotations = ref([])
+const docs = ref([])
+const spanTypes = ref([])
+const relations = ref([])
+const relationTypes = ref([])
+const project = ref({})
+const enableAutoLabeling = ref(false)
+const selectedLabelIndex = ref(null)
+const progress = ref({})
+const relationMode = ref(false)
+const showLabelTypes = ref(true)
+
+const isRTL = computed(() => configStore.isRTL)
+const projectId = computed(() => route.params.id)
+
+const shortKeys = computed(() =>
+  Object.fromEntries(spanTypes.value.map((item) => [item.id, [item.suffixKey]]))
+)
+
+const doc = computed(() => {
+  if (_.isEmpty(docs.value) || docs.value.items.length === 0) {
+    return {}
+  }
+  return docs.value.items[0]
+})
+
+const selectedLabel = computed(() => {
+  if (Number.isInteger(selectedLabelIndex.value)) {
+    if (relationMode.value) {
+      return relationTypes.value[selectedLabelIndex.value]
+    }
+    return spanTypes.value[selectedLabelIndex.value]
+  }
+  return null
+})
+
+const useRelationLabeling = computed(() => !!project.value.useRelation)
+
+const labelTypes = computed(() => {
+  if (relationMode.value) {
+    return relationTypes.value
+  }
+  return spanTypes.value
+})
+
+async function load() {
+  docs.value = await $services.example.fetchOne(
+    projectId.value,
+    route.query.page,
+    route.query.q,
+    route.query.isChecked,
+    route.query.ordering
+  )
+  const currentDoc = docs.value.items[0]
+  if (enableAutoLabeling.value && !currentDoc.isConfirmed) {
+    await autoLabel(currentDoc.id)
+  }
+  await list(currentDoc.id)
+}
+
+watch(() => route.query, load, { immediate: true, deep: true })
+watch(enableAutoLabeling, async (val) => {
+  if (val && !doc.value.isConfirmed) {
+    await autoLabel(doc.value.id)
+    await list(doc.value.id)
+  }
+})
+
+onMounted(async () => {
+  spanTypes.value = await $services.spanType.list(projectId.value)
+  relationTypes.value = await $services.relationType.list(projectId.value)
+  project.value = await $services.project.findById(projectId.value)
+  progress.value = await $repositories.metrics.fetchMyProgress(projectId.value)
+})
+
+async function maybeFetchSpanTypes(annotationList) {
+  const labelIds = new Set(spanTypes.value.map((label) => label.id))
+  if (annotationList.some((item) => !labelIds.has(item.label))) {
+    spanTypes.value = await $services.spanType.list(projectId.value)
+  }
+}
+
+async function list(docId) {
+  const annotationList = await $services.sequenceLabeling.list(projectId.value, docId)
+  const relationList = await $services.sequenceLabeling.listRelations(projectId.value, docId)
+  await maybeFetchSpanTypes(annotationList)
+  annotations.value = annotationList
+  relations.value = relationList
+}
+
+async function deleteSpan(id) {
+  await $services.sequenceLabeling.delete(projectId.value, doc.value.id, id)
+  await list(doc.value.id)
+}
+
+async function addSpan(startOffset, endOffset, labelId) {
+  await $services.sequenceLabeling.create(
+    projectId.value,
+    doc.value.id,
+    labelId,
+    startOffset,
+    endOffset
+  )
+  await list(doc.value.id)
+}
+
+async function updateSpan(annotationId, labelId) {
+  await $services.sequenceLabeling.changeLabel(
+    projectId.value,
+    doc.value.id,
+    annotationId,
+    labelId
+  )
+  await list(doc.value.id)
+}
+
+async function addRelation(fromId, toId, typeId) {
+  await $services.sequenceLabeling.createRelation(
+    projectId.value,
+    doc.value.id,
+    fromId,
+    toId,
+    typeId
+  )
+  await list(doc.value.id)
+}
+
+async function updateRelation(relationId, typeId) {
+  await $services.sequenceLabeling.updateRelation(
+    projectId.value,
+    doc.value.id,
+    relationId,
+    typeId
+  )
+  await list(doc.value.id)
+}
+
+async function deleteRelation(relationId) {
+  await $services.sequenceLabeling.deleteRelation(projectId.value, doc.value.id, relationId)
+  await list(doc.value.id)
+}
+
+async function clear() {
+  await $services.sequenceLabeling.clear(projectId.value, doc.value.id)
+  await list(doc.value.id)
+}
+
+async function autoLabel(docId) {
+  try {
+    await $services.sequenceLabeling.autoLabel(projectId.value, docId)
+  } catch (e) {
+    console.log(e.response.data.detail)
+  }
+}
+
+async function updateProgress() {
+  progress.value = await $repositories.metrics.fetchMyProgress(projectId.value)
+}
+
+async function confirm() {
+  await $services.example.confirm(projectId.value, doc.value.id)
+  await load()
+  updateProgress()
+}
+
+function changeSelectedLabel(event) {
+  selectedLabelIndex.value = spanTypes.value.findIndex((item) => item.suffixKey === event.srcKey)
 }
 </script>
 

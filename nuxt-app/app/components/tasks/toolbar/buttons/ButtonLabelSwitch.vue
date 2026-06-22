@@ -9,26 +9,18 @@
   </v-btn-toggle>
 </template>
 
-<script>
+<script setup>
 import { mdiFormatListBulleted, mdiText } from '@mdi/js'
 
-export default {
-  data() {
-    return {
-      option: 0,
-      mdiFormatListBulleted,
-      mdiText
-    }
-  },
+const emit = defineEmits(['change'])
 
-  watch: {
-    option(val) {
-      if (val === 0) {
-        this.$emit('change', 'label-group')
-      } else {
-        this.$emit('change', 'label-select')
-      }
-    }
+const option = ref(0)
+
+watch(option, (val) => {
+  if (val === 0) {
+    emit('change', 'TasksTextClassificationLabelGroup')
+  } else {
+    emit('change', 'TasksTextClassificationLabelSelect')
   }
-}
+})
 </script>

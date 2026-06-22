@@ -1,7 +1,7 @@
 <template>
-  <layout-text v-if="doc.id">
+  <TasksLayoutText v-if="doc.id">
     <template #header>
-      <toolbar-laptop
+      <TasksToolbarLaptop
         :doc-id="doc.id"
         :enable-auto-labeling.sync="enableAutoLabeling"
         :guideline-text="project.guideline"
@@ -11,12 +11,12 @@
         @click:clear-label="clear"
         @click:review="confirm"
       />
-      <toolbar-mobile :total="docs.count" class="d-flex d-sm-none" />
+      <TasksToolbarMobile :total="docs.count" class="d-flex d-sm-none" />
     </template>
     <template #content>
       <v-card v-shortkey="shortKeys" @shortkey="addOrRemoveCategory">
         <v-card-title>
-          <label-group
+          <TasksTextClassificationLabelGroup
             :labels="categoryTypes"
             :annotations="categories"
             :single-label="exclusive"
@@ -26,7 +26,7 @@
         </v-card-title>
         <v-divider />
         <div class="annotation-text pa-4">
-          <entity-editor
+          <TasksSequenceLabelingEntityEditor
             :dark="$vuetify.theme.dark"
             :rtl="isRTL"
             :text="doc.text"
@@ -40,192 +40,165 @@
       </v-card>
     </template>
     <template #sidebar>
-      <annotation-progress :progress="progress" />
-      <list-metadata :metadata="doc.meta" class="mt-4" />
+      <TasksSidebarAnnotationProgress :progress="progress" />
+      <TasksMetadataListMetadata :metadata="doc.meta" class="mt-4" />
     </template>
-  </layout-text>
+  </TasksLayoutText>
 </template>
-<script>
-import { mapGetters } from 'vuex'
-import LayoutText from '@/components/tasks/layout/LayoutText'
-import ListMetadata from '@/components/tasks/metadata/ListMetadata'
-import EntityEditor from '@/components/tasks/sequenceLabeling/EntityEditor.vue'
-import AnnotationProgress from '@/components/tasks/sidebar/AnnotationProgress.vue'
-import LabelGroup from '@/components/tasks/textClassification/LabelGroup'
-import ToolbarLaptop from '@/components/tasks/toolbar/ToolbarLaptop'
-import ToolbarMobile from '@/components/tasks/toolbar/ToolbarMobile'
-import { Category } from '~/domain/models/tasks/category'
 
-export default {
-  components: {
-    AnnotationProgress,
-    EntityEditor,
-    LayoutText,
-    ListMetadata,
-    LabelGroup,
-    ToolbarLaptop,
-    ToolbarMobile
-  },
+<script setup>
+import _ from 'lodash'
+import { useMainStore as useConfigStore } from '@/store/config'
+import { Category } from '@/domain/models/tasks/category'
 
+definePageMeta({
   layout: 'workspace',
+  validate(route) {
+    return /^\d+$/.test(route.params.id) && /^\d+$/.test(route.query.page)
+  }
+})
 
-  validate({ params, query }) {
-    return /^\d+$/.test(params.id) && /^\d+$/.test(query.page)
-  },
+const route = useRoute()
+const { $services, $repositories } = useNuxtApp()
+const configStore = useConfigStore()
 
-  data() {
-    return {
-      docs: [],
-      spans: [],
-      categories: [],
-      spanTypes: [],
-      categoryTypes: [],
-      project: {},
-      exclusive: false,
-      enableAutoLabeling: false,
-      progress: {}
-    }
-  },
+const docs = ref([])
+const spans = ref([])
+const categories = ref([])
+const spanTypes = ref([])
+const categoryTypes = ref([])
+const project = ref({})
+const exclusive = ref(false)
+const enableAutoLabeling = ref(false)
+const progress = ref({})
 
-  async fetch() {
-    this.docs = await this.$services.example.fetchOne(
-      this.projectId,
-      this.$route.query.page,
-      this.$route.query.q,
-      this.$route.query.isChecked,
-      this.$route.query.ordering
-    )
-    const doc = this.docs.items[0]
-    if (this.enableAutoLabeling && !doc.isConfirmed) {
-      await this.autoLabel(doc.id)
-    }
-    await this.listSpan(doc.id)
-    await this.listCategory(doc.id)
-  },
+const isRTL = computed(() => configStore.isRTL)
+const projectId = computed(() => route.params.id)
 
-  computed: {
-    ...mapGetters('auth', ['isAuthenticated', 'getUsername', 'getUserId']),
-    ...mapGetters('config', ['isRTL']),
+const shortKeys = computed(() =>
+  Object.fromEntries(categoryTypes.value.map((item) => [item.id, [item.suffixKey]]))
+)
 
-    projectId() {
-      return this.$route.params.id
-    },
+const doc = computed(() => {
+  if (_.isEmpty(docs.value) || docs.value.items.length === 0) {
+    return {}
+  }
+  return docs.value.items[0]
+})
 
-    shortKeys() {
-      return Object.fromEntries(this.categoryTypes.map((item) => [item.id, [item.suffixKey]]))
-    },
+async function load() {
+  docs.value = await $services.example.fetchOne(
+    projectId.value,
+    route.query.page,
+    route.query.q,
+    route.query.isChecked,
+    route.query.ordering
+  )
+  const currentDoc = docs.value.items[0]
+  if (enableAutoLabeling.value && !currentDoc.isConfirmed) {
+    await autoLabel(currentDoc.id)
+  }
+  await listSpan(currentDoc.id)
+  await listCategory(currentDoc.id)
+}
 
-    doc() {
-      if (_.isEmpty(this.docs) || this.docs.items.length === 0) {
-        return {}
-      } else {
-        return this.docs.items[0]
-      }
-    }
-  },
+watch(() => route.query, load, { immediate: true, deep: true })
+watch(enableAutoLabeling, async (val) => {
+  if (val && !doc.value.isConfirmed) {
+    await autoLabel(doc.value.id)
+    await listSpan(doc.value.id)
+    await listCategory(doc.value.id)
+  }
+})
 
-  watch: {
-    '$route.query': '$fetch',
-    async enableAutoLabeling(val) {
-      if (val && !this.doc.isConfirmed) {
-        await this.autoLabel(this.doc.id)
-        await this.listSpan(this.doc.id)
-        await this.listCategory(this.doc.id)
-      }
-    }
-  },
+onMounted(async () => {
+  spanTypes.value = await $services.spanType.list(projectId.value)
+  categoryTypes.value = await $services.categoryType.list(projectId.value)
+  project.value = await $services.project.findById(projectId.value)
+  progress.value = await $repositories.metrics.fetchMyProgress(projectId.value)
+})
 
-  async created() {
-    this.spanTypes = await this.$services.spanType.list(this.projectId)
-    this.categoryTypes = await this.$services.categoryType.list(this.projectId)
-    this.project = await this.$services.project.findById(this.projectId)
-    this.progress = await this.$repositories.metrics.fetchMyProgress(this.projectId)
-  },
+async function listSpan(docId) {
+  spans.value = await $services.sequenceLabeling.list(projectId.value, docId)
+}
 
-  methods: {
-    async listSpan(docId) {
-      const spans = await this.$services.sequenceLabeling.list(this.projectId, docId)
-      this.spans = spans
-    },
+async function deleteSpan(id) {
+  await $services.sequenceLabeling.delete(projectId.value, doc.value.id, id)
+  await listSpan(doc.value.id)
+}
 
-    async deleteSpan(id) {
-      await this.$services.sequenceLabeling.delete(this.projectId, this.doc.id, id)
-      await this.listSpan(this.doc.id)
-    },
+async function addSpan(startOffset, endOffset, labelId) {
+  await $services.sequenceLabeling.create(
+    projectId.value,
+    doc.value.id,
+    labelId,
+    startOffset,
+    endOffset
+  )
+  await listSpan(doc.value.id)
+}
 
-    async addSpan(startOffset, endOffset, labelId) {
-      await this.$services.sequenceLabeling.create(
-        this.projectId,
-        this.doc.id,
-        labelId,
-        startOffset,
-        endOffset
-      )
-      await this.listSpan(this.doc.id)
-    },
+async function updateSpan(annotationId, labelId) {
+  await $services.sequenceLabeling.changeLabel(
+    projectId.value,
+    doc.value.id,
+    annotationId,
+    labelId
+  )
+  await listSpan(doc.value.id)
+}
 
-    async updateSpan(annotationId, labelId) {
-      await this.$services.sequenceLabeling.changeLabel(
-        this.projectId,
-        this.doc.id,
-        annotationId,
-        labelId
-      )
-      await this.listSpan(this.doc.id)
-    },
+async function listCategory(id) {
+  categories.value = await $repositories.category.list(projectId.value, id)
+}
 
-    async listCategory(id) {
-      this.categories = await this.$repositories.category.list(this.projectId, id)
-    },
+async function removeCategory(id) {
+  await $repositories.category.delete(projectId.value, doc.value.id, id)
+  await listCategory(doc.value.id)
+}
 
-    async removeCategory(id) {
-      await this.$repositories.category.delete(this.projectId, this.doc.id, id)
-      await this.listCategory(this.doc.id)
-    },
+async function addCategory(labelId) {
+  const category = Category.create(labelId)
+  await $repositories.category.create(projectId.value, doc.value.id, category)
+  await listCategory(doc.value.id)
+}
 
-    async addCategory(labelId) {
-      const category = Category.create(labelId)
-      await this.$repositories.category.create(this.projectId, this.doc.id, category)
-      await this.listCategory(this.doc.id)
-    },
-
-    async addOrRemoveCategory(event) {
-      const labelId = parseInt(event.srcKey, 10)
-      const category = this.categories.find((item) => item.label === labelId)
-      if (category) {
-        await this.removeCategory(category.id)
-      } else {
-        await this.addCategory(labelId)
-      }
-    },
-
-    async clear() {
-      await this.$repositories.category.clear(this.projectId, this.doc.id)
-      await this.$services.sequenceLabeling.clear(this.projectId, this.doc.id)
-      await this.listSpan(this.doc.id)
-      await this.listCategory(this.doc.id)
-    },
-
-    async autoLabel(docId) {
-      try {
-        await this.$services.sequenceLabeling.autoLabel(this.projectId, docId)
-      } catch (e) {
-        console.log(e.response.data.detail)
-      }
-    },
-
-    async updateProgress() {
-      this.progress = await this.$repositories.metrics.fetchMyProgress(this.projectId)
-    },
-
-    async confirm() {
-      await this.$services.example.confirm(this.projectId, this.doc.id)
-      await this.$fetch()
-      this.updateProgress()
-    }
+async function addOrRemoveCategory(event) {
+  const labelId = parseInt(event.srcKey, 10)
+  const category = categories.value.find((item) => item.label === labelId)
+  if (category) {
+    await removeCategory(category.id)
+  } else {
+    await addCategory(labelId)
   }
 }
+
+async function clear() {
+  await $repositories.category.clear(projectId.value, doc.value.id)
+  await $services.sequenceLabeling.clear(projectId.value, doc.value.id)
+  await listSpan(doc.value.id)
+  await listCategory(doc.value.id)
+}
+
+async function autoLabel(docId) {
+  try {
+    await $services.sequenceLabeling.autoLabel(projectId.value, docId)
+  } catch (e) {
+    console.log(e.response.data.detail)
+  }
+}
+
+async function updateProgress() {
+  progress.value = await $repositories.metrics.fetchMyProgress(projectId.value)
+}
+
+async function confirm() {
+  await $services.example.confirm(projectId.value, doc.value.id)
+  await load()
+  updateProgress()
+}
 </script>
+
 <style scoped>
 .annotation-text {
   font-size: 1.25rem !important;

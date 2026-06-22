@@ -1,4 +1,4 @@
-import { TagItem } from '~/domain/models/tag/tag'
+import { TagItem } from '@/domain/models/tag/tag'
 
 export const DocumentClassification = 'DocumentClassification'
 export const SequenceLabeling = 'SequenceLabeling'

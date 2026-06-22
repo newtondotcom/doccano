@@ -1,5 +1,5 @@
 <template>
-  <action-menu
+  <UtilsActionMenu
     :items="items"
     :text="$t('dataset.actions')"
     @create="$emit('create')"
@@ -8,49 +8,48 @@
   />
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import { mdiPencil, mdiUpload, mdiDownload } from '@mdi/js'
-import ActionMenu from '~/components/utils/ActionMenu.vue'
+import { computed } from 'vue'
 
-export default Vue.extend({
-  components: {
-    ActionMenu
-  },
+const props = defineProps({
+  addOnly: {
+    type: Boolean,
+    default: false
+  }
+})
 
-  props: {
-    addOnly: {
-      type: Boolean,
-      default: false
+defineEmits<{
+  create: []
+  upload: []
+  download: []
+}>()
+
+const { t } = useI18n()
+
+const items = computed(() => {
+  const menuItems = [
+    {
+      title: t('labels.createLabel'),
+      icon: mdiPencil,
+      event: 'create'
     }
-  },
-
-  computed: {
-    items() {
-      const items = [
-        {
-          title: this.$t('labels.createLabel'),
-          icon: mdiPencil,
-          event: 'create'
-        }
-      ]
-      if (this.addOnly) {
-        return items
-      } else {
-        return items.concat([
-          {
-            title: this.$t('labels.importLabels'),
-            icon: mdiUpload,
-            event: 'upload'
-          },
-          {
-            title: this.$t('labels.exportLabels'),
-            icon: mdiDownload,
-            event: 'download'
-          }
-        ])
+  ]
+  if (props.addOnly) {
+    return menuItems
+  } else {
+    return menuItems.concat([
+      {
+        title: t('labels.importLabels'),
+        icon: mdiUpload,
+        event: 'upload'
+      },
+      {
+        title: t('labels.exportLabels'),
+        icon: mdiDownload,
+        event: 'download'
       }
-    }
+    ])
   }
 })
 </script>

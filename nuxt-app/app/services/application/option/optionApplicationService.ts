@@ -1,6 +1,6 @@
 import { OptionDTO } from './optionData'
-import { OptionRepository } from '~/domain/models/option/optionRepository'
-import { OptionItem } from '~/domain/models/option/option'
+import { type OptionRepository } from '@/domain/models/option/optionRepository'
+import { OptionItem } from '@/domain/models/option/option'
 
 export class OptionApplicationService {
   constructor(private readonly repository: OptionRepository) {}

@@ -1,5 +1,5 @@
 import ApiService from '@/services/api.service'
-import { LabelRepository } from '@/domain/models/label/labelRepository'
+import { type LabelRepository } from '@/domain/models/label/labelRepository'
 import { LabelItem } from '@/domain/models/label/label'
 
 function toModel(item: { [key: string]: any }): LabelItem {

@@ -1,5 +1,5 @@
 <template>
-  <base-card
+  <UtilsBaseCard
     :disabled="!valid"
     :title="$t('members.addMember')"
     :agree-text="$t('generic.save')"
@@ -48,100 +48,88 @@
         </v-alert>
       </v-form>
     </template>
-  </base-card>
+  </UtilsBaseCard>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { mdiAccount, mdiCreditCardOutline } from '@mdi/js'
 import type { PropType } from 'vue'
-import Vue from 'vue'
-import BaseCard from '@/components/utils/BaseCard.vue'
-import { MemberItem } from '~/domain/models/member/member'
-import { RoleItem } from '~/domain/models/role/role'
-import { UserItem } from '~/domain/models/user/user'
+import { computed, onBeforeMount, ref, watch } from 'vue'
+import { MemberItem } from '@/domain/models/member/member'
+import { RoleItem } from '@/domain/models/role/role'
+import { UserItem } from '@/domain/models/user/user'
 
-export default Vue.extend({
-  components: {
-    BaseCard
+const props = defineProps({
+  value: {
+    type: Object as PropType<MemberItem>,
+    required: true
   },
-
-  props: {
-    value: {
-      type: Object as PropType<MemberItem>,
-      required: true
-    },
-    errorMessage: {
-      type: String,
-      default: ''
-    }
-  },
-
-  data() {
-    return {
-      isLoading: false,
-      valid: false,
-      users: [] as UserItem[],
-      roles: [] as RoleItem[],
-      username: '',
-      rules: {
-        userRequired: (v: UserItem) => (!!v && !!v.username) || 'Required',
-        roleRequired: (v: RoleItem) => (!!v && !!v.name) || 'Required'
-      },
-      mdiAccount,
-      mdiCreditCardOutline
-    }
-  },
-
-  async fetch() {
-    this.isLoading = true
-    this.users = await this.$repositories.user.list(this.username)
-    this.isLoading = false
-  },
-
-  computed: {
-    user: {
-      get(): UserItem {
-        return {
-          id: this.value.user,
-          username: this.value.username,
-          isStaff: false,
-          isSuperuser: false
-        }
-      },
-      set(val: MemberItem) {
-        if (val === undefined) return
-        const user = { user: val.id, username: val.username }
-        this.$emit('input', { ...this.value, ...user })
-      }
-    },
-    role: {
-      get(): RoleItem {
-        return {
-          id: this.value.role,
-          name: this.value.rolename
-        }
-      },
-      set(val: RoleItem) {
-        const role = { role: val.id, rolename: val.name }
-        this.$emit('input', { ...this.value, ...role })
-      }
-    }
-  },
-
-  watch: {
-    username() {
-      // Items have already been loaded
-      if (this.users.length > 0) return
-
-      // Items have already been requested
-      if (this.isLoading) return
-
-      this.$fetch()
-    }
-  },
-
-  async created() {
-    this.roles = await this.$repositories.role.list()
+  errorMessage: {
+    type: String,
+    default: ''
   }
+})
+
+const emit = defineEmits<{
+  input: [value: MemberItem]
+  save: []
+  cancel: []
+}>()
+
+const { $repositories } = useNuxtApp()
+
+const isLoading = ref(false)
+const valid = ref(false)
+const users = ref<UserItem[]>([])
+const roles = ref<RoleItem[]>([])
+const username = ref('')
+const rules = {
+  userRequired: (v: UserItem) => (!!v && !!v.username) || 'Required',
+  roleRequired: (v: RoleItem) => (!!v && !!v.name) || 'Required'
+}
+
+const user = computed({
+  get(): UserItem {
+    return {
+      id: props.value.user,
+      username: props.value.username,
+      isStaff: false,
+      isSuperuser: false
+    }
+  },
+  set(val: UserItem) {
+    if (val === undefined) return
+    const userData = { user: val.id, username: val.username }
+    emit('input', { ...props.value, ...userData })
+  }
+})
+
+const role = computed({
+  get(): RoleItem {
+    return {
+      id: props.value.role,
+      name: props.value.rolename
+    }
+  },
+  set(val: RoleItem) {
+    const roleData = { role: val.id, rolename: val.name }
+    emit('input', { ...props.value, ...roleData })
+  }
+})
+
+async function fetchUsers() {
+  isLoading.value = true
+  users.value = await $repositories.user.list(username.value)
+  isLoading.value = false
+}
+
+watch(username, () => {
+  if (users.value.length > 0) return
+  if (isLoading.value) return
+  fetchUsers()
+})
+
+onBeforeMount(async () => {
+  roles.value = await $repositories.role.list()
 })
 </script>

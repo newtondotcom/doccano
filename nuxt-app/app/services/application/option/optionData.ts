@@ -1,4 +1,4 @@
-import { OptionItem } from '~/domain/models/option/option'
+import { OptionItem } from '@/domain/models/option/option'
 
 export class OptionDTO {
   page: number

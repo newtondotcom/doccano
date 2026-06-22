@@ -1,5 +1,5 @@
 import ApiService from '@/services/api.service'
-import { ConfigItem, ConfigItemList } from '~/domain/models/autoLabeling/config'
+import { ConfigItem, ConfigItemList } from '@/domain/models/autoLabeling/config'
 
 export interface ConfigItemResponse {
   id: number

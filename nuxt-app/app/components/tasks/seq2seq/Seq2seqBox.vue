@@ -48,69 +48,64 @@
   </v-card>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import { mdiPencil, mdiDeleteOutline } from '@mdi/js'
 
-export default Vue.extend({
-  props: {
-    annotations: {
-      type: Array,
-      default: () => [],
-      required: true
-    }
-  },
-
-  data() {
-    return {
-      newText: '',
-      headers: [
-        {
-          text: 'Text',
-          align: 'left',
-          value: 'text'
-        },
-        {
-          text: 'Actions',
-          align: 'right',
-          value: 'action'
-        }
-      ],
-      isComposing: false,
-      hasCompositionJustEnded: false,
-      mdiPencil,
-      mdiDeleteOutline
-    }
-  },
-
-  methods: {
-    update(annotationId: number, text: string) {
-      if (text.length > 0) {
-        this.$emit('update:annotation', annotationId, text)
-      } else {
-        this.remove(annotationId)
-      }
-    },
-    create() {
-      if (this.isComposing || this.hasCompositionJustEnded) {
-        this.hasCompositionJustEnded = false
-        return
-      }
-      if (this.newText.length > 0) {
-        this.$emit('create:annotation', this.newText)
-        this.newText = ''
-      }
-    },
-    remove(annotationId: number) {
-      this.$emit('delete:annotation', annotationId)
-    },
-    compositionStart() {
-      this.isComposing = true
-    },
-    compositionEnd() {
-      this.isComposing = false
-      this.hasCompositionJustEnded = true
-    }
+defineProps({
+  annotations: {
+    type: Array,
+    default: () => [],
+    required: true
   }
 })
+
+const emit = defineEmits(['update:annotation', 'create:annotation', 'delete:annotation'])
+
+const newText = ref('')
+const headers = [
+  {
+    text: 'Text',
+    align: 'left',
+    value: 'text'
+  },
+  {
+    text: 'Actions',
+    align: 'right',
+    value: 'action'
+  }
+]
+const isComposing = ref(false)
+const hasCompositionJustEnded = ref(false)
+
+function update(annotationId: number, text: string) {
+  if (text.length > 0) {
+    emit('update:annotation', annotationId, text)
+  } else {
+    remove(annotationId)
+  }
+}
+
+function create() {
+  if (isComposing.value || hasCompositionJustEnded.value) {
+    hasCompositionJustEnded.value = false
+    return
+  }
+  if (newText.value.length > 0) {
+    emit('create:annotation', newText.value)
+    newText.value = ''
+  }
+}
+
+function remove(annotationId: number) {
+  emit('delete:annotation', annotationId)
+}
+
+function compositionStart() {
+  isComposing.value = true
+}
+
+function compositionEnd() {
+  isComposing.value = false
+  hasCompositionJustEnded.value = true
+}
 </script>

@@ -2,25 +2,25 @@
   <v-toolbar class="toolbar-control" dense flat>
     <v-row no-gutters>
       <v-btn-toggle>
-        <button-review :is-reviewd="isReviewd" @click:review="$emit('click:review')" />
+        <TasksToolbarButtonsButtonReview :is-reviewd="isReviewd" @click:review="$emit('click:review')" />
 
-        <button-filter :value="filterOption" @click:filter="changeFilter" />
+        <TasksToolbarButtonsButtonFilter :value="filterOption" @click:filter="changeFilter" />
 
-        <button-order :value="orderOption" @click:order="changeOrder" />
+        <TasksToolbarButtonsButtonOrder :value="orderOption" @click:order="changeOrder" />
 
-        <button-guideline @click:guideline="dialogGuideline = true" />
+        <TasksToolbarButtonsButtonGuideline @click:guideline="dialogGuideline = true" />
         <v-dialog v-model="dialogGuideline">
-          <form-guideline :guideline-text="guidelineText" @click:close="dialogGuideline = false" />
+          <TasksToolbarFormsFormGuideline :guideline-text="guidelineText" @click:close="dialogGuideline = false" />
         </v-dialog>
 
-        <button-comment @click:comment="dialogComment = true" />
+        <TasksToolbarButtonsButtonComment @click:comment="dialogComment = true" />
         <v-dialog v-model="dialogComment">
-          <form-comment :example-id="docId" @click:cancel="dialogComment = false" />
+          <TasksToolbarFormsFormComment :example-id="docId" @click:cancel="dialogComment = false" />
         </v-dialog>
 
-        <button-auto-labeling @click:auto="dialogAutoLabeling = true" />
+        <TasksToolbarButtonsButtonAutoLabeling @click:auto="dialogAutoLabeling = true" />
         <v-dialog v-model="dialogAutoLabeling">
-          <form-auto-labeling
+          <TasksToolbarFormsFormAutoLabeling
             :is-enabled="enableAutoLabeling"
             :error-message="errorMessage"
             @click:cancel="dialogAutoLabeling = false"
@@ -28,25 +28,22 @@
           />
         </v-dialog>
 
-        <button-clear @click:clear="dialogClear = true" />
+        <TasksToolbarButtonsButtonClear @click:clear="dialogClear = true" />
         <v-dialog v-model="dialogClear">
-          <form-clear-label
-            @click:ok="
-              $emit('click:clear-label')
-              dialogClear = false
-            "
+          <TasksToolbarFormsFormClearLabel
+            @click:ok="confirmClear"
             @click:cancel="dialogClear = false"
           />
         </v-dialog>
 
-        <button-keyboard-shortcut @click:open="dialogShortcut = true" />
+        <TasksToolbarButtonsButtonKeyboardShortcut @click:open="dialogShortcut = true" />
         <v-dialog v-model="dialogShortcut">
-          <form-keyboard-shortcut @click:close="dialogShortcut = false" />
+          <TasksToolbarFormsFormKeyboardShortcut @click:close="dialogShortcut = false" />
         </v-dialog>
       </v-btn-toggle>
       <slot />
       <v-spacer />
-      <button-pagination
+      <TasksToolbarButtonsButtonPagination
         :value="page"
         :total="total"
         @click:prev="updatePage(page - 1)"
@@ -59,135 +56,89 @@
   </v-toolbar>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import ButtonAutoLabeling from './buttons/ButtonAutoLabeling.vue'
-import ButtonClear from './buttons/ButtonClear.vue'
-import ButtonComment from './buttons/ButtonComment.vue'
-import ButtonFilter from './buttons/ButtonFilter.vue'
-import ButtonGuideline from './buttons/ButtonGuideline.vue'
-import ButtonOrder from './buttons/ButtonOrder.vue'
-import ButtonPagination from './buttons/ButtonPagination.vue'
-import ButtonReview from './buttons/ButtonReview.vue'
-import ButtonKeyboardShortcut from './buttons/ButtonKeyboardShortcut.vue'
-import FormAutoLabeling from './forms/FormAutoLabeling.vue'
-import FormClearLabel from './forms/FormClearLabel.vue'
-import FormComment from './forms/FormComment.vue'
-import FormGuideline from './forms/FormGuideline.vue'
-import FormKeyboardShortcut from './forms/FormKeyboardShortcut.vue'
-
-export default Vue.extend({
-  components: {
-    ButtonAutoLabeling,
-    ButtonClear,
-    ButtonComment,
-    ButtonFilter,
-    ButtonGuideline,
-    ButtonOrder,
-    ButtonKeyboardShortcut,
-    ButtonPagination,
-    ButtonReview,
-    FormAutoLabeling,
-    FormClearLabel,
-    FormComment,
-    FormGuideline,
-    FormKeyboardShortcut
+<script setup lang="ts">
+const props = defineProps({
+  docId: {
+    type: Number,
+    required: true
   },
-
-  props: {
-    docId: {
-      type: Number,
-      required: true
-    },
-    enableAutoLabeling: {
-      type: Boolean,
-      default: false,
-      required: true
-    },
-    guidelineText: {
-      type: String,
-      default: '',
-      required: true
-    },
-    isReviewd: {
-      type: Boolean,
-      default: false
-    },
-    total: {
-      type: Number,
-      default: 1
-    }
+  enableAutoLabeling: {
+    type: Boolean,
+    default: false,
+    required: true
   },
-
-  data() {
-    return {
-      dialogAutoLabeling: false,
-      dialogClear: false,
-      dialogComment: false,
-      dialogGuideline: false,
-      dialogShortcut: false,
-      errorMessage: ''
-    }
+  guidelineText: {
+    type: String,
+    default: '',
+    required: true
   },
-
-  computed: {
-    page(): number {
-      // @ts-ignore
-      return parseInt(this.$route.query.page, 10)
-    },
-    filterOption(): string {
-      // @ts-ignore
-      return this.$route.query.isChecked
-    },
-    orderOption(): string {
-      // @ts-ignore
-      return this.$route.query.ordering
-    }
+  isReviewd: {
+    type: Boolean,
+    default: false
   },
-
-  methods: {
-    updatePage(page: number) {
-      this.$router.push({
-        query: {
-          page: page.toString(),
-          isChecked: this.filterOption,
-          ordering: this.$route.query.ordering,
-          q: this.$route.query.q
-        }
-      })
-    },
-
-    changeFilter(isChecked: string) {
-      this.$router.push({
-        query: {
-          page: '1',
-          isChecked,
-          ordering: this.$route.query.ordering,
-          q: this.$route.query.q
-        }
-      })
-    },
-
-    changeOrder(ordering: string) {
-      this.$router.push({
-        query: {
-          page: '1',
-          isChecked: this.filterOption,
-          q: this.$route.query.q,
-          ordering
-        }
-      })
-    },
-
-    updateAutoLabeling(isEnable: boolean) {
-      if (isEnable) {
-        this.$emit('update:enable-auto-labeling', true)
-      } else {
-        this.$emit('update:enable-auto-labeling', false)
-      }
-    }
+  total: {
+    type: Number,
+    default: 1
   }
 })
+
+const emit = defineEmits(['click:review', 'click:clear-label', 'update:enable-auto-labeling'])
+
+const route = useRoute()
+const router = useRouter()
+
+const dialogAutoLabeling = ref(false)
+const dialogClear = ref(false)
+const dialogComment = ref(false)
+const dialogGuideline = ref(false)
+const dialogShortcut = ref(false)
+const errorMessage = ref('')
+
+const page = computed(() => parseInt(route.query.page as string, 10))
+const filterOption = computed(() => route.query.isChecked as string)
+const orderOption = computed(() => route.query.ordering as string)
+
+function updatePage(pageNum: number) {
+  router.push({
+    query: {
+      page: pageNum.toString(),
+      isChecked: filterOption.value,
+      ordering: route.query.ordering,
+      q: route.query.q
+    }
+  })
+}
+
+function changeFilter(isChecked: string) {
+  router.push({
+    query: {
+      page: '1',
+      isChecked,
+      ordering: route.query.ordering,
+      q: route.query.q
+    }
+  })
+}
+
+function changeOrder(ordering: string) {
+  router.push({
+    query: {
+      page: '1',
+      isChecked: filterOption.value,
+      q: route.query.q,
+      ordering
+    }
+  })
+}
+
+function updateAutoLabeling(isEnable: boolean) {
+  emit('update:enable-auto-labeling', isEnable)
+}
+
+function confirmClear() {
+  emit('click:clear-label')
+  dialogClear.value = false
+}
 </script>
 
 <style scoped>

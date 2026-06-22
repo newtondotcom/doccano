@@ -5,12 +5,8 @@ export const useMainStore = defineStore("config", {
         rtl: false,
     }),
     actions: {
-        changeRTLState(state) {
-            state.rtl = !state.rtl;
-        },
-
-        toggleRTL({ commit }) {
-            commit("changeRTLState");
+        setRTL(value: boolean) {
+            this.rtl = value;
         },
     },
     getters: {

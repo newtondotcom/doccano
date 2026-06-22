@@ -12,26 +12,22 @@
   </v-card>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-
-export default Vue.extend({
-  props: {
-    title: {
-      type: String,
-      default: '',
-      required: true
-    },
-    text: {
-      type: String,
-      default: '',
-      required: true
-    },
-    imageSrc: {
-      type: String,
-      default: '',
-      required: true
-    }
+<script setup lang="ts">
+defineProps({
+  title: {
+    type: String,
+    default: '',
+    required: true
+  },
+  text: {
+    type: String,
+    default: '',
+    required: true
+  },
+  imageSrc: {
+    type: String,
+    default: '',
+    required: true
   }
 })
 </script>

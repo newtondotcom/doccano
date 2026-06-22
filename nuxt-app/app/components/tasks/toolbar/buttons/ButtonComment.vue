@@ -1,7 +1,7 @@
 <template>
   <v-tooltip bottom>
-    <template #activator="{ on }">
-      <v-btn icon v-on="on" @click="$emit('click:comment')">
+    <template #activator="{ props }">
+      <v-btn icon v-bind="props" @click="$emit('click:comment')">
         <v-icon>
           {{ mdiMessageText }}
         </v-icon>
@@ -11,15 +11,8 @@
   </v-tooltip>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import { mdiMessageText } from '@mdi/js'
 
-export default Vue.extend({
-  data() {
-    return {
-      mdiMessageText
-    }
-  }
-})
+defineEmits(['click:comment'])
 </script>

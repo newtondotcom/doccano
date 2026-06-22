@@ -1,7 +1,7 @@
 import { plainToInstance } from 'class-transformer'
 import { ExampleDTO, ExampleListDTO } from './exampleData'
-import { ExampleRepository, SearchOption } from '~/domain/models/example/exampleRepository'
-import { ExampleItem } from '~/domain/models/example/example'
+import { type ExampleRepository, type SearchOption } from '@/domain/models/example/exampleRepository'
+import { ExampleItem } from '@/domain/models/example/example'
 
 export class ExampleApplicationService {
   constructor(private readonly repository: ExampleRepository) {}

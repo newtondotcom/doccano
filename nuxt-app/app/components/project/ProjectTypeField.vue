@@ -23,53 +23,43 @@
   </v-item-group>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { mdiCheckBold } from '@mdi/js'
-import Vue from 'vue'
+import { ref } from 'vue'
 import {
   allProjectTypes,
   DocumentClassification,
   ProjectType
-} from '~/domain/models/project/project'
+} from '@/domain/models/project/project'
 
-export default Vue.extend({
-  props: {
-    value: {
-      type: String,
-      default: DocumentClassification,
-      required: true
-    }
-  },
-
-  data() {
-    return {
-      mdiCheckBold,
-      allProjectTypes,
-      selected: 0
-    }
-  },
-
-  computed: {
-    images() {
-      return [
-        'text_classification.png',
-        'sequence_labeling.png',
-        'seq2seq.png',
-        'intent_detection.png',
-        'image_classification.png',
-        'image_captioning.jpg',
-        'object_detection.jpg',
-        'segmentation.jpg',
-        'speech_to_text.png'
-      ]
-    }
-  },
-
-  methods: {
-    translateTypeName(type: ProjectType, types: any): string {
-      const index = allProjectTypes.indexOf(type)
-      return types[index]
-    }
+defineProps({
+  value: {
+    type: String,
+    default: DocumentClassification,
+    required: true
   }
 })
+
+defineEmits<{
+  input: [value: ProjectType]
+}>()
+
+const selected = ref(0)
+
+const images = [
+  'text_classification.png',
+  'sequence_labeling.png',
+  'seq2seq.png',
+  'intent_detection.png',
+  'image_classification.png',
+  'image_captioning.jpg',
+  'object_detection.jpg',
+  'segmentation.jpg',
+  'speech_to_text.png'
+]
+
+function translateTypeName(type: ProjectType, types: any): string {
+  const index = allProjectTypes.indexOf(type)
+  return types[index]
+}
 </script>

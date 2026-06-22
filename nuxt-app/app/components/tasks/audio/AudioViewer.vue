@@ -52,8 +52,7 @@
   </div>
 </template>
 
-<script>
-import Vue from 'vue'
+<script setup>
 import WaveSurfer from 'wavesurfer.js'
 import {
   mdiPlayCircleOutline,
@@ -63,71 +62,65 @@ import {
   mdiMagnifyMinusOutline
 } from '@mdi/js'
 
-export default Vue.extend({
-  props: {
-    source: {
-      type: String,
-      default: '',
-      required: true
-    }
-  },
-
-  data() {
-    return {
-      wavesurfer: null,
-      isPlaying: false,
-      zoom: 0,
-      volume: 0.6,
-      speed: 1,
-      speeds: [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0],
-      mdiPlayCircleOutline,
-      mdiPauseCircleOutline,
-      mdiVolumeHigh,
-      mdiMagnifyPlusOutline,
-      mdiMagnifyMinusOutline
-    }
-  },
-
-  watch: {
-    source() {
-      this.load()
-      this.isPlaying = false
-    }
-  },
-
-  mounted() {
-    this.wavesurfer = WaveSurfer.create({
-      container: '#waveform',
-      backend: 'MediaElement'
-    })
-    this.load()
-  },
-
-  methods: {
-    load() {
-      this.wavesurfer.load(this.source)
-    },
-    play() {
-      this.isPlaying = !this.isPlaying
-      this.wavesurfer.playPause()
-    },
-    zoomOut() {
-      this.zoom = this.zoom - 10 || 0
-      this.onChangeZoom(this.zoom)
-    },
-    zoomIn() {
-      this.zoom = this.zoom + 10 || 500
-      this.onChangeZoom(this.zoom)
-    },
-    onChangeVolume(value) {
-      this.wavesurfer.setVolume(value)
-    },
-    onChangeZoom(value) {
-      this.wavesurfer.zoom(value)
-    },
-    onChangeSpeed(value) {
-      this.wavesurfer.setPlaybackRate(value)
-    }
+const props = defineProps({
+  source: {
+    type: String,
+    default: '',
+    required: true
   }
 })
+
+const wavesurfer = ref(null)
+const isPlaying = ref(false)
+const zoom = ref(0)
+const volume = ref(0.6)
+const speed = ref(1)
+const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
+
+watch(
+  () => props.source,
+  () => {
+    load()
+    isPlaying.value = false
+  }
+)
+
+onMounted(() => {
+  wavesurfer.value = WaveSurfer.create({
+    container: '#waveform',
+    backend: 'MediaElement'
+  })
+  load()
+})
+
+function load() {
+  wavesurfer.value?.load(props.source)
+}
+
+function play() {
+  isPlaying.value = !isPlaying.value
+  wavesurfer.value?.playPause()
+}
+
+function zoomOut() {
+  zoom.value = zoom.value - 10 || 0
+  onChangeZoom(zoom.value)
+}
+
+function zoomIn() {
+  zoom.value = zoom.value + 10 || 500
+  onChangeZoom(zoom.value)
+}
+
+function onChangeVolume(value) {
+  wavesurfer.value?.setVolume(value)
+}
+
+function onChangeZoom(value) {
+  wavesurfer.value?.zoom(value)
+}
+
+function onChangeSpeed(value) {
+  wavesurfer.value?.setPlaybackRate(value)
+}
 </script>

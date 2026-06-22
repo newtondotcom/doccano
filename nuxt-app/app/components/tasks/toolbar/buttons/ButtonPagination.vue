@@ -61,76 +61,63 @@
   </div>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import { mdiPageFirst, mdiPageLast, mdiChevronLeft, mdiChevronRight } from '@mdi/js'
 
-export default Vue.extend({
-  props: {
-    value: {
-      type: Number,
-      default: 1,
-      required: true
-    },
-    total: {
-      type: Number,
-      default: 1,
-      required: true
-    }
+const props = defineProps({
+  value: {
+    type: Number,
+    default: 1,
+    required: true
   },
-
-  data() {
-    return {
-      editedPage: '1',
-      rules: [
-        (v: string) =>
-          (v && parseInt(v, 10) > 0 && parseInt(v, 10) <= this.total) || 'Invalid page number!'
-      ],
-      mdiPageFirst,
-      mdiPageLast,
-      mdiChevronLeft,
-      mdiChevronRight
-    }
-  },
-
-  computed: {
-    isFirstPage(): boolean {
-      return this.value === 1
-    },
-    isLastPage(): boolean {
-      return this.value === this.total || this.total === 0
-    }
-  },
-
-  methods: {
-    changePageNumber() {
-      if (!this.editedPage) {
-        return
-      }
-      const page = parseInt(this.editedPage, 10)
-      if (page < 0 || page > this.total) {
-        return
-      }
-      this.$emit('click:jump', page)
-    },
-    prevPage() {
-      if (this.value === 1) {
-        return
-      }
-      this.$emit('click:prev')
-    },
-    nextPage() {
-      if (this.value === this.total) {
-        return
-      }
-      this.$emit('click:next')
-    },
-    firstPage() {
-      this.$emit('click:first')
-    },
-    lastPage() {
-      this.$emit('click:last')
-    }
+  total: {
+    type: Number,
+    default: 1,
+    required: true
   }
 })
+
+const emit = defineEmits(['click:prev', 'click:next', 'click:first', 'click:last', 'click:jump'])
+
+const editedPage = ref('1')
+const rules = [
+  (v: string) =>
+    (v && parseInt(v, 10) > 0 && parseInt(v, 10) <= props.total) || 'Invalid page number!'
+]
+
+const isFirstPage = computed(() => props.value === 1)
+const isLastPage = computed(() => props.value === props.total || props.total === 0)
+
+function changePageNumber() {
+  if (!editedPage.value) {
+    return
+  }
+  const page = parseInt(editedPage.value, 10)
+  if (page < 0 || page > props.total) {
+    return
+  }
+  emit('click:jump', page)
+}
+
+function prevPage() {
+  if (props.value === 1) {
+    return
+  }
+  emit('click:prev')
+}
+
+function nextPage() {
+  if (props.value === props.total) {
+    return
+  }
+  emit('click:next')
+}
+
+function firstPage() {
+  emit('click:first')
+}
+
+function lastPage() {
+  emit('click:last')
+}
 </script>

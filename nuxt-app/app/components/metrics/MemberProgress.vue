@@ -12,25 +12,20 @@
   </v-card>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import { Progress } from '~/domain/models/metrics/metrics'
+<script setup lang="ts">
+import { onBeforeMount, ref } from 'vue'
+import { Progress } from '@/domain/models/metrics/metrics'
 
-export default Vue.extend({
-  data() {
-    return {
-      stats: {} as Progress
-    }
-  },
+const route = useRoute()
+const { $repositories } = useNuxtApp()
 
-  async created() {
-    this.stats = await this.$repositories.metrics.fetchMemberProgress(this.$route.params.id)
-  },
+const stats = ref({} as Progress)
 
-  methods: {
-    rate(done: number, total: number) {
-      return (done / total) * 100
-    }
-  }
+function rate(done: number, total: number) {
+  return (done / total) * 100
+}
+
+onBeforeMount(async () => {
+  stats.value = await $repositories.metrics.fetchMemberProgress(route.params.id as string)
 })
 </script>

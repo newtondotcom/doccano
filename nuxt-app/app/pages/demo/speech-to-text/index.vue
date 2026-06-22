@@ -7,7 +7,7 @@
             Your browser does not support the
             <code>audio</code> element.
           </audio>
-          <seq2seq-box
+          <TasksSeq2seqBox
             :text="currentDoc.text"
             :annotations="currentDoc.annotations"
             @delete:annotation="_deleteAnnotation"
@@ -16,63 +16,53 @@
           />
         </v-col>
         <v-col cols="12" md="3">
-          <list-metadata :metadata="currentDoc.meta" />
+          <TasksMetadataListMetadata :metadata="currentDoc.meta" />
         </v-col>
       </v-row>
     </v-container>
   </v-main>
 </template>
 
-<script>
-import ListMetadata from '@/components/tasks/metadata/ListMetadata'
-import Seq2seqBox from '~/components/tasks/seq2seq/Seq2seqBox'
+<script setup>
+definePageMeta({
+  layout: 'demo'
+})
 
-export default {
-  components: {
-    Seq2seqBox,
-    ListMetadata
-  },
-  layout: 'demo',
-
-  data() {
-    return {
-      currentDoc: {
-        id: 8,
-        text: '',
-        annotations: [
-          {
-            id: 17,
-            text: 'Hi! Welcome to doccano!',
-            user: 1,
-            document: 8
-          }
-        ],
-        meta: {
-          url: 'https://github.com/doccano'
-        },
-        annotation_approver: null
-      },
-      src: require('~/assets/examples/speech_1.mp3').default
+const currentDoc = ref({
+  id: 8,
+  text: '',
+  annotations: [
+    {
+      id: 17,
+      text: 'Hi! Welcome to doccano!',
+      user: 1,
+      document: 8
     }
+  ],
+  meta: {
+    url: 'https://github.com/doccano'
   },
+  annotation_approver: null
+})
 
-  methods: {
-    _deleteAnnotation(annotationId) {
-      this.currentDoc.annotations = this.currentDoc.annotations.filter(
-        (item) => item.id !== annotationId
-      )
-    },
-    _updateAnnotation(annotationId, text) {
-      const index = this.currentDoc.annotations.findIndex((item) => item.id === annotationId)
-      this.currentDoc.annotations[index].text = text
-    },
-    _createAnnotation(text) {
-      const payload = {
-        id: Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER)),
-        text
-      }
-      this.currentDoc.annotations.push(payload)
-    }
+const src = require('@/assets/examples/speech_1.mp3').default
+
+function _deleteAnnotation(annotationId) {
+  currentDoc.value.annotations = currentDoc.value.annotations.filter(
+    (item) => item.id !== annotationId
+  )
+}
+
+function _updateAnnotation(annotationId, text) {
+  const index = currentDoc.value.annotations.findIndex((item) => item.id === annotationId)
+  currentDoc.value.annotations[index].text = text
+}
+
+function _createAnnotation(text) {
+  const payload = {
+    id: Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER)),
+    text
   }
+  currentDoc.value.annotations.push(payload)
 }
 </script>

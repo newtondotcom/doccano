@@ -4,11 +4,11 @@
       <v-form ref="form" v-model="valid" :disabled="!isEditing">
         <v-row>
           <v-col cols="12" sm="12" md="6" lg="6" xl="6">
-            <project-name-field v-model="project.name" />
-            <project-description-field v-model="project.description" />
-            <tag-list v-model="tags" />
-            <random-order-field v-model="project.enableRandomOrder" />
-            <sharing-mode-field v-model="project.enableSharingMode" />
+            <ProjectNameField v-model="project.name" />
+            <ProjectDescriptionField v-model="project.description" />
+            <ProjectTagList v-model="tags" />
+            <ProjectRandomOrderField v-model="project.enableRandomOrder" />
+            <ProjectSharingModeField v-model="project.enableSharingMode" />
             <v-checkbox
               v-if="project.canDefineLabel"
               v-model="project.allowMemberToCreateLabelType"
@@ -38,53 +38,39 @@
   </v-card>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import ProjectDescriptionField from './ProjectDescriptionField.vue'
-import ProjectNameField from './ProjectNameField.vue'
-import RandomOrderField from './RandomOrderField.vue'
-import SharingModeField from './SharingModeField.vue'
-import TagList from './TagList.vue'
-import { Project } from '~/domain/models/project/project'
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { Project } from '@/domain/models/project/project'
 
-export default Vue.extend({
-  components: {
-    ProjectNameField,
-    ProjectDescriptionField,
-    RandomOrderField,
-    SharingModeField,
-    TagList
-  },
+const route = useRoute()
+const { $services } = useNuxtApp()
 
-  data() {
-    return {
-      project: {} as Project,
-      tags: [] as string[],
-      valid: false,
-      isEditing: false,
-      isUpdating: false
-    }
-  },
+const project = ref({} as Project)
+const tags = ref<string[]>([])
+const valid = ref(false)
+const isEditing = ref(false)
+const isUpdating = ref(false)
 
-  async fetch() {
-    const projectId = this.$route.params.id
-    this.project = await this.$services.project.findById(projectId)
-    this.tags = this.project.tags.map((item) => item.text)
-    this.isEditing = false
-  },
+async function loadProject() {
+  const projectId = route.params.id as string
+  project.value = await $services.project.findById(projectId)
+  tags.value = project.value.tags.map((item) => item.text)
+  isEditing.value = false
+}
 
-  methods: {
-    cancel() {
-      this.$fetch()
-    },
+function cancel() {
+  loadProject()
+}
 
-    async save() {
-      this.isUpdating = true
-      await this.$services.project.update(this.project.id, this.project)
-      await this.$services.tag.bulkUpdate(this.project.id, this.tags)
-      this.$fetch()
-      this.isUpdating = false
-    }
-  }
+async function save() {
+  isUpdating.value = true
+  await $services.project.update(project.value.id, project.value)
+  await $services.tag.bulkUpdate(project.value.id, tags.value)
+  await loadProject()
+  isUpdating.value = false
+}
+
+onMounted(() => {
+  loadProject()
 })
 </script>

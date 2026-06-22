@@ -1,4 +1,3 @@
-import { Plugin } from '@nuxt/types'
 import { repositories } from './repositories'
 import { ExampleApplicationService } from '@/services/application/example/exampleApplicationService'
 import { LabelApplicationService } from '@/services/application/label/labelApplicationService'
@@ -22,29 +21,30 @@ export interface Services {
   segmentation: SegmentationApplicationService
 }
 
-declare module 'vue/types/vue' {
-  interface Vue {
-    readonly $services: Services
-  }
+const services: Services = {
+  categoryType: new LabelApplicationService(repositories.categoryType),
+  spanType: new LabelApplicationService(repositories.spanType),
+  relationType: new LabelApplicationService(repositories.relationType),
+  project: new ProjectApplicationService(repositories.project),
+  example: new ExampleApplicationService(repositories.example),
+  sequenceLabeling: new SequenceLabelingApplicationService(
+    repositories.span,
+    repositories.relation
+  ),
+  option: new OptionApplicationService(repositories.option),
+  tag: new TagApplicationService(repositories.tag),
+  bbox: new BoundingBoxApplicationService(repositories.boundingBox),
+  segmentation: new SegmentationApplicationService(repositories.segmentation)
 }
 
-const plugin: Plugin = (_, inject) => {
-  const services: Services = {
-    categoryType: new LabelApplicationService(repositories.categoryType),
-    spanType: new LabelApplicationService(repositories.spanType),
-    relationType: new LabelApplicationService(repositories.relationType),
-    project: new ProjectApplicationService(repositories.project),
-    example: new ExampleApplicationService(repositories.example),
-    sequenceLabeling: new SequenceLabelingApplicationService(
-      repositories.span,
-      repositories.relation
-    ),
-    option: new OptionApplicationService(repositories.option),
-    tag: new TagApplicationService(repositories.tag),
-    bbox: new BoundingBoxApplicationService(repositories.boundingBox),
-    segmentation: new SegmentationApplicationService(repositories.segmentation)
+export default defineNuxtPlugin({
+  name: 'doccano-services',
+  dependsOn: ['doccano-repositories'],
+  setup() {
+    return {
+      provide: {
+        services
+      }
+    }
   }
-  inject('services', services)
-}
-
-export default plugin
+})

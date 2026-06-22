@@ -1,11 +1,11 @@
 <template>
   <section>
-    <v-parallax :src="require(`~/assets/vbanner.jpg`)" height="400" dark>
-      <v-layout wrap align-center justify-center class="white--text">
-        <v-flex text-right class="mr-5">
+    <v-parallax src="~/assets/vbanner.jpg" height="400" dark>
+      <v-row align="center" justify="center" class="text-white">
+        <v-col class="text-right mr-5">
           <img src="~/assets/icon.png" alt="doccano" height="200" />
-        </v-flex>
-        <v-flex>
+        </v-col>
+        <v-col>
           <h1 class="mb-2 display-1 text-xs-center">
             {{ $t('home.mainTitle') }}
           </h1>
@@ -20,21 +20,14 @@
               {{ $t('home.getStarted') }}
             </v-btn>
           </div>
-        </v-flex>
-      </v-layout>
+        </v-col>
+      </v-row>
     </v-parallax>
   </section>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import { mdiGithub } from '@mdi/js'
 
-export default Vue.extend({
-  data() {
-    return {
-      mdiGithub
-    }
-  }
-})
+const localePath = useLocalePath()
 </script>

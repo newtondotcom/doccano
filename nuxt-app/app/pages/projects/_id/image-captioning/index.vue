@@ -1,7 +1,7 @@
 <template>
-  <layout-text v-if="example.id">
+  <TasksLayoutText v-if="example.id">
     <template #header>
-      <toolbar-laptop
+      <TasksToolbarLaptop
         :doc-id="example.id"
         :enable-auto-labeling.sync="enableAutoLabeling"
         :guideline-text="project.guideline"
@@ -11,7 +11,7 @@
         @click:clear-label="clear(example.id)"
         @click:review="confirm(projectId)"
       />
-      <toolbar-mobile :total="totalExample" class="d-flex d-sm-none" />
+      <TasksToolbarMobile :total="totalExample" class="d-flex d-sm-none" />
     </template>
     <template #content>
       <v-snackbar :value="!!error" color="error" timeout="2000">
@@ -19,7 +19,7 @@
       </v-snackbar>
       <v-card>
         <v-img contain :src="example.url" :max-height="imageSize.height" class="grey lighten-2" />
-        <seq2seq-box
+        <TasksSeq2seqBox
           :annotations="labels"
           @delete:annotation="(labelId) => remove(example.id, labelId)"
           @update:annotation="(labelId, text) => update(example.id, labelId, text)"
@@ -28,106 +28,78 @@
       </v-card>
     </template>
     <template #sidebar>
-      <annotation-progress :progress="progress" />
-      <list-metadata :metadata="example.meta" class="mt-4" />
+      <TasksSidebarAnnotationProgress :progress="progress" />
+      <TasksMetadataListMetadata :metadata="example.meta" class="mt-4" />
     </template>
-  </layout-text>
+  </TasksLayoutText>
 </template>
 
-<script>
-import { reactive, ref, toRefs, useContext, useFetch, watch } from '@nuxtjs/composition-api'
-import LayoutText from '@/components/tasks/layout/LayoutText'
-import ListMetadata from '@/components/tasks/metadata/ListMetadata'
-import AnnotationProgress from '@/components/tasks/sidebar/AnnotationProgress.vue'
-import ToolbarLaptop from '@/components/tasks/toolbar/ToolbarLaptop'
-import ToolbarMobile from '@/components/tasks/toolbar/ToolbarMobile'
-import Seq2seqBox from '~/components/tasks/seq2seq/Seq2seqBox'
-import { useExampleItem } from '~/composables/useExampleItem'
-import { useProjectItem } from '~/composables/useProjectItem'
-import { useTextLabel } from '~/composables/useTextLabel'
+<script setup>
+import { useExampleItem } from '@/composables/useExampleItem'
+import { useProjectItem } from '@/composables/useProjectItem'
+import { useTextLabel } from '@/composables/useTextLabel'
 
-export default {
-  components: {
-    AnnotationProgress,
-    LayoutText,
-    ListMetadata,
-    Seq2seqBox,
-    ToolbarLaptop,
-    ToolbarMobile
-  },
-
+definePageMeta({
   layout: 'workspace',
+  validate(route) {
+    return /^\d+$/.test(route.params.id) && /^\d+$/.test(route.query.page)
+  }
+})
 
-  validate({ params, query }) {
-    return /^\d+$/.test(params.id) && /^\d+$/.test(query.page)
-  },
+const route = useRoute()
+const { $repositories } = useNuxtApp()
+const projectId = route.params.id
 
-  setup() {
-    const { app, params, query } = useContext()
-    const projectId = params.value.id
-    const { state: projectState, getProjectById } = useProjectItem()
-    const {
-      state: labelState,
-      autoLabel,
-      list,
-      clear,
-      remove,
-      add,
-      update
-    } = useTextLabel(app.$repositories.textLabel, projectId)
-    const { state: exampleState, confirm, getExample, updateProgress } = useExampleItem()
-    const enableAutoLabeling = ref(false)
-    const imageSize = reactive({
-      height: 0,
-      width: 0
-    })
+const { state: projectState, getProjectById } = useProjectItem()
+const { project } = toRefs(projectState)
+const {
+  state: labelState,
+  autoLabel,
+  list,
+  clear,
+  remove,
+  add,
+  update
+} = useTextLabel($repositories.textLabel, projectId)
+const { labels, error } = toRefs(labelState)
+const { state: exampleState, confirm, getExample, updateProgress } = useExampleItem()
+const { example, totalExample, progress } = toRefs(exampleState)
+const enableAutoLabeling = ref(false)
+const imageSize = reactive({
+  height: 0,
+  width: 0
+})
 
-    getProjectById(projectId)
-    updateProgress(projectId)
+getProjectById(projectId)
+updateProgress(projectId)
 
-    const setImageSize = (val) => {
-      const img = new Image()
-      img.onload = function () {
-        imageSize.height = this.height
-        imageSize.width = this.width
-      }
-      img.src = val.url
+function setImageSize(val) {
+  const img = new Image()
+  img.onload = function () {
+    imageSize.height = this.height
+    imageSize.width = this.width
+  }
+  img.src = val.url
+}
+
+async function load() {
+  await getExample(projectId, route.query)
+  setImageSize(exampleState.example)
+  if (enableAutoLabeling.value) {
+    try {
+      await autoLabel(projectId, exampleState.example.id)
+    } catch (e) {
+      enableAutoLabeling.value = false
     }
-
-    const { fetch } = useFetch(async () => {
-      await getExample(projectId, query.value)
-      setImageSize(exampleState.example)
-      if (enableAutoLabeling.value) {
-        try {
-          await autoLabel(projectId, exampleState.example.id)
-        } catch (e) {
-          enableAutoLabeling.value = false
-        }
-      } else {
-        await list(exampleState.example.id)
-      }
-    })
-    watch(query, fetch)
-    watch(enableAutoLabeling, async (val) => {
-      if (val && !exampleState.example.isConfirmed) {
-        await autoLabel(exampleState.example.id)
-      }
-    })
-
-    return {
-      ...toRefs(labelState),
-      ...toRefs(exampleState),
-      ...toRefs(projectState),
-      add,
-      list,
-      clear,
-      remove,
-      update,
-      confirm,
-      enableAutoLabeling,
-      imageSize,
-      projectId
-    }
+  } else {
+    await list(exampleState.example.id)
   }
 }
+
+watch(() => route.query, load, { immediate: true, deep: true })
+watch(enableAutoLabeling, async (val) => {
+  if (val && !exampleState.example.isConfirmed) {
+    await autoLabel(exampleState.example.id)
+  }
+})
 </script>

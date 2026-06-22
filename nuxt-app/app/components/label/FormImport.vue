@@ -17,7 +17,7 @@
           accept=".json"
           :error-messages="errorMessage"
           :label="$t('labels.filePlaceholder')"
-          :rules="uploadSingleFileRules($t('rules.uploadFileRules'))"
+          :rules="uploadSingleFileRules(tm('rules.uploadFileRules'))"
           outlined
           prepend-icon=""
           @change="$emit('clear')"
@@ -36,44 +36,42 @@
   </v-card>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
+import { computed, ref } from 'vue'
 import { uploadSingleFileRules } from '@/rules/index'
 
-export default Vue.extend({
-  props: {
-    errorMessage: {
-      type: String,
-      default: ''
-    }
-  },
+const { tm } = useI18n()
 
-  data() {
-    return {
-      file: null,
-      valid: false,
-      uploadSingleFileRules
-    }
-  },
-
-  computed: {
-    exampleFormat() {
-      const data = [
-        {
-          text: 'Dog',
-          suffix_key: 'a',
-          background_color: '#FF0000',
-          text_color: '#ffffff'
-        },
-        {
-          text: 'Cat',
-          suffix_key: 'c',
-          background_color: '#FF0000',
-          text_color: '#ffffff'
-        }
-      ]
-      return JSON.stringify(data, null, 4)
-    }
+defineProps({
+  errorMessage: {
+    type: String,
+    default: ''
   }
+})
+
+defineEmits<{
+  clear: []
+  upload: [file: File | null]
+}>()
+
+const file = ref(null)
+const valid = ref(false)
+
+const exampleFormat = computed(() => {
+  const data = [
+    {
+      text: 'Dog',
+      suffix_key: 'a',
+      background_color: '#FF0000',
+      text_color: '#ffffff'
+    },
+    {
+      text: 'Cat',
+      suffix_key: 'c',
+      background_color: '#FF0000',
+      text_color: '#ffffff'
+    }
+  ]
+  return JSON.stringify(data, null, 4)
 })
 </script>

@@ -35,9 +35,7 @@
       </nuxt-link>
     </template>
     <template #[`item.createdAt`]="{ item }">
-      <span>{{
-        dateFormat(dateParse(item.createdAt, 'YYYY-MM-DDTHH:mm:ss'), 'YYYY/MM/DD HH:mm')
-      }}</span>
+      <span>{{ formatApiDateTime(item.createdAt, PROJECT_DATETIME_FORMAT) }}</span>
     </template>
     <template #[`item.tags`]="{ item }">
       <v-chip v-for="tag in item.tags" :key="tag.id" outlined v-text="tag.text" />
@@ -45,99 +43,90 @@
   </v-data-table>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { mdiMagnify } from '@mdi/js'
-import { dateFormat } from '@vuejs-community/vue-filter-date-format'
-import { dateParse } from '@vuejs-community/vue-filter-date-parse'
 import type { PropType } from 'vue'
-import Vue from 'vue'
-import { DataOptions } from 'vuetify/types'
-import { Project } from '~/domain/models/project/project'
+import { computed, ref, watch } from 'vue'
+import { Project } from '@/domain/models/project/project'
+import { PROJECT_DATETIME_FORMAT, formatApiDateTime } from '@/utils/date'
 
-export default Vue.extend({
-  props: {
-    isLoading: {
-      type: Boolean,
-      default: false,
-      required: true
-    },
-    items: {
-      type: Array as PropType<Project[]>,
-      default: () => [],
-      required: true
-    },
-    value: {
-      type: Array as PropType<Project[]>,
-      default: () => [],
-      required: true
-    },
-    total: {
-      type: Number,
-      default: 0,
-      required: true
-    }
+defineProps({
+  isLoading: {
+    type: Boolean,
+    default: false,
+    required: true
   },
-
-  data() {
-    return {
-      search: this.$route.query.q,
-      options: {} as DataOptions,
-      mdiMagnify,
-      dateFormat,
-      dateParse
-    }
+  items: {
+    type: Array as PropType<Project[]>,
+    default: () => [],
+    required: true
   },
-
-  computed: {
-    headers(): { text: any; value: string; sortable?: boolean }[] {
-      return [
-        { text: this.$t('generic.name'), value: 'name' },
-        { text: this.$t('generic.description'), value: 'description', sortable: false },
-        { text: this.$t('generic.type'), value: 'projectType' },
-        { text: 'Created', value: 'createdAt' },
-        { text: 'Author', value: 'author' },
-        { text: 'Tags', value: 'tags', sortable: false }
-      ]
-    }
+  value: {
+    type: Array as PropType<Project[]>,
+    default: () => [],
+    required: true
   },
-
-  watch: {
-    options: {
-      handler() {
-        this.updateQuery({
-          query: {
-            limit: this.options.itemsPerPage.toString(),
-            offset: ((this.options.page - 1) * this.options.itemsPerPage).toString(),
-            q: this.search
-          }
-        })
-      },
-      deep: true
-    },
-    search() {
-      this.updateQuery({
-        query: {
-          limit: this.options.itemsPerPage.toString(),
-          offset: '0',
-          q: this.search
-        }
-      })
-      this.options.page = 1
-    }
-  },
-
-  methods: {
-    updateQuery(payload: any) {
-      const { sortBy, sortDesc } = this.options
-      if (sortBy.length === 1 && sortDesc.length === 1) {
-        payload.query.sortBy = sortBy[0]
-        payload.query.sortDesc = sortDesc[0]
-      } else {
-        payload.query.sortBy = 'createdAt'
-        payload.query.sortDesc = true
-      }
-      this.$emit('update:query', payload)
-    }
+  total: {
+    type: Number,
+    default: 0,
+    required: true
   }
+})
+
+const emit = defineEmits<{
+  input: [value: Project[]]
+  'update:query': [payload: any]
+}>()
+
+const route = useRoute()
+const { t, localePath } = useI18n()
+
+const search = ref((route.query.q as string) || '')
+const options = ref({} as DataOptions)
+
+const headers = computed((): { text: any; value: string; sortable?: boolean }[] => [
+  { text: t('generic.name'), value: 'name' },
+  { text: t('generic.description'), value: 'description', sortable: false },
+  { text: t('generic.type'), value: 'projectType' },
+  { text: 'Created', value: 'createdAt' },
+  { text: 'Author', value: 'author' },
+  { text: 'Tags', value: 'tags', sortable: false }
+])
+
+function updateQuery(payload: any) {
+  const { sortBy, sortDesc } = options.value
+  if (sortBy.length === 1 && sortDesc.length === 1) {
+    payload.query.sortBy = sortBy[0]
+    payload.query.sortDesc = sortDesc[0]
+  } else {
+    payload.query.sortBy = 'createdAt'
+    payload.query.sortDesc = true
+  }
+  emit('update:query', payload)
+}
+
+watch(
+  options,
+  () => {
+    updateQuery({
+      query: {
+        limit: options.value.itemsPerPage.toString(),
+        offset: ((options.value.page - 1) * options.value.itemsPerPage).toString(),
+        q: search.value
+      }
+    })
+  },
+  { deep: true }
+)
+
+watch(search, () => {
+  updateQuery({
+    query: {
+      limit: options.value.itemsPerPage.toString(),
+      offset: '0',
+      q: search.value
+    }
+  })
+  options.value.page = 1
 })
 </script>

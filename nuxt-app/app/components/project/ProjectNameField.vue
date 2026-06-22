@@ -9,25 +9,25 @@
   />
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import { validateMinLength, validateNameMaxLength } from '~/domain/models/project/project'
+<script setup lang="ts">
+import { validateMinLength, validateNameMaxLength } from '@/domain/models/project/project'
 
-export default Vue.extend({
-  props: {
-    value: {
-      type: String,
-      default: '',
-      required: true
-    }
-  },
-  data() {
-    return {
-      projectNameRules: [
-        (text: string) => validateMinLength(text) || this.$t('rules.projectName.required'),
-        (text: string) => validateNameMaxLength(text) || this.$t('rules.projectName.maxLength')
-      ]
-    }
+defineProps({
+  value: {
+    type: String,
+    default: '',
+    required: true
   }
 })
+
+defineEmits<{
+  input: [value: string]
+}>()
+
+const { t } = useI18n()
+
+const projectNameRules = [
+  (text: string) => validateMinLength(text) || t('rules.projectName.required'),
+  (text: string) => validateNameMaxLength(text) || t('rules.projectName.maxLength')
+]
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <base-card title="Keyboard Shortcut" :cancel-text="$t('generic.close')" @cancel="close">
+  <UtilsBaseCard title="Keyboard Shortcut" :cancel-text="$t('generic.close')" @cancel="close">
     <template #content>
       <v-simple-table>
         <template #default>
@@ -28,48 +28,36 @@
         </template>
       </v-simple-table>
     </template>
-  </base-card>
+  </UtilsBaseCard>
 </template>
 
-<script>
-import BaseCard from '@/components/utils/BaseCard'
+<script setup>
+const emit = defineEmits(['click:close'])
 
-export default {
-  components: {
-    BaseCard
+const items = [
+  {
+    name: 'Jump to the first data',
+    key: ['shift', '←']
   },
-
-  data() {
-    return {
-      items: [
-        {
-          name: 'Jump to the first data',
-          key: ['shift', '←']
-        },
-        {
-          name: 'Jump to the last data',
-          key: ['shift', '→']
-        },
-        {
-          name: 'Move to the previous data',
-          key: ['←']
-        },
-        {
-          name: 'Move to the next data',
-          key: ['→']
-        },
-        {
-          name: 'Confirm the data',
-          key: ['enter']
-        }
-      ]
-    }
+  {
+    name: 'Jump to the last data',
+    key: ['shift', '→']
   },
-
-  methods: {
-    close() {
-      this.$emit('click:close')
-    }
+  {
+    name: 'Move to the previous data',
+    key: ['←']
+  },
+  {
+    name: 'Move to the next data',
+    key: ['→']
+  },
+  {
+    name: 'Confirm the data',
+    key: ['enter']
   }
+]
+
+function close() {
+  emit('click:close')
 }
 </script>

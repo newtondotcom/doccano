@@ -22,23 +22,19 @@
   </v-form>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 
-export default Vue.extend({
-  data() {
-    return {
-      commentRules: [(v: string) => !!v.trim() || 'Comment is required'],
-      message: '',
-      valid: false
-    }
-  },
+const emit = defineEmits<{
+  'add-comment': [message: string]
+}>()
 
-  methods: {
-    addComment() {
-      this.$emit('add-comment', this.message)
-      this.message = ''
-    }
-  }
-})
+const commentRules = [(v: string) => !!v.trim() || 'Comment is required']
+const message = ref('')
+const valid = ref(false)
+
+function addComment() {
+  emit('add-comment', message.value)
+  message.value = ''
+}
 </script>

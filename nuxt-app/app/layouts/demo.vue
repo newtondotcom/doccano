@@ -1,16 +1,6 @@
 <template>
   <v-app>
-    <the-header />
-    <nuxt />
+    <LayoutTheHeader />
+    <NuxtPage />
   </v-app>
 </template>
-
-<script>
-import TheHeader from '~/components/layout/TheHeader'
-
-export default {
-  components: {
-    TheHeader
-  }
-}
-</script>

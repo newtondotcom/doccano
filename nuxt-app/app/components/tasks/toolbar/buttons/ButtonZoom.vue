@@ -1,16 +1,16 @@
 <template>
   <v-btn-toggle mandatory>
     <v-tooltip bottom>
-      <template #activator="{ on }">
-        <v-btn icon @click="$emit('zoom-out')" v-on="on">
+      <template #activator="{ props }">
+        <v-btn icon v-bind="props" @click="$emit('zoom-out')">
           <v-icon>{{ mdiMagnifyMinusOutline }}</v-icon>
         </v-btn>
       </template>
       <span>Zoom Out</span>
     </v-tooltip>
     <v-tooltip bottom>
-      <template #activator="{ on }" v-on="on">
-        <v-btn icon @click="$emit('zoom-in')">
+      <template #activator="{ props }">
+        <v-btn icon v-bind="props" @click="$emit('zoom-in')">
           <v-icon>{{ mdiMagnifyPlusOutline }}</v-icon>
         </v-btn>
       </template>
@@ -19,15 +19,8 @@
   </v-btn-toggle>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import { mdiMagnifyPlusOutline, mdiMagnifyMinusOutline } from '@mdi/js'
-export default Vue.extend({
-  data() {
-    return {
-      mdiMagnifyPlusOutline,
-      mdiMagnifyMinusOutline
-    }
-  }
-})
+
+defineEmits(['zoom-out', 'zoom-in'])
 </script>

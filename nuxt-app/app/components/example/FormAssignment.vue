@@ -25,7 +25,7 @@
         <v-row>
           <v-card-title class="pb-0 pl-3">Allocate weights</v-card-title>
           <v-col v-for="(member, i) in members" :key="member.id" cols="12" class="pt-0 pb-0">
-            <v-subheader class="pl-0">{{ member.username }}</v-subheader>
+            <div class="text-subtitle-2 pl-0">{{ member.username }}</div>
             <v-slider v-model="workloadAllocation[i]" :max="100" class="align-center">
               <template #append>
                 <v-text-field
@@ -61,78 +61,77 @@
   </v-card>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import { MemberItem } from '~/domain/models/member/member'
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
+import { MemberItem } from '@/domain/models/member/member'
 
-export default Vue.extend({
-  data() {
-    return {
-      members: [] as MemberItem[],
-      workloadAllocation: [] as number[],
-      selectedStrategy: 'weighted_sequential',
-      isWaiting: false
-    }
+const emit = defineEmits<{
+  assigned: []
+  cancel: []
+}>()
+
+const route = useRoute()
+const { $repositories } = useNuxtApp()
+
+const members = ref<MemberItem[]>([])
+const workloadAllocation = ref<number[]>([])
+const selectedStrategy = ref('weighted_sequential')
+const isWaiting = ref(false)
+
+const projectId = computed(() => route.params.id as string)
+
+const strategies = computed(() => [
+  {
+    displayName: 'Weighted sequential',
+    value: 'weighted_sequential',
+    description:
+      'Assign examples to members in order of their workload. The total weight must equal 100.'
   },
-
-  async fetch() {
-    this.members = await this.$repositories.member.list(this.projectId)
-    this.workloadAllocation = this.members.map(() => Math.round(100 / this.members.length))
+  {
+    displayName: 'Weighted random',
+    value: 'weighted_random',
+    description:
+      'Assign examples to members randomly based on their workload. The total weight must equal 100.'
   },
+  {
+    displayName: 'Sampling without replacement',
+    value: 'sampling_without_replacement',
+    description: 'Assign examples to members randomly without replacement.'
+  }
+])
 
-  computed: {
-    projectId() {
-      return this.$route.params.id
-    },
-
-    strategies() {
-      return [
-        {
-          displayName: 'Weighted sequential',
-          value: 'weighted_sequential',
-          description:
-            'Assign examples to members in order of their workload. The total weight must equal 100.'
-        },
-        {
-          displayName: 'Weighted random',
-          value: 'weighted_random',
-          description:
-            'Assign examples to members randomly based on their workload. The total weight must equal 100.'
-        },
-        {
-          displayName: 'Sampling without replacement',
-          value: 'sampling_without_replacement',
-          description: 'Assign examples to members randomly without replacement.'
-        }
-      ]
-    },
-
-    validateWeight(): boolean {
-      if (this.selectedStrategy === 'sampling_without_replacement') {
-        return true
-      } else {
-        return this.workloadAllocation.reduce((acc, cur) => acc + cur, 0) === 100
-      }
-    }
-  },
-
-  methods: {
-    async agree() {
-      this.isWaiting = true
-      const workloads = this.workloadAllocation.map((weight, i) => ({
-        weight,
-        member_id: this.members[i].id
-      }))
-      await this.$repositories.assignment.bulkAssign(this.projectId, {
-        strategy_name: this.selectedStrategy,
-        workloads
-      })
-      this.isWaiting = false
-      this.$emit('assigned')
-    },
-    cancel() {
-      this.$emit('cancel')
-    }
+const validateWeight = computed((): boolean => {
+  if (selectedStrategy.value === 'sampling_without_replacement') {
+    return true
+  } else {
+    return workloadAllocation.value.reduce((acc, cur) => acc + cur, 0) === 100
   }
 })
+
+async function loadMembers() {
+  members.value = await $repositories.member.list(projectId.value)
+  workloadAllocation.value = members.value.map(() => Math.round(100 / members.value.length))
+}
+
+onMounted(() => {
+  loadMembers()
+})
+
+async function agree() {
+  isWaiting.value = true
+  const workloads = workloadAllocation.value.map((weight, i) => ({
+    weight,
+    member_id: members.value[i].id
+  }))
+  await $repositories.assignment.bulkAssign(projectId.value, {
+    strategy_name: selectedStrategy.value,
+    workloads
+  })
+  isWaiting.value = false
+  emit('assigned')
+}
+
+function cancel() {
+  emit('cancel')
+}
 </script>

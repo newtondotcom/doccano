@@ -1,4 +1,4 @@
-import { ExampleItem, ExampleItemList, Assignment } from '~/domain/models/example/example'
+import { type ExampleItem, type ExampleItemList, type Assignment } from '@/domain/models/example/example'
 
 export class ExampleDTO {
   id: number

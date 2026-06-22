@@ -4,7 +4,10 @@ export const colorRules = (msg) => {
 }
 
 export const labelNameRules = (msg) => {
-  return [(v) => !!v || msg.labelRequired, (v) => (v && v.length <= 30) || msg.labelLessThan30Chars]
+  return [
+    (v) => !!v || msg.labelRequired,
+    (v) => (v && v.length <= 100) || msg.labelLessThan100Chars
+  ]
 }
 
 // Rules for project member.

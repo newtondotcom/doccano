@@ -1,53 +1,51 @@
 <template>
   <v-app>
-    <the-header>
+    <LayoutTheHeader>
       <template #leftDrawerIcon>
         <v-app-bar-nav-icon @click="drawerLeft = !drawerLeft" />
       </template>
-    </the-header>
+    </LayoutTheHeader>
 
     <v-navigation-drawer v-model="drawerLeft" app clipped>
-      <the-side-bar :is-project-admin="isProjectAdmin" :project="currentProject" />
+      <LayoutTheSideBar :is-project-admin="isProjectAdmin" :project="currentProject" />
     </v-navigation-drawer>
 
     <v-main class="pb-0">
-      <nuxt />
+      <NuxtPage />
     </v-main>
   </v-app>
 </template>
 
-<script>
-import { mapGetters } from 'vuex'
-import TheHeader from '~/components/layout/TheHeader'
-import TheSideBar from '~/components/layout/TheSideBar'
+<script setup>
+import { ref, watch, onBeforeMount } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useMainStore as useProjectsStore } from '@/store/projects'
 
-export default {
-  components: {
-    TheSideBar,
-    TheHeader
-  },
-  middleware: ['check-auth', 'auth', 'set-project'],
+const route = useRoute()
+const { $repositories, $services } = useNuxtApp()
 
-  data() {
-    return {
-      drawerLeft: null,
-      isProjectAdmin: false
-    }
-  },
+const projectsStore = useProjectsStore()
+const { currentProject } = storeToRefs(projectsStore)
+const { setCurrentProject } = projectsStore
 
-  computed: {
-    ...mapGetters('projects', ['currentProject'])
-  },
+const drawerLeft = ref(null)
+const isProjectAdmin = ref(false)
 
-  watch: {
-    '$route.query'() {
-      this.$services.option.save(this.$route.params.id, this.$route.query)
-    }
-  },
-
-  async created() {
-    const member = await this.$repositories.member.fetchMyRole(this.$route.params.id)
-    this.isProjectAdmin = member.isProjectAdmin
+watch(
+  () => route.query,
+  () => {
+    $services.option.save(route.params.id, route.query)
   }
-}
+)
+
+onBeforeMount(async () => {
+  const project = currentProject.value
+  const isEmpty = Object.keys(project).length === 0 && project.constructor === Object
+  if (isEmpty) {
+    await setCurrentProject(route.params.id)
+  }
+
+  const member = await $repositories.member.fetchMyRole(route.params.id)
+  isProjectAdmin.value = member.isProjectAdmin
+})
 </script>

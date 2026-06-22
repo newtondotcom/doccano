@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title v-if="isProjectAdmin">
-      <action-menu
+      <ExampleActionMenu
         @upload="$router.push('dataset/import')"
         @download="$router.push('dataset/export')"
         @assign="dialogAssignment = true"
@@ -25,7 +25,7 @@
         {{ $t('generic.deleteAll') }}
       </v-btn>
       <v-dialog v-model="dialogDelete">
-        <form-delete
+        <ExampleFormDelete
           :selected="selected"
           :item-key="itemKey"
           @cancel="dialogDelete = false"
@@ -33,16 +33,16 @@
         />
       </v-dialog>
       <v-dialog v-model="dialogDeleteAll">
-        <form-delete-bulk @cancel="dialogDeleteAll = false" @remove="removeAll" />
+        <ExampleFormDeleteBulk @cancel="dialogDeleteAll = false" @remove="removeAll" />
       </v-dialog>
       <v-dialog v-model="dialogAssignment">
-        <form-assignment @assigned="assigned" @cancel="dialogAssignment = false" />
+        <ExampleFormAssignment @assigned="assigned" @cancel="dialogAssignment = false" />
       </v-dialog>
       <v-dialog v-model="dialogReset">
-        <form-reset-assignment @cancel="dialogReset = false" @reset="resetAssignment" />
+        <ExampleFormResetAssignment @cancel="dialogReset = false" @reset="resetAssignment" />
       </v-dialog>
     </v-card-title>
-    <image-list
+    <ExampleImageList
       v-if="project.isImageProject"
       v-model="selected"
       :items="item.items"
@@ -55,7 +55,7 @@
       @assign="assign"
       @unassign="unassign"
     />
-    <audio-list
+    <ExampleAudioList
       v-else-if="project.isAudioProject"
       v-model="selected"
       :items="item.items"
@@ -68,7 +68,7 @@
       @assign="assign"
       @unassign="unassign"
     />
-    <document-list
+    <ExampleDocumentList
       v-else
       v-model="selected"
       :items="item.items"
@@ -85,153 +85,125 @@
   </v-card>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import _ from 'lodash'
-import { mapGetters } from 'vuex'
-import Vue from 'vue'
-import { NuxtAppOptions } from '@nuxt/types'
-import DocumentList from '@/components/example/DocumentList.vue'
-import FormAssignment from '~/components/example/FormAssignment.vue'
-import FormDelete from '@/components/example/FormDelete.vue'
-import FormDeleteBulk from '@/components/example/FormDeleteBulk.vue'
-import FormResetAssignment from '~/components/example/FormResetAssignment.vue'
-import ActionMenu from '~/components/example/ActionMenu.vue'
-import AudioList from '~/components/example/AudioList.vue'
-import ImageList from '~/components/example/ImageList.vue'
-import { getLinkToAnnotationPage } from '~/presenter/linkToAnnotationPage'
-import { ExampleDTO, ExampleListDTO } from '~/services/application/example/exampleData'
-import { MemberItem } from '~/domain/models/member/member'
+import { useMainStore as useProjectsStore } from '@/store/projects'
+import { getLinkToAnnotationPage } from '@/presenter/linkToAnnotationPage'
+import { ExampleDTO, ExampleListDTO } from '@/services/application/example/exampleData'
+import { MemberItem } from '@/domain/models/member/member'
 
-export default Vue.extend({
-  components: {
-    ActionMenu,
-    AudioList,
-    DocumentList,
-    ImageList,
-    FormAssignment,
-    FormDelete,
-    FormDeleteBulk,
-    FormResetAssignment
-  },
-
+definePageMeta({
   layout: 'project',
-
   middleware: ['check-auth', 'auth', 'setCurrentProject'],
-
-  validate({ params, query }: NuxtAppOptions) {
-    return /^\d+$/.test(params.id) && /^\d+|$/.test(query.limit) && /^\d+|$/.test(query.offset)
-  },
-
-  data() {
-    return {
-      dialogDelete: false,
-      dialogDeleteAll: false,
-      dialogAssignment: false,
-      dialogReset: false,
-      item: {} as ExampleListDTO,
-      selected: [] as ExampleDTO[],
-      members: [] as MemberItem[],
-      user: {} as MemberItem,
-      isLoading: false,
-      isProjectAdmin: false
-    }
-  },
-
-  async fetch() {
-    this.isLoading = true
-    this.item = await this.$services.example.list(this.projectId, this.$route.query)
-    this.user = await this.$repositories.member.fetchMyRole(this.projectId)
-    if (this.user.isProjectAdmin) {
-      this.members = await this.$repositories.member.list(this.projectId)
-    }
-    this.isLoading = false
-  },
-
-  computed: {
-    ...mapGetters('projects', ['project']),
-
-    canDelete(): boolean {
-      return this.selected.length > 0
-    },
-
-    projectId(): string {
-      return this.$route.params.id
-    },
-
-    itemKey(): string {
-      if (this.project.isImageProject || this.project.isAudioProject) {
-        return 'filename'
-      } else {
-        return 'text'
-      }
-    }
-  },
-
-  watch: {
-    '$route.query': _.debounce(function () {
-      // @ts-ignore
-      this.$fetch()
-    }, 1000)
-  },
-
-  async created() {
-    const member = await this.$repositories.member.fetchMyRole(this.projectId)
-    this.isProjectAdmin = member.isProjectAdmin
-  },
-
-  methods: {
-    async remove() {
-      await this.$services.example.bulkDelete(this.projectId, this.selected)
-      this.$fetch()
-      this.dialogDelete = false
-      this.selected = []
-    },
-
-    async removeAll() {
-      await this.$services.example.bulkDelete(this.projectId, [])
-      this.$fetch()
-      this.dialogDeleteAll = false
-      this.selected = []
-    },
-
-    updateQuery(query: object) {
-      this.$router.push(query)
-    },
-
-    movePage(query: object) {
-      const link = getLinkToAnnotationPage(this.projectId, this.project.projectType)
-      this.updateQuery({
-        path: this.localePath(link),
-        query
-      })
-    },
-
-    editItem(item: ExampleDTO) {
-      this.$router.push(`dataset/${item.id}/edit`)
-    },
-
-    async assign(exampleId: number, userId: number) {
-      await this.$repositories.assignment.assign(this.projectId, exampleId, userId)
-      this.item = await this.$services.example.list(this.projectId, this.$route.query)
-    },
-
-    async unassign(assignmentId: string) {
-      await this.$repositories.assignment.unassign(this.projectId, assignmentId)
-      this.item = await this.$services.example.list(this.projectId, this.$route.query)
-    },
-
-    async assigned() {
-      this.dialogAssignment = false
-      this.item = await this.$services.example.list(this.projectId, this.$route.query)
-    },
-
-    async resetAssignment() {
-      this.dialogReset = false
-      await this.$repositories.assignment.reset(this.projectId)
-      this.item = await this.$services.example.list(this.projectId, this.$route.query)
-    }
+  validate(route) {
+    return (
+      /^\d+$/.test(route.params.id as string) &&
+      /^\d+|$/.test(route.query.limit as string) &&
+      /^\d+|$/.test(route.query.offset as string)
+    )
   }
 })
+
+const route = useRoute()
+const router = useRouter()
+const { localePath } = useI18n()
+const { $services, $repositories } = useNuxtApp()
+const projectsStore = useProjectsStore()
+
+const dialogDelete = ref(false)
+const dialogDeleteAll = ref(false)
+const dialogAssignment = ref(false)
+const dialogReset = ref(false)
+const item = ref({} as ExampleListDTO)
+const selected = ref([] as ExampleDTO[])
+const members = ref([] as MemberItem[])
+const user = ref({} as MemberItem)
+const isLoading = ref(false)
+const isProjectAdmin = ref(false)
+
+const project = computed(() => projectsStore.project)
+const canDelete = computed(() => selected.value.length > 0)
+const projectId = computed(() => route.params.id as string)
+const itemKey = computed(() => {
+  if (project.value.isImageProject || project.value.isAudioProject) {
+    return 'filename'
+  }
+  return 'text'
+})
+
+async function load() {
+  isLoading.value = true
+  item.value = await $services.example.list(projectId.value, route.query)
+  user.value = await $repositories.member.fetchMyRole(projectId.value)
+  if (user.value.isProjectAdmin) {
+    members.value = await $repositories.member.list(projectId.value)
+  }
+  isLoading.value = false
+}
+
+watch(
+  () => route.query,
+  _.debounce(() => {
+    load()
+  }, 1000),
+  { immediate: true, deep: true }
+)
+
+onMounted(async () => {
+  const member = await $repositories.member.fetchMyRole(projectId.value)
+  isProjectAdmin.value = member.isProjectAdmin
+})
+
+async function remove() {
+  await $services.example.bulkDelete(projectId.value, selected.value)
+  await load()
+  dialogDelete.value = false
+  selected.value = []
+}
+
+async function removeAll() {
+  await $services.example.bulkDelete(projectId.value, [])
+  await load()
+  dialogDeleteAll.value = false
+  selected.value = []
+}
+
+function updateQuery(query: object) {
+  router.push(query)
+}
+
+function movePage(query: object) {
+  const link = getLinkToAnnotationPage(projectId.value, project.value.projectType)
+  updateQuery({
+    path: localePath(link),
+    query
+  })
+}
+
+function editItem(example: ExampleDTO) {
+  router.push(`dataset/${example.id}/edit`)
+}
+
+async function assign(exampleId: number, userId: number) {
+  await $repositories.assignment.assign(projectId.value, exampleId, userId)
+  item.value = await $services.example.list(projectId.value, route.query)
+}
+
+async function unassign(assignmentId: string) {
+  await $repositories.assignment.unassign(projectId.value, assignmentId)
+  item.value = await $services.example.list(projectId.value, route.query)
+}
+
+async function assigned() {
+  dialogAssignment.value = false
+  item.value = await $services.example.list(projectId.value, route.query)
+}
+
+async function resetAssignment() {
+  dialogReset.value = false
+  await $repositories.assignment.reset(projectId.value)
+  item.value = await $services.example.list(projectId.value, route.query)
+}
 </script>
 
 <style scoped>

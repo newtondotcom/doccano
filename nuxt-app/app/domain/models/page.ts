@@ -6,3 +6,10 @@ export class Page<T> {
     readonly items: T[]
   ) {}
 }
+
+
+
+export interface DataTableOptions {
+  page: number
+  itemsPerPage: number
+}

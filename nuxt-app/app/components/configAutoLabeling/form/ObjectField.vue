@@ -7,8 +7,8 @@
         </v-toolbar-title>
         <v-spacer />
         <v-dialog v-model="dialog" max-width="800px">
-          <template #activator="{ on, attrs }">
-            <v-btn color="primary" dark class="text-none" v-bind="attrs" v-on="on"> Add </v-btn>
+          <template #activator="{ props }">
+            <v-btn color="primary" dark class="text-none" v-bind="props"> Add </v-btn>
           </template>
           <v-card>
             <v-card-title>
@@ -60,98 +60,89 @@
   </v-data-table>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import { mdiPencil, mdiDelete } from '@mdi/js'
 
-export default Vue.extend({
-  props: {
-    value: {
-      type: Array,
-      default: () => [],
-      required: true
-    },
-    title: {
-      type: String,
-      default: '',
-      required: true
-    }
+const props = defineProps({
+  value: {
+    type: Array,
+    default: () => [],
+    required: true
   },
-  data() {
-    return {
-      headers: [
-        {
-          text: 'Key',
-          align: 'left',
-          value: 'key',
-          sortable: false
-        },
-        {
-          text: 'Value',
-          align: 'left',
-          value: 'value',
-          sortable: false
-        },
-        {
-          text: 'Actions',
-          value: 'actions',
-          sortable: false
-        }
-      ],
-      dialog: false,
-      valid: false,
-      editedIndex: -1,
-      editedItem: {
-        key: '',
-        value: ''
-      },
-      defaultItem: {
-        key: '',
-        value: ''
-      },
-      items: [] as string[],
-      mdiPencil,
-      mdiDelete
-    }
-  },
-
-  methods: {
-    editItem(item: { key: string; value: string }) {
-      this.editedIndex = this.value.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialog = true
-    },
-
-    deleteItem(item: { key: string; value: string }) {
-      this.editedIndex = this.value.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      const items = Object.assign([], this.value)
-      items.splice(this.editedIndex, 1)
-      this.editedItem = Object.assign({}, this.defaultItem)
-      this.editedIndex = -1
-      this.$emit('input', items)
-    },
-
-    close() {
-      this.dialog = false
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
-      })
-    },
-
-    save() {
-      const items = Object.assign([], this.value)
-      if (this.editedIndex > -1) {
-        Object.assign(items[this.editedIndex], this.editedItem)
-      } else {
-        items.push(this.editedItem)
-      }
-      this.close()
-      this.$emit('input', items)
-    }
+  title: {
+    type: String,
+    default: '',
+    required: true
   }
 })
+
+const emit = defineEmits(['input'])
+
+const headers = [
+  {
+    text: 'Key',
+    align: 'left',
+    value: 'key',
+    sortable: false
+  },
+  {
+    text: 'Value',
+    align: 'left',
+    value: 'value',
+    sortable: false
+  },
+  {
+    text: 'Actions',
+    value: 'actions',
+    sortable: false
+  }
+]
+const dialog = ref(false)
+const valid = ref(false)
+const editedIndex = ref(-1)
+const editedItem = ref({
+  key: '',
+  value: ''
+})
+const defaultItem = {
+  key: '',
+  value: ''
+}
+
+function editItem(item: { key: string; value: string }) {
+  editedIndex.value = props.value.indexOf(item)
+  editedItem.value = Object.assign({}, item)
+  dialog.value = true
+}
+
+function deleteItem(item: { key: string; value: string }) {
+  editedIndex.value = props.value.indexOf(item)
+  editedItem.value = Object.assign({}, item)
+  const items = Object.assign([], props.value)
+  items.splice(editedIndex.value, 1)
+  editedItem.value = Object.assign({}, defaultItem)
+  editedIndex.value = -1
+  emit('input', items)
+}
+
+function close() {
+  dialog.value = false
+  nextTick(() => {
+    editedItem.value = Object.assign({}, defaultItem)
+    editedIndex.value = -1
+  })
+}
+
+function save() {
+  const items = Object.assign([], props.value)
+  if (editedIndex.value > -1) {
+    Object.assign(items[editedIndex.value], editedItem.value)
+  } else {
+    items.push(editedItem.value)
+  }
+  close()
+  emit('input', items)
+}
 </script>
 
 <style scoped>

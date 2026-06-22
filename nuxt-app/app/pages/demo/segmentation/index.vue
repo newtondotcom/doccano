@@ -26,7 +26,7 @@
               </v-chip-group>
             </v-card-title>
             <v-divider />
-            <v-segmentation
+            <TasksSegmentationVSegmentation
               :highlight-id="highlightId"
               :image-url="imageUrl"
               :labels="bboxLabels"
@@ -42,8 +42,8 @@
           </v-card>
         </v-col>
         <v-col cols="12" md="3">
-          <list-metadata :metadata="meta" />
-          <region-list
+          <TasksMetadataListMetadata :metadata="meta" />
+          <TasksImageRegionList
             class="mt-4"
             :regions="regionList"
             @change-visibility="changeVisibility"
@@ -57,159 +57,125 @@
   </v-main>
 </template>
 
-<script>
-import VSegmentation from '@/components/tasks/segmentation/VSegmentation.vue'
-import ListMetadata from '@/components/tasks/metadata/ListMetadata'
-import RegionList from '@/components/tasks/image/RegionList.vue'
+<script setup>
+definePageMeta({
+  layout: 'demo'
+})
 
-export default {
-  components: {
-    ListMetadata,
-    VSegmentation,
-    RegionList
-  },
-
-  layout: 'demo',
-
-  data() {
-    return {
-      imageUrl: require('~/assets/images/demo/cat.jpeg'),
-      polygons: [
-        {
-          id: 'uuid',
-          label: 1,
-          points: [372, 249, 284, 366, 450, 371]
-        }
-      ],
-      task: 'bounding box',
-      labels: [
-        {
-          id: 1,
-          text: 'Cat',
-          prefixKey: null,
-          suffixKey: 'c',
-          backgroundColor: '#7c20e0',
-          textColor: '#ffffff'
-        },
-        {
-          id: 2,
-          text: 'Dog',
-          prefixKey: null,
-          suffixKey: 'd',
-          backgroundColor: '#fbb028',
-          textColor: '#000000'
-        }
-      ],
-      meta: { wikiPageId: 2 },
-      selectedLabelIndex: undefined,
-      selectedPolygon: undefined,
-      scale: 1,
-      visibilities: {},
-      highlightId: null
-    }
-  },
-
-  computed: {
-    bboxLabels() {
-      return this.labels.map((label) => {
-        return {
-          id: label.id,
-          name: label.text,
-          color: label.backgroundColor
-        }
-      })
-    },
-
-    selectedLabel() {
-      if (this.selectedLabelIndex !== undefined) {
-        return this.labels[this.selectedLabelIndex]
-      } else {
-        return undefined
-      }
-    },
-
-    regionList() {
-      return this.polygons.map((polygon) => {
-        return {
-          id: polygon.id,
-          category: this.labels.find((label) => polygon.label === label.id).text,
-          color: this.labels.find((label) => polygon.label === label.id).backgroundColor,
-          visibility: polygon.id in this.visibilities ? this.visibilities[polygon.id] : true
-        }
-      })
-    },
-
-    filteredRegions() {
-      return this.polygons.filter((polygon) => this.visibilities[polygon.id] !== false)
-    }
-  },
-
-  watch: {
-    selectedLabel(newLabel) {
-      if (newLabel !== undefined && !!this.selectedPolygon) {
-        this.selectedPolygon.label = newLabel.id
-        this.updatePolygon(this.selectedPolygon)
-      }
-    }
-  },
-
-  methods: {
-    addPolygon(polygon) {
-      this.polygons.push(polygon)
-      this.selectedLabelIndex = undefined
-    },
-
-    deletePolygon(polygonId) {
-      this.polygons = this.polygons.filter((p) => p.id !== polygonId)
-    },
-
-    updatePolygon(polygon) {
-      console.log('updatePolygon', polygon)
-      const index = this.polygons.findIndex((p) => p.id === polygon.id)
-      if (index !== -1) {
-        this.$set(this.polygons, index, polygon)
-        this.selectedPolygon = polygon
-      }
-    },
-
-    changeVisibility(regionId, visibility) {
-      console.log('changeVisibility', regionId, visibility)
-      this.$set(this.visibilities, regionId, visibility)
-      this.visibilities = Object.assign({}, this.visibilities)
-    },
-
-    hoverRegion(regionId) {
-      console.log('hoverRegion', regionId)
-      this.highlightId = regionId
-    },
-
-    unhoverRegion(regionId) {
-      console.log('unhoverRegion', regionId)
-      this.highlightId = null
-    },
-
-    selectRegion(regionId) {
-      console.log('selectRegion', regionId)
-      if (regionId) {
-        this.selectedPolygon = this.polygons.find((r) => r.id === regionId)
-        this.selectedLabelIndex = this.labels.findIndex((l) => l.id === this.selectedPolygon.label)
-      } else {
-        this.selectedPolygon = undefined
-        this.selectedLabelIndex = undefined
-      }
-    },
-
-    zoomOut() {
-      this.scale -= 0.1
-    },
-
-    zoomIn() {
-      this.scale += 0.1
-    },
-
-    updateScale(scale) {
-      this.scale = scale
-    }
+const imageUrl = require('@/assets/images/demo/cat.jpeg')
+const polygons = ref([
+  {
+    id: 'uuid',
+    label: 1,
+    points: [372, 249, 284, 366, 450, 371]
   }
+])
+const labels = [
+  {
+    id: 1,
+    text: 'Cat',
+    prefixKey: null,
+    suffixKey: 'c',
+    backgroundColor: '#7c20e0',
+    textColor: '#ffffff'
+  },
+  {
+    id: 2,
+    text: 'Dog',
+    prefixKey: null,
+    suffixKey: 'd',
+    backgroundColor: '#fbb028',
+    textColor: '#000000'
+  }
+]
+const meta = { wikiPageId: 2 }
+const selectedLabelIndex = ref(undefined)
+const selectedPolygon = ref(undefined)
+const scale = ref(1)
+const visibilities = ref({})
+const highlightId = ref(null)
+
+const bboxLabels = computed(() =>
+  labels.map((label) => ({
+    id: label.id,
+    name: label.text,
+    color: label.backgroundColor
+  }))
+)
+
+const selectedLabel = computed(() => {
+  if (selectedLabelIndex.value !== undefined) {
+    return labels[selectedLabelIndex.value]
+  }
+  return undefined
+})
+
+const regionList = computed(() =>
+  polygons.value.map((polygon) => ({
+    id: polygon.id,
+    category: labels.find((label) => polygon.label === label.id).text,
+    color: labels.find((label) => polygon.label === label.id).backgroundColor,
+    visibility: polygon.id in visibilities.value ? visibilities.value[polygon.id] : true
+  }))
+)
+
+const filteredRegions = computed(() =>
+  polygons.value.filter((polygon) => visibilities.value[polygon.id] !== false)
+)
+
+watch(selectedLabel, (newLabel) => {
+  if (newLabel !== undefined && !!selectedPolygon.value) {
+    selectedPolygon.value.label = newLabel.id
+    updatePolygon(selectedPolygon.value)
+  }
+})
+
+function addPolygon(polygon) {
+  polygons.value.push(polygon)
+  selectedLabelIndex.value = undefined
+}
+
+function deletePolygon(polygonId) {
+  polygons.value = polygons.value.filter((p) => p.id !== polygonId)
+}
+
+function updatePolygon(polygon) {
+  console.log('updatePolygon', polygon)
+  const index = polygons.value.findIndex((p) => p.id === polygon.id)
+  if (index !== -1) {
+    polygons.value[index] = polygon
+    selectedPolygon.value = polygon
+  }
+}
+
+function changeVisibility(regionId, visibility) {
+  console.log('changeVisibility', regionId, visibility)
+  visibilities.value[regionId] = visibility
+  visibilities.value = { ...visibilities.value }
+}
+
+function hoverRegion(regionId) {
+  console.log('hoverRegion', regionId)
+  highlightId.value = regionId
+}
+
+function unhoverRegion(regionId) {
+  console.log('unhoverRegion', regionId)
+  highlightId.value = null
+}
+
+function selectRegion(regionId) {
+  console.log('selectRegion', regionId)
+  if (regionId) {
+    selectedPolygon.value = polygons.value.find((r) => r.id === regionId)
+    selectedLabelIndex.value = labels.findIndex((l) => l.id === selectedPolygon.value.label)
+  } else {
+    selectedPolygon.value = undefined
+    selectedLabelIndex.value = undefined
+  }
+}
+
+function updateScale(newScale) {
+  scale.value = newScale
 }
 </script>

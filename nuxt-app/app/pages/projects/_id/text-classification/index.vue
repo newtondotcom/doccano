@@ -1,7 +1,7 @@
 <template>
-  <layout-text v-if="example.id">
+  <TasksLayoutText v-if="example.id">
     <template #header>
-      <toolbar-laptop
+      <TasksToolbarLaptop
         :doc-id="example.id"
         :enable-auto-labeling.sync="enableAutoLabeling"
         :guideline-text="project.guideline"
@@ -11,9 +11,9 @@
         @click:clear-label="clearTeacherList(project.id, example.id)"
         @click:review="confirm(project.id)"
       >
-        <button-label-switch class="ms-2" @change="labelComponent = $event" />
-      </toolbar-laptop>
-      <toolbar-mobile :total="totalExample" class="d-flex d-sm-none" />
+        <TasksToolbarButtonsButtonLabelSwitch class="ms-2" @change="labelComponent = $event" />
+      </TasksToolbarLaptop>
+      <TasksToolbarMobile :total="totalExample" class="d-flex d-sm-none" />
     </template>
     <template #content>
       <v-card
@@ -35,101 +35,71 @@
       </v-card>
     </template>
     <template #sidebar>
-      <annotation-progress :progress="progress" />
-      <list-metadata :metadata="example.meta" class="mt-4" />
+      <TasksSidebarAnnotationProgress :progress="progress" />
+      <TasksMetadataListMetadata :metadata="example.meta" class="mt-4" />
     </template>
-  </layout-text>
+  </TasksLayoutText>
 </template>
 
-<script>
-import { ref, toRefs, useContext, useFetch, watch } from '@nuxtjs/composition-api'
-import LayoutText from '@/components/tasks/layout/LayoutText'
-import ListMetadata from '@/components/tasks/metadata/ListMetadata'
-import AnnotationProgress from '@/components/tasks/sidebar/AnnotationProgress.vue'
-import LabelGroup from '@/components/tasks/textClassification/LabelGroup'
-import LabelSelect from '@/components/tasks/textClassification/LabelSelect'
-import ButtonLabelSwitch from '@/components/tasks/toolbar/buttons/ButtonLabelSwitch'
-import ToolbarLaptop from '@/components/tasks/toolbar/ToolbarLaptop'
-import ToolbarMobile from '@/components/tasks/toolbar/ToolbarMobile'
+<script setup>
 import { useExampleItem } from '@/composables/useExampleItem'
 import { useLabelList } from '@/composables/useLabelList'
 import { useProjectItem } from '@/composables/useProjectItem'
 import { useTeacherList } from '@/composables/useTeacherList'
 
-export default {
-  components: {
-    AnnotationProgress,
-    ButtonLabelSwitch,
-    LabelGroup,
-    LabelSelect,
-    LayoutText,
-    ListMetadata,
-    ToolbarLaptop,
-    ToolbarMobile
-  },
+definePageMeta({
   layout: 'workspace',
+  validate(route) {
+    return /^\d+$/.test(route.params.id) && /^\d+$/.test(route.query.page)
+  }
+})
 
-  validate({ params, query }) {
-    return /^\d+$/.test(params.id) && /^\d+$/.test(query.page)
-  },
+const route = useRoute()
+const { $repositories } = useNuxtApp()
+const projectId = route.params.id
 
-  setup() {
-    const { app, params, query } = useContext()
-    const projectId = params.value.id
-    const { state: projectState, getProjectById } = useProjectItem()
-    const { state: exampleState, confirm, getExample, updateProgress } = useExampleItem()
-    const {
-      state: teacherState,
-      annotateLabel,
-      annotateOrRemoveLabel,
-      autoLabel,
-      clearTeacherList,
-      getTeacherList,
-      removeTeacher
-    } = useTeacherList(app.$repositories.category)
-    const enableAutoLabeling = ref(false)
-    const { state: labelState, getLabelList, shortKeys } = useLabelList(app.$services.categoryType)
-    const labelComponent = ref('label-group')
+const { state: projectState, getProjectById } = useProjectItem()
+const { project } = toRefs(projectState)
+const { state: exampleState, confirm, getExample, updateProgress } = useExampleItem()
+const { example, totalExample, progress } = toRefs(exampleState)
+const {
+  state: teacherState,
+  annotateLabel,
+  annotateOrRemoveLabel,
+  autoLabel,
+  clearTeacherList,
+  getTeacherList,
+  removeTeacher
+} = useTeacherList($repositories.category)
+const { teacherList } = toRefs(teacherState)
+const enableAutoLabeling = ref(false)
+const { state: labelState, getLabelList, shortKeys } = useLabelList(useNuxtApp().$services.categoryType)
+const { labels } = toRefs(labelState)
+const labelComponent = ref('TasksTextClassificationLabelGroup')
 
-    getLabelList(projectId)
-    getProjectById(projectId)
-    updateProgress(projectId)
+getLabelList(projectId)
+getProjectById(projectId)
+updateProgress(projectId)
 
-    const { fetch } = useFetch(async () => {
-      await getExample(projectId, query.value)
-      if (enableAutoLabeling.value) {
-        try {
-          await autoLabel(projectId, exampleState.example.id)
-        } catch (e) {
-          enableAutoLabeling.value = false
-          alert(e.response.data.detail)
-        }
-      } else {
-        await getTeacherList(projectId, exampleState.example.id)
-      }
-    })
-    watch(query, fetch)
-    watch(enableAutoLabeling, async (val) => {
-      if (val && !exampleState.example.isConfirmed) {
-        await autoLabel(exampleState.example.id)
-        await getTeacherList(exampleState.example.id)
-      }
-    })
-
-    return {
-      ...toRefs(labelState),
-      ...toRefs(projectState),
-      ...toRefs(teacherState),
-      ...toRefs(exampleState),
-      confirm,
-      annotateLabel,
-      annotateOrRemoveLabel,
-      clearTeacherList,
-      enableAutoLabeling,
-      labelComponent,
-      removeTeacher,
-      shortKeys
+async function load() {
+  await getExample(projectId, route.query)
+  if (enableAutoLabeling.value) {
+    try {
+      await autoLabel(projectId, exampleState.example.id)
+    } catch (e) {
+      enableAutoLabeling.value = false
+      alert(e.response.data.detail)
     }
+  } else {
+    await getTeacherList(projectId, exampleState.example.id)
   }
 }
+
+watch(() => route.query, load, { immediate: true, deep: true })
+watch(enableAutoLabeling, async (val) => {
+  if (val && !exampleState.example.isConfirmed) {
+    await autoLabel(exampleState.example.id)
+    await getTeacherList(exampleState.example.id)
+  }
+})
 </script>

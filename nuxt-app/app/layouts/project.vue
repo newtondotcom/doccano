@@ -1,52 +1,43 @@
 <template>
   <v-app>
-    <the-header>
+    <LayoutTheHeader>
       <template #leftDrawerIcon>
         <v-app-bar-nav-icon @click="drawerLeft = !drawerLeft" />
       </template>
-    </the-header>
+    </LayoutTheHeader>
 
     <v-navigation-drawer v-model="drawerLeft" app clipped color="">
-      <the-side-bar :is-project-admin="isProjectAdmin" :project="currentProject" />
+      <LayoutTheSideBar :is-project-admin="isProjectAdmin" :project="currentProject" />
     </v-navigation-drawer>
 
     <v-main>
-      <v-container fluid fill-height>
-        <v-layout justify-center>
-          <v-flex fill-height>
-            <nuxt />
-          </v-flex>
-        </v-layout>
+      <v-container fluid class="fill-height">
+        <v-row justify="center" class="fill-height">
+          <v-col class="fill-height">
+            <NuxtPage />
+          </v-col>
+        </v-row>
       </v-container>
     </v-main>
   </v-app>
 </template>
 
-<script>
-import { mapGetters } from 'vuex'
-import TheHeader from '~/components/layout/TheHeader'
-import TheSideBar from '~/components/layout/TheSideBar'
+<script setup>
+import { ref, onBeforeMount } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useMainStore as useProjectsStore } from '@/store/projects'
 
-export default {
-  components: {
-    TheSideBar,
-    TheHeader
-  },
+const route = useRoute()
+const { $repositories } = useNuxtApp()
 
-  data() {
-    return {
-      drawerLeft: null,
-      isProjectAdmin: false
-    }
-  },
+const projectsStore = useProjectsStore()
+const { currentProject } = storeToRefs(projectsStore)
 
-  computed: {
-    ...mapGetters('projects', ['currentProject'])
-  },
+const drawerLeft = ref(null)
+const isProjectAdmin = ref(false)
 
-  async created() {
-    const member = await this.$repositories.member.fetchMyRole(this.$route.params.id)
-    this.isProjectAdmin = member.isProjectAdmin
-  }
-}
+onBeforeMount(async () => {
+  const member = await $repositories.member.fetchMyRole(route.params.id)
+  isProjectAdmin.value = member.isProjectAdmin
+})
 </script>

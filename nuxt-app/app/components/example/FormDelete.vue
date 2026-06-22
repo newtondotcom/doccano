@@ -1,5 +1,5 @@
 <template>
-  <confirm-form
+  <UtilsConfirmForm
     :title="$t('dataset.deleteDocumentsTitle')"
     :message="$t('dataset.deleteDocumentsMessage', { number: selected.length })"
     @ok="$emit('remove')"
@@ -7,24 +7,20 @@
   />
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
-import ConfirmForm from '@/components/utils/ConfirmForm.vue'
-
-export default Vue.extend({
-  components: {
-    ConfirmForm
+<script setup lang="ts">
+defineProps({
+  selected: {
+    type: Array,
+    default: () => []
   },
-
-  props: {
-    selected: {
-      type: Array,
-      default: () => []
-    },
-    itemKey: {
-      type: String,
-      default: 'text'
-    }
+  itemKey: {
+    type: String,
+    default: 'text'
   }
 })
+
+defineEmits<{
+  remove: []
+  cancel: []
+}>()
 </script>

@@ -38,45 +38,41 @@
   </v-select>
 </template>
 
-<script>
-export default {
-  props: {
-    labels: {
-      type: Array,
-      default: () => [],
-      required: true
-    },
-    annotations: {
-      type: Array,
-      default: () => [],
-      required: true
-    }
+<script setup>
+const props = defineProps({
+  labels: {
+    type: Array,
+    default: () => [],
+    required: true
   },
-
-  computed: {
-    annotatedLabel() {
-      const labelIds = this.annotations.map((item) => item.label)
-      return this.labels.find((item) => labelIds.includes(item.id))
-    }
-  },
-
-  methods: {
-    addOrRemove(val) {
-      if (val) {
-        this.add(val)
-      } else {
-        this.remove(this.annotatedLabel)
-      }
-    },
-
-    add(label) {
-      this.$emit('add', label.id)
-    },
-
-    remove(label) {
-      const annotation = this.annotations.find((item) => item.label === label.id)
-      this.$emit('remove', annotation.id)
-    }
+  annotations: {
+    type: Array,
+    default: () => [],
+    required: true
   }
+})
+
+const emit = defineEmits(['add', 'remove'])
+
+const annotatedLabel = computed(() => {
+  const labelIds = props.annotations.map((item) => item.label)
+  return props.labels.find((item) => labelIds.includes(item.id))
+})
+
+function addOrRemove(val) {
+  if (val) {
+    add(val)
+  } else {
+    remove(annotatedLabel.value)
+  }
+}
+
+function add(label) {
+  emit('add', label.id)
+}
+
+function remove(label) {
+  const annotation = props.annotations.find((item) => item.label === label.id)
+  emit('remove', annotation.id)
 }
 </script>

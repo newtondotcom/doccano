@@ -12,43 +12,25 @@
   </v-bottom-navigation>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import { mdiChevronLeft, mdiChevronRight } from '@mdi/js'
 
-export default Vue.extend({
-  props: {
-    total: {
-      type: Number,
-      default: 1,
-      required: true
-    }
-  },
-
-  data() {
-    return {
-      mdiChevronLeft,
-      mdiChevronRight
-    }
-  },
-
-  computed: {
-    page(): number {
-      // @ts-ignore
-      return parseInt(this.$route.query.page, 10)
-    },
-    isFirstPage(): boolean {
-      return this.page === 1
-    },
-    isLastPage(): boolean {
-      return this.page === this.total || this.total === 0
-    }
-  },
-
-  methods: {
-    updatePage(page: number) {
-      this.$router.push({ query: { page: page.toString() } })
-    }
+const props = defineProps({
+  total: {
+    type: Number,
+    default: 1,
+    required: true
   }
 })
+
+const route = useRoute()
+const router = useRouter()
+
+const page = computed(() => parseInt(route.query.page as string, 10))
+const isFirstPage = computed(() => page.value === 1)
+const isLastPage = computed(() => page.value === props.total || props.total === 0)
+
+function updatePage(pageNum: number) {
+  router.push({ query: { page: pageNum.toString() } })
+}
 </script>

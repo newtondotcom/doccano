@@ -1,10 +1,10 @@
 <template>
   <v-tooltip bottom>
-    <template #activator="{ on }">
+    <template #activator="{ props }">
       <v-btn
         v-shortkey.once="['enter']"
         icon
-        v-on="on"
+        v-bind="props"
         @shortkey="$emit('click:review')"
         @click="$emit('click:review')"
       >
@@ -21,24 +21,16 @@
   </v-tooltip>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script setup lang="ts">
 import { mdiClose, mdiCheck } from '@mdi/js'
 
-export default Vue.extend({
-  props: {
-    isReviewd: {
-      type: Boolean,
-      default: false,
-      required: true
-    }
-  },
-
-  data() {
-    return {
-      mdiClose,
-      mdiCheck
-    }
+defineProps({
+  isReviewd: {
+    type: Boolean,
+    default: false,
+    required: true
   }
 })
+
+defineEmits(['click:review'])
 </script>

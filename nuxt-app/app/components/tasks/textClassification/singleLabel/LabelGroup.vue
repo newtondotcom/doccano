@@ -15,47 +15,43 @@
   </v-chip-group>
 </template>
 
-<script>
-export default {
-  props: {
-    labels: {
-      type: Array,
-      default: () => [],
-      required: true
-    },
-    annotations: {
-      type: Array,
-      default: () => [],
-      required: true
-    }
+<script setup>
+const props = defineProps({
+  labels: {
+    type: Array,
+    default: () => [],
+    required: true
   },
-
-  computed: {
-    annotatedLabel() {
-      const labelIds = this.annotations.map((item) => item.label)
-      return this.labels.findIndex((item) => labelIds.includes(item.id))
-    }
-  },
-
-  methods: {
-    addOrRemove(index) {
-      if (index === undefined) {
-        const label = this.labels[this.annotatedLabel]
-        this.remove(label)
-      } else {
-        const label = this.labels[index]
-        this.add(label)
-      }
-    },
-
-    add(label) {
-      this.$emit('add', label.id)
-    },
-
-    remove(label) {
-      const annotation = this.annotations.find((item) => item.label === label.id)
-      this.$emit('remove', annotation.id)
-    }
+  annotations: {
+    type: Array,
+    default: () => [],
+    required: true
   }
+})
+
+const emit = defineEmits(['add', 'remove'])
+
+const annotatedLabel = computed(() => {
+  const labelIds = props.annotations.map((item) => item.label)
+  return props.labels.findIndex((item) => labelIds.includes(item.id))
+})
+
+function addOrRemove(index) {
+  if (index === undefined) {
+    const label = props.labels[annotatedLabel.value]
+    remove(label)
+  } else {
+    const label = props.labels[index]
+    add(label)
+  }
+}
+
+function add(label) {
+  emit('add', label.id)
+}
+
+function remove(label) {
+  const annotation = props.annotations.find((item) => item.label === label.id)
+  emit('remove', annotation.id)
 }
 </script>

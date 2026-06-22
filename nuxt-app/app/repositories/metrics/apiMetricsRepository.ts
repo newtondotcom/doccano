@@ -1,5 +1,5 @@
 import ApiService from '@/services/api.service'
-import { Distribution, MyProgress, Progress } from '~/domain/models/metrics/metrics'
+import { type Distribution, type MyProgress, type Progress } from '@/domain/models/metrics/metrics'
 
 export class APIMetricsRepository {
   constructor(private readonly request = ApiService) {}

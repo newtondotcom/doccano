@@ -1,4 +1,4 @@
-import { OptionRepository } from '@/domain/models/option/optionRepository'
+import { type OptionRepository } from '@/domain/models/option/optionRepository'
 import { OptionItem } from '@/domain/models/option/option'
 
 function toPayload(item: OptionItem): { [key: string]: any } {

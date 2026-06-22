@@ -1,4 +1,4 @@
-import { TagItem } from '~/domain/models/tag/tag'
+import { TagItem } from '@/domain/models/tag/tag'
 
 export interface TagRepository {
   list(projectId: string | number): Promise<TagItem[]>

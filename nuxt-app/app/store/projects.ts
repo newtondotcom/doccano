@@ -15,17 +15,13 @@ export const useMainStore = defineStore("projects", {
     },
 
     actions: {
-        setCurrent(state, payload) {
-            state.current = payload;
+        setCurrent(payload) {
+            this.current = payload;
         },
-        async setCurrentProject({ commit }, projectId) {
-            try {
-                const project =
-                    await this.$services.project.findById(projectId);
-                commit("setCurrent", project);
-            } catch (error) {
-                throw new Error(error);
-            }
+        async setCurrentProject(projectId: string | number) {
+            const { $services } = useNuxtApp();
+            const project = await $services.project.findById(String(projectId));
+            this.current = project;
         },
     },
 });

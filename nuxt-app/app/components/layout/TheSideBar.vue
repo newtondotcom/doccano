@@ -1,33 +1,27 @@
 <template>
-  <v-list dense>
-    <v-btn color="ms-4 my-1 mb-2 primary text-capitalize" nuxt @click="toLabeling">
-      <v-icon left>
-        {{ mdiPlayCircleOutline }}
-      </v-icon>
-      {{ $t('home.startAnnotation') }}
-    </v-btn>
-    <v-list-item-group v-model="selected" mandatory>
-      <v-list-item
+  <v-list density="compact" nav>
+    <v-list-item class="px-2">
+      <v-btn color="primary" class="text-capitalize" @click="toLabeling">
+        <v-icon start>{{ mdiPlayCircleOutline }}</v-icon>
+        {{ $t('home.startAnnotation') }}
+      </v-btn>
+    </v-list-item>
+    <v-list-item
         v-for="(item, i) in filteredItems"
         :key="i"
-        @click="$router.push(localePath(`/projects/${$route.params.id}/${item.link}`))"
+        :active="selected === i"
+        @click="selectItem(i, item)"
       >
-        <v-list-item-action>
-          <v-icon>
-            {{ item.icon }}
-          </v-icon>
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title>
-            {{ item.text }}
-          </v-list-item-title>
-        </v-list-item-content>
+        <template #prepend>
+          <v-icon>{{ item.icon }}</v-icon>
+        </template>
+        <v-list-item-title>{{ item.text }}</v-list-item-title>
       </v-list-item>
-    </v-list-item-group>
   </v-list>
 </template>
 
-<script>
+<script setup>
+import { ref, computed } from 'vue'
 import {
   mdiAccount,
   mdiBookOpenOutline,
@@ -39,104 +33,103 @@ import {
   mdiLabel,
   mdiPlayCircleOutline
 } from '@mdi/js'
-import { getLinkToAnnotationPage } from '~/presenter/linkToAnnotationPage'
+import { getLinkToAnnotationPage } from '@/presenter/linkToAnnotationPage'
 
-export default {
-  props: {
-    isProjectAdmin: {
-      type: Boolean,
-      default: false,
-      required: true
-    },
-    project: {
-      type: Object,
-      default: () => {},
-      required: true
-    }
+const props = defineProps({
+  isProjectAdmin: {
+    type: Boolean,
+    default: false,
+    required: true
   },
-
-  data() {
-    return {
-      selected: 0,
-      mdiPlayCircleOutline
-    }
-  },
-
-  computed: {
-    filteredItems() {
-      const items = [
-        {
-          icon: mdiHome,
-          text: this.$t('projectHome.home'),
-          link: '',
-          isVisible: true
-        },
-        {
-          icon: mdiDatabase,
-          text: this.$t('dataset.dataset'),
-          link: 'dataset',
-          isVisible: true
-        },
-        {
-          icon: mdiLabel,
-          text: this.$t('labels.labels'),
-          link: 'labels',
-          isVisible:
-            (this.isProjectAdmin || this.project.allowMemberToCreateLabelType) &&
-            this.project.canDefineLabel
-        },
-        {
-          icon: mdiLabel,
-          text: 'Relations',
-          link: 'links',
-          isVisible:
-            (this.isProjectAdmin || this.project.allowMemberToCreateLabelType) &&
-            this.project.canDefineRelation
-        },
-        {
-          icon: mdiAccount,
-          text: this.$t('members.members'),
-          link: 'members',
-          isVisible: this.isProjectAdmin
-        },
-        {
-          icon: mdiCommentAccountOutline,
-          text: 'Comments',
-          link: 'comments',
-          isVisible: this.isProjectAdmin
-        },
-        {
-          icon: mdiBookOpenOutline,
-          text: this.$t('guideline.guideline'),
-          link: 'guideline',
-          isVisible: this.isProjectAdmin
-        },
-        {
-          icon: mdiChartBar,
-          text: this.$t('statistics.statistics'),
-          link: 'metrics',
-          isVisible: this.isProjectAdmin
-        },
-        {
-          icon: mdiCog,
-          text: this.$t('settings.title'),
-          link: 'settings',
-          isVisible: this.isProjectAdmin
-        }
-      ]
-      return items.filter((item) => item.isVisible)
-    }
-  },
-
-  methods: {
-    toLabeling() {
-      const query = this.$services.option.findOption(this.$route.params.id)
-      const link = getLinkToAnnotationPage(this.$route.params.id, this.project.projectType)
-      this.$router.push({
-        path: this.localePath(link),
-        query
-      })
-    }
+  project: {
+    type: Object,
+    default: () => {},
+    required: true
   }
+})
+
+const router = useRouter()
+const route = useRoute()
+const { localePath, t } = useI18n()
+const { $services } = useNuxtApp()
+
+const selected = ref(0)
+
+const filteredItems = computed(() => {
+  const items = [
+    {
+      icon: mdiHome,
+      text: t('projectHome.home'),
+      link: '',
+      isVisible: true
+    },
+    {
+      icon: mdiDatabase,
+      text: t('dataset.dataset'),
+      link: 'dataset',
+      isVisible: true
+    },
+    {
+      icon: mdiLabel,
+      text: t('labels.labels'),
+      link: 'labels',
+      isVisible:
+        (props.isProjectAdmin || props.project.allowMemberToCreateLabelType) &&
+        props.project.canDefineLabel
+    },
+    {
+      icon: mdiLabel,
+      text: 'Relations',
+      link: 'links',
+      isVisible:
+        (props.isProjectAdmin || props.project.allowMemberToCreateLabelType) &&
+        props.project.canDefineRelation
+    },
+    {
+      icon: mdiAccount,
+      text: t('members.members'),
+      link: 'members',
+      isVisible: props.isProjectAdmin
+    },
+    {
+      icon: mdiCommentAccountOutline,
+      text: 'Comments',
+      link: 'comments',
+      isVisible: props.isProjectAdmin
+    },
+    {
+      icon: mdiBookOpenOutline,
+      text: t('guideline.guideline'),
+      link: 'guideline',
+      isVisible: props.isProjectAdmin
+    },
+    {
+      icon: mdiChartBar,
+      text: t('statistics.statistics'),
+      link: 'metrics',
+      isVisible: props.isProjectAdmin
+    },
+    {
+      icon: mdiCog,
+      text: t('settings.title'),
+      link: 'settings',
+      isVisible: props.isProjectAdmin
+    }
+  ]
+  return items.filter((item) => item.isVisible)
+})
+
+function selectItem(index, item) {
+  selected.value = index
+  router.push(localePath(`/projects/${route.params.id}/${item.link}`))
+}
+
+function toLabeling() {
+  const query = $services.option.findOption(route.params.id)
+  const link = getLinkToAnnotationPage(route.params.id, props.project.projectType)
+  router.push({
+    path: localePath(link),
+    query
+  })
 }
 </script>

@@ -2,77 +2,88 @@
   <v-card>
     <v-card-title v-text="title" />
     <v-divider />
-    <v-tabs show-arrows>
-      <v-tab v-for="(value, user) in chartJSFormat" :key="user" class="text-capitalize">
+    <v-tabs v-model="tab" show-arrows>
+      <v-tab
+        v-for="(value, user) in chartJSFormat"
+        :key="user"
+        :value="user"
+        class="text-capitalize"
+      >
         {{ user }}
       </v-tab>
-      <v-tab-item v-for="(value, user) in chartJSFormat" :key="user">
-        <v-card-text>
-          <bar-chart :chart-data="value" />
-        </v-card-text>
-      </v-tab-item>
     </v-tabs>
+    <v-window v-model="tab">
+      <v-window-item v-for="(value, user) in chartJSFormat" :key="user" :value="user">
+        <v-card-text>
+          <MetricsChartBar :chart-data="value" />
+        </v-card-text>
+      </v-window-item>
+    </v-window>
   </v-card>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { PropType } from 'vue'
-import Vue from 'vue'
-import BarChart from '@/components/metrics/ChartBar.vue'
-import { Distribution } from '~/domain/models/metrics/metrics'
-import { LabelDTO } from '~/services/application/label/labelData'
+import { computed } from 'vue'
+import { Distribution } from '@/domain/models/metrics/metrics'
+import { LabelDTO } from '@/services/application/label/labelData'
 
-export default Vue.extend({
-  components: {
-    BarChart
+const props = defineProps({
+  title: {
+    type: String,
+    required: true,
+    default: 'Distribution'
   },
-
-  props: {
-    title: {
-      type: String,
-      required: true,
-      default: 'Distribution'
-    },
-    distribution: {
-      type: Object as PropType<Distribution>,
-      required: true
-    },
-    labelTypes: {
-      type: Array as PropType<LabelDTO[]>,
-      default: () => [],
-      required: true
-    }
+  distribution: {
+    type: Object as PropType<Distribution>,
+    required: true
   },
-
-  computed: {
-    colorMapping(): { [text: string]: string } {
-      return Object.fromEntries(
-        this.labelTypes.map((labelType) => [labelType.text, labelType.backgroundColor])
-      )
-    },
-
-    chartJSFormat(): any {
-      const data: { [user: string]: { labels: string[]; datasets: any[] } } = {}
-      for (const user in this.distribution) {
-        const labels = Object.keys(this.distribution[user])
-        labels.sort()
-        const counts = labels.map((label) => this.distribution[user][label])
-        const colors = labels.map((label) =>
-          label in this.colorMapping ? this.colorMapping[label] : '#00d1b2'
-        )
-        data[user] = {
-          labels,
-          datasets: [
-            {
-              title: this.title,
-              backgroundColor: colors,
-              data: counts
-            }
-          ]
-        }
-      }
-      return data
-    }
+  labelTypes: {
+    type: Array as PropType<LabelDTO[]>,
+    default: () => [],
+    required: true
   }
 })
+
+const tab = ref<string | null>(null)
+
+const colorMapping = computed((): { [text: string]: string } => {
+  return Object.fromEntries(
+    props.labelTypes.map((labelType) => [labelType.text, labelType.backgroundColor])
+  )
+})
+
+const chartJSFormat = computed((): any => {
+  const data: { [user: string]: { labels: string[]; datasets: any[] } } = {}
+  for (const user in props.distribution) {
+    const labels = Object.keys(props.distribution[user])
+    labels.sort()
+    const counts = labels.map((label) => props.distribution[user][label])
+    const colors = labels.map((label) =>
+      label in colorMapping.value ? colorMapping.value[label] : '#00d1b2'
+    )
+    data[user] = {
+      labels,
+      datasets: [
+        {
+          title: props.title,
+          backgroundColor: colors,
+          data: counts
+        }
+      ]
+    }
+  }
+  return data
+})
+
+watch(
+  chartJSFormat,
+  (format) => {
+    const users = Object.keys(format)
+    if (users.length && !tab.value) {
+      tab.value = users[0]
+    }
+  },
+  { immediate: true }
+)
 </script>

@@ -1,7 +1,7 @@
 import { LabelDTO } from './labelData'
-import { CreateLabelCommand } from './labelCommand'
-import { LabelRepository } from '~/domain/models/label/labelRepository'
-import { LabelItem } from '~/domain/models/label/label'
+import { type CreateLabelCommand } from './labelCommand'
+import { type LabelRepository } from '@/domain/models/label/labelRepository'
+import { LabelItem } from '@/domain/models/label/label'
 
 export class LabelApplicationService {
   constructor(private readonly repository: LabelRepository) {}

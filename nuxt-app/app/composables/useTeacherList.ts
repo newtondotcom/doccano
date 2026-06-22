@@ -1,5 +1,4 @@
-import { reactive } from '@nuxtjs/composition-api'
-import { Category } from '~/domain/models/tasks/category'
+import { Category } from '@/domain/models/tasks/category'
 
 export const useTeacherList = (repository: any) => {
   const state = reactive({

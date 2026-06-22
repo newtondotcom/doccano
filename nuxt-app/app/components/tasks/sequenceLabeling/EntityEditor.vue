@@ -1,7 +1,7 @@
 <template>
   <div v-shortkey="['esc']" @shortkey="cleanUp">
-    <v-annotator
-      :dark="$vuetify.theme.dark"
+    <VAnnotator
+      :dark="theme.global.current.value.dark"
       :rtl="rtl"
       :text="text"
       :entities="entities"
@@ -17,7 +17,7 @@
       @contextmenu:entity="deleteEntity"
       @contextmenu:relation="deleteRelation"
     />
-    <labeling-menu
+    <TasksSequenceLabelingMenu
       :opened="entityMenuOpened"
       :x="x"
       :y="y"
@@ -26,7 +26,7 @@
       @close="cleanUp"
       @click:label="addOrUpdateEntity"
     />
-    <labeling-menu
+    <TasksSequenceLabelingMenu
       :opened="relationMenuOpened"
       :x="x"
       :y="y"
@@ -38,242 +38,206 @@
   </div>
 </template>
 
-<script lang="ts">
-import VAnnotator from 'v-annotator'
-import type { PropType } from 'vue'
-import Vue from 'vue'
+<script setup lang="ts">
+import { VAnnotator } from 'vue3-annotator'
+import 'vue3-annotator/dist/vue3-annotator.css'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
-import LabelingMenu from './LabelingMenu.vue'
-import { SpanDTO } from '~/services/application/tasks/sequenceLabeling/sequenceLabelingData'
+import { SpanDTO } from '@/services/application/tasks/sequenceLabeling/sequenceLabelingData'
+import { useTheme } from 'vuetify';
 
-export default Vue.extend({
-  components: {
-    VAnnotator,
-    LabelingMenu
-  },
+const theme = useTheme()
 
-  props: {
-    dark: {
-      type: Boolean,
-      default: false
-    },
-    rtl: {
-      type: Boolean,
-      default: false
-    },
-    text: {
-      type: String,
-      default: '',
-      required: true
-    },
-    entities: {
-      type: Array as PropType<SpanDTO[]>,
-      default: () => [],
-      required: true
-    },
-    entityLabels: {
-      type: Array,
-      default: () => [],
-      required: true
-    },
-    relations: {
-      type: Array,
-      default: () => []
-    },
-    relationLabels: {
-      type: Array,
-      default: () => []
-    },
-    allowOverlapping: {
-      type: Boolean,
-      default: false,
-      required: false
-    },
-    graphemeMode: {
-      type: Boolean,
-      default: false
-    },
-    selectedLabel: {
-      type: Object,
-      default: null,
-      required: false
-    },
-    relationMode: {
-      type: Boolean,
-      default: false
-    }
-  },
+const props = withDefaults(
+  defineProps<{
+    dark?: boolean
+    rtl?: boolean
+    text: string
+    entities: SpanDTO[]
+    entityLabels: any[]
+    relations?: any[]
+    relationLabels?: any[]
+    allowOverlapping?: boolean
+    graphemeMode?: boolean
+    selectedLabel?: any
+    relationMode?: boolean
+  }>(),
+  {
+    dark: false,
+    rtl: false,
+    relations: () => [],
+    relationLabels: () => [],
+    allowOverlapping: false,
+    graphemeMode: false,
+    relationMode: false
+  }
+)
 
-  data() {
-    return {
-      entityMenuOpened: false,
-      relationMenuOpened: false,
-      x: 0,
-      y: 0,
-      startOffset: 0,
-      endOffset: 0,
-      entity: null as any,
-      relation: null as any,
-      selectedEntities: [] as SpanDTO[]
-    }
-  },
+const emit = defineEmits<{
+  addEntity: [startOffset: number, endOffset: number, labelId: number]
+  'click:entity': [entityId: number, labelId: number]
+  'contextmenu:entity': [entityId: number]
+  addRelation: [fromEntityId: number, toEntityId: number, labelId: number]
+  'click:relation': [relationId: number, labelId: number]
+  'contextmenu:relation': [relationId: number]
+}>()
 
-  computed: {
-    currentLabel(): any {
-      if (this.entity) {
-        const label = this.entityLabels.find((label: any) => label.id === this.entity!.label)
-        return label
-      } else {
-        return null
-      }
-    },
+const entityMenuOpened = ref(false)
+const relationMenuOpened = ref(false)
+const x = ref(0)
+const y = ref(0)
+const startOffset = ref(0)
+const endOffset = ref(0)
+const entity = ref<any>(null)
+const relation = ref<any>(null)
+const selectedEntities = ref<SpanDTO[]>([])
 
-    currentRelationLabel(): any {
-      if (this.relation) {
-        const label = this.relationLabels.find((label: any) => label.id === this.relation.labelId)
-        return label
-      } else {
-        return null
-      }
-    }
-  },
+const currentLabel = computed(() => {
+  if (entity.value) {
+    return props.entityLabels.find((label: any) => label.id === entity.value!.label)
+  }
+  return null
+})
 
-  methods: {
-    setOffset(startOffset: number, endOffset: number) {
-      this.startOffset = startOffset
-      this.endOffset = endOffset
-    },
+const currentRelationLabel = computed(() => {
+  if (relation.value) {
+    return props.relationLabels.find((label: any) => label.id === relation.value.labelId)
+  }
+  return null
+})
 
-    setEntity(entityId: number) {
-      this.entity = this.entities.find((entity: any) => entity.id === entityId)
-    },
+function setOffset(newStartOffset: number, newEndOffset: number) {
+  startOffset.value = newStartOffset
+  endOffset.value = newEndOffset
+}
 
-    setRelation(relationId: number) {
-      this.relation = this.relations.find((relation: any) => relation.id === relationId)
-    },
+function setEntity(entityId: number) {
+  entity.value = props.entities.find((e: any) => e.id === entityId)
+}
 
-    setEntityForRelation(e: Event, entityId: number) {
-      const entity = this.entities.find((entity) => entity.id === entityId)!
-      const index = this.selectedEntities.findIndex((e) => e.id === entity.id)
-      if (index === -1) {
-        this.selectedEntities.push(entity)
-      } else {
-        this.selectedEntities.splice(index, 1)
-      }
-      if (this.selectedEntities.length === 2) {
-        if (this.selectedLabel) {
-          this.addRelation(this.selectedLabel.id)
-          this.cleanUp()
-        } else {
-          this.showRelationLabelMenu(e)
-        }
-      }
-    },
+function setRelation(relationId: number) {
+  relation.value = props.relations.find((r: any) => r.id === relationId)
+}
 
-    showEntityLabelMenu(e: any) {
-      e.preventDefault()
-      this.entityMenuOpened = false
-      this.x = e.clientX || e.changedTouches[0].clientX
-      this.y = e.clientY || e.changedTouches[0].clientY
-      this.$nextTick(() => {
-        this.entityMenuOpened = true
-      })
-    },
-
-    showRelationLabelMenu(e: any) {
-      e.preventDefault()
-      this.relationMenuOpened = false
-      this.x = e.clientX || e.changedTouches[0].clientX
-      this.y = e.clientY || e.changedTouches[0].clientY
-      this.$nextTick(() => {
-        this.relationMenuOpened = true
-      })
-    },
-
-    handleAddEvent(e: any, startOffset: number, endOffset: number) {
-      this.setOffset(startOffset, endOffset)
-      if (this.selectedLabel) {
-        this.addOrUpdateEntity(this.selectedLabel.id)
-      } else {
-        this.showEntityLabelMenu(e)
-      }
-    },
-
-    onEntityClicked(e: any, entityId: number) {
-      if (this.relationMode) {
-        this.setEntityForRelation(e, entityId)
-      } else {
-        this.setEntity(entityId)
-        this.showEntityLabelMenu(e)
-      }
-    },
-
-    onRelationClicked(e: any, relation: any) {
-      this.setRelation(relation.id)
-      this.showRelationLabelMenu(e)
-    },
-
-    addOrUpdateEntity(labelId: number) {
-      if (labelId) {
-        if (this.entity) {
-          this.updateEntity(labelId)
-        } else {
-          this.addEntity(labelId)
-        }
-      } else {
-        this.deleteEntity(this.entity)
-      }
-      this.cleanUp()
-    },
-
-    addOrUpdateRelation(labelId: number) {
-      if (labelId) {
-        if (this.relation) {
-          this.updateRelation(labelId)
-        } else {
-          this.addRelation(labelId)
-        }
-      } else {
-        this.deleteRelation(this.relation)
-      }
-      this.cleanUp()
-    },
-
-    addEntity(labelId: number) {
-      this.$emit('addEntity', this.startOffset, this.endOffset, labelId)
-    },
-
-    updateEntity(labelId: number) {
-      this.$emit('click:entity', this.entity!.id, labelId)
-    },
-
-    deleteEntity(entity: any) {
-      this.$emit('contextmenu:entity', entity.id)
-      this.cleanUp()
-    },
-
-    cleanUp() {
-      this.entityMenuOpened = false
-      this.relationMenuOpened = false
-      this.entity = null
-      this.relation = null
-      this.startOffset = 0
-      this.endOffset = 0
-      this.selectedEntities = []
-    },
-
-    addRelation(labelId: number) {
-      const [fromEntity, toEntity] = this.selectedEntities
-      this.$emit('addRelation', fromEntity.id, toEntity.id, labelId)
-    },
-
-    updateRelation(labelId: number) {
-      this.$emit('click:relation', this.relation.id, labelId)
-    },
-
-    deleteRelation(relation: any) {
-      this.$emit('contextmenu:relation', relation.id)
+function setEntityForRelation(e: Event, entityId: number) {
+  const foundEntity = props.entities.find((ent) => ent.id === entityId)!
+  const index = selectedEntities.value.findIndex((ent) => ent.id === foundEntity.id)
+  if (index === -1) {
+    selectedEntities.value.push(foundEntity)
+  } else {
+    selectedEntities.value.splice(index, 1)
+  }
+  if (selectedEntities.value.length === 2) {
+    if (props.selectedLabel) {
+      addRelation(props.selectedLabel.id)
+      cleanUp()
+    } else {
+      showRelationLabelMenu(e)
     }
   }
-})
+}
+
+function showEntityLabelMenu(e: any) {
+  e.preventDefault()
+  entityMenuOpened.value = false
+  x.value = e.clientX || e.changedTouches[0].clientX
+  y.value = e.clientY || e.changedTouches[0].clientY
+  nextTick(() => {
+    entityMenuOpened.value = true
+  })
+}
+
+function showRelationLabelMenu(e: any) {
+  e.preventDefault()
+  relationMenuOpened.value = false
+  x.value = e.clientX || e.changedTouches[0].clientX
+  y.value = e.clientY || e.changedTouches[0].clientY
+  nextTick(() => {
+    relationMenuOpened.value = true
+  })
+}
+
+function handleAddEvent(e: any, newStartOffset: number, newEndOffset: number) {
+  setOffset(newStartOffset, newEndOffset)
+  if (props.selectedLabel) {
+    addOrUpdateEntity(props.selectedLabel.id)
+  } else {
+    showEntityLabelMenu(e)
+  }
+}
+
+function onEntityClicked(e: any, entityId: number) {
+  if (props.relationMode) {
+    setEntityForRelation(e, entityId)
+  } else {
+    setEntity(entityId)
+    showEntityLabelMenu(e)
+  }
+}
+
+function onRelationClicked(e: any, rel: any) {
+  setRelation(rel.id)
+  showRelationLabelMenu(e)
+}
+
+function addOrUpdateEntity(labelId: number) {
+  if (labelId) {
+    if (entity.value) {
+      updateEntity(labelId)
+    } else {
+      addEntity(labelId)
+    }
+  } else {
+    deleteEntity(entity.value)
+  }
+  cleanUp()
+}
+
+function addOrUpdateRelation(labelId: number) {
+  if (labelId) {
+    if (relation.value) {
+      updateRelation(labelId)
+    } else {
+      addRelation(labelId)
+    }
+  } else {
+    deleteRelation(relation.value)
+  }
+  cleanUp()
+}
+
+function addEntity(labelId: number) {
+  emit('addEntity', startOffset.value, endOffset.value, labelId)
+}
+
+function updateEntity(labelId: number) {
+  emit('click:entity', entity.value!.id, labelId)
+}
+
+function deleteEntity(ent: any) {
+  emit('contextmenu:entity', ent.id)
+  cleanUp()
+}
+
+function cleanUp() {
+  entityMenuOpened.value = false
+  relationMenuOpened.value = false
+  entity.value = null
+  relation.value = null
+  startOffset.value = 0
+  endOffset.value = 0
+  selectedEntities.value = []
+}
+
+function addRelation(labelId: number) {
+  const [fromEntity, toEntity] = selectedEntities.value
+  emit('addRelation', fromEntity.id, toEntity.id, labelId)
+}
+
+function updateRelation(labelId: number) {
+  emit('click:relation', relation.value.id, labelId)
+}
+
+function deleteRelation(rel: any) {
+  emit('contextmenu:relation', rel.id)
+}
 </script>
