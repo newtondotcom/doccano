@@ -9,13 +9,20 @@
   />
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import Vue from 'vue'
 import ConfirmForm from '@/components/utils/ConfirmForm.vue'
 
-defineProps({
-  selected: {
-    type: Array,
-    default: () => []
+export default Vue.extend({
+  components: {
+    ConfirmForm
+  },
+
+  props: {
+    selected: {
+      type: Array,
+      default: () => []
+    }
   }
 })
 </script>

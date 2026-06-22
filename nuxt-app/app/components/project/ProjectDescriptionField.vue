@@ -1,26 +1,32 @@
 <template>
-    <v-text-field
-        v-bind="$attrs"
-        :value="value"
-        :rules="descriptionRules"
-        :label="$t('generic.description')"
-        required
-        @input="$emit('input', $event)"
-    />
+  <v-text-field
+    v-bind="$attrs"
+    :value="value"
+    :rules="descriptionRules"
+    :label="$t('generic.description')"
+    required
+    @input="$emit('input', $event)"
+  />
 </template>
 
-<script setup lang="ts">
-import { validateMinLength } from "@/domain/models/project/project";
+<script lang="ts">
+import Vue from 'vue'
+import { validateMinLength } from '~/domain/models/project/project'
 
-defineProps({
+export default Vue.extend({
+  props: {
     value: {
-        type: String,
-        default: "",
-        required: true,
-    },
-});
-
-const descriptionRules = [
-    (text: string) => validateMinLength(text) || $t("rules.description.required"),
-];
+      type: String,
+      default: '',
+      required: true
+    }
+  },
+  data() {
+    return {
+      descriptionRules: [
+        (text: string) => validateMinLength(text) || this.$t('rules.description.required')
+      ]
+    }
+  }
+})
 </script>

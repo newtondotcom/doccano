@@ -19,18 +19,27 @@
   </v-menu>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import Vue from 'vue'
 import { mdiMenuDown } from '@mdi/js'
 
-defineProps({
-  text: {
-    type: String,
-    default: 'Actions'
+export default Vue.extend({
+  props: {
+    text: {
+      type: String,
+      default: 'Actions'
+    },
+    items: {
+      type: Array,
+      default: () => [],
+      required: true
+    }
   },
-  items: {
-    type: Array,
-    default: () => [],
-    required: true
+
+  data() {
+    return {
+      mdiMenuDown
+    }
   }
 })
 </script>

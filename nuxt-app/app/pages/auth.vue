@@ -13,15 +13,20 @@
   </v-app>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import Vue from 'vue'
+import { mapActions } from 'vuex'
 import FormLogin from '@/components/auth/FormLogin.vue'
 import SocialLogin from '@/components/auth/SocialLogin.vue'
-import { useMainStore as useAuthStore } from '@/store/auth'
 
-const authStore = useAuthStore()
+export default Vue.extend({
+  components: {
+    FormLogin,
+    SocialLogin
+  },
 
-const authenticateUser = (payload: { username: string; password: string }) =>
-  authStore.authenticateUser(payload)
-
-const fetchSocialLink = () => authStore.fetchSocialLink()
+  methods: {
+    ...mapActions('auth', ['authenticateUser', 'fetchSocialLink'])
+  }
+})
 </script>

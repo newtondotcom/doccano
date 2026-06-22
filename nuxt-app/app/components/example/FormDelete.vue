@@ -7,17 +7,24 @@
   />
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import Vue from 'vue'
 import ConfirmForm from '@/components/utils/ConfirmForm.vue'
 
-defineProps({
-  selected: {
-    type: Array,
-    default: () => []
+export default Vue.extend({
+  components: {
+    ConfirmForm
   },
-  itemKey: {
-    type: String,
-    default: 'text'
+
+  props: {
+    selected: {
+      type: Array,
+      default: () => []
+    },
+    itemKey: {
+      type: String,
+      default: 'text'
+    }
   }
 })
 </script>

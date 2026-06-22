@@ -38,45 +38,54 @@
   </v-stepper-content>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue'
+<script lang="ts">
+import Vue from 'vue'
 import LabelMapping from './LabelMapping.vue'
 
-const props = defineProps({
-  value: {
-    type: Array,
-    default: () => [],
-    required: true
+export default Vue.extend({
+  components: {
+    LabelMapping
   },
-  errorMessages: {
-    type: Array,
-    default: () => [],
-    required: true
-  },
-  isPassed: {
-    type: Boolean,
-    default: false,
-    required: true
-  },
-  response: {
-    type: [String, Object, Array],
-    default: () => [],
-    required: true
-  },
-  result: {
-    type: Array,
-    default: () => [],
-    required: true
-  }
-})
-const emit = defineEmits(['input', 'prev', 'onTest', 'next'])
 
-const mapping = computed({
-  get() {
-    return props.value
+  props: {
+    value: {
+      type: Array,
+      default: () => [],
+      required: true
+    },
+    errorMessages: {
+      type: Array,
+      default: () => [],
+      required: true
+    },
+    isPassed: {
+      type: Boolean,
+      default: false,
+      required: true
+    },
+    response: {
+      type: [String, Object, Array],
+      default: () => [],
+      required: true
+    },
+    result: {
+      type: Array,
+      default: () => [],
+      required: true
+    }
   },
-  set(newVal) {
-    emit('input', newVal)
+
+  computed: {
+    mapping: {
+      get() {
+        // @ts-ignore
+        return this.value
+      },
+      set(newVal) {
+        // @ts-ignore
+        this.$emit('input', newVal)
+      }
+    }
   }
 })
 </script>

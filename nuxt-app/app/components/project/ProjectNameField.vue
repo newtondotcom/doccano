@@ -1,30 +1,33 @@
 <template>
-    <v-text-field
-        v-bind="$attrs"
-        :value="value"
-        :rules="projectNameRules"
-        :label="$t('overview.projectName')"
-        required
-        @input="$emit('input', $event)"
-    />
+  <v-text-field
+    v-bind="$attrs"
+    :value="value"
+    :rules="projectNameRules"
+    :label="$t('overview.projectName')"
+    required
+    @input="$emit('input', $event)"
+  />
 </template>
 
-<script setup lang="ts">
-import {
-    validateMinLength,
-    validateNameMaxLength,
-} from "@/domain/models/project/project";
+<script lang="ts">
+import Vue from 'vue'
+import { validateMinLength, validateNameMaxLength } from '~/domain/models/project/project'
 
-defineProps({
+export default Vue.extend({
+  props: {
     value: {
-        type: String,
-        default: "",
-        required: true,
-    },
-});
-
-const projectNameRules = [
-    (text: string) => validateMinLength(text) || $t("rules.projectName.required"),
-    (text: string) => validateNameMaxLength(text) || $t("rules.projectName.maxLength"),
-];
+      type: String,
+      default: '',
+      required: true
+    }
+  },
+  data() {
+    return {
+      projectNameRules: [
+        (text: string) => validateMinLength(text) || this.$t('rules.projectName.required'),
+        (text: string) => validateNameMaxLength(text) || this.$t('rules.projectName.maxLength')
+      ]
+    }
+  }
+})
 </script>

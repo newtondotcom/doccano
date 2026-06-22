@@ -36,36 +36,44 @@
   </v-card>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
+<script lang="ts">
+import Vue from 'vue'
 import { uploadSingleFileRules } from '@/rules/index'
 
-defineProps({
-  errorMessage: {
-    type: String,
-    default: ''
+export default Vue.extend({
+  props: {
+    errorMessage: {
+      type: String,
+      default: ''
+    }
+  },
+
+  data() {
+    return {
+      file: null,
+      valid: false,
+      uploadSingleFileRules
+    }
+  },
+
+  computed: {
+    exampleFormat() {
+      const data = [
+        {
+          text: 'Dog',
+          suffix_key: 'a',
+          background_color: '#FF0000',
+          text_color: '#ffffff'
+        },
+        {
+          text: 'Cat',
+          suffix_key: 'c',
+          background_color: '#FF0000',
+          text_color: '#ffffff'
+        }
+      ]
+      return JSON.stringify(data, null, 4)
+    }
   }
 })
-
-const file = ref(null)
-const valid = ref(false)
-
-const exampleFormat = JSON.stringify(
-  [
-    {
-      text: 'Dog',
-      suffix_key: 'a',
-      background_color: '#FF0000',
-      text_color: '#ffffff'
-    },
-    {
-      text: 'Cat',
-      suffix_key: 'c',
-      background_color: '#FF0000',
-      text_color: '#ffffff'
-    }
-  ],
-  null,
-  4
-)
 </script>

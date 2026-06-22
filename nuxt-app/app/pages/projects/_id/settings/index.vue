@@ -18,18 +18,29 @@
   </v-card>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
+<script lang="ts">
+import Vue from 'vue'
 import FormUpdate from '@/components/project/FormUpdate.vue'
 import ConfigList from '@/components/configAutoLabeling/ConfigList.vue'
 
-definePageMeta({
+export default Vue.extend({
+  components: {
+    ConfigList,
+    FormUpdate
+  },
+
   layout: 'project',
+
   middleware: ['check-auth', 'auth', 'setCurrentProject', 'isProjectAdmin'],
+
   validate({ params }) {
     return /^\d+$/.test(params.id)
+  },
+
+  data() {
+    return {
+      tab: null
+    }
   }
 })
-
-const tab = ref(null)
 </script>

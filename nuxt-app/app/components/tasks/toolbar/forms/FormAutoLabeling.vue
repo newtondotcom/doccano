@@ -21,19 +21,26 @@
   </base-card>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import Vue from 'vue'
 import BaseCard from '@/components/utils/BaseCard.vue'
 
-defineProps({
-  isEnabled: {
-    type: Boolean,
-    default: false,
-    required: true
+export default Vue.extend({
+  components: {
+    BaseCard
   },
-  errorMessage: {
-    type: String,
-    default: '',
-    required: true
+
+  props: {
+    isEnabled: {
+      type: Boolean,
+      default: false,
+      required: true
+    },
+    errorMessage: {
+      type: String,
+      default: '',
+      required: true
+    }
   }
 })
 </script>

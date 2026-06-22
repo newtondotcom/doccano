@@ -32,34 +32,36 @@
   </v-card>
 </template>
 
-<script setup lang="ts">
-defineProps({
-  title: {
-    type: String,
-    default: '',
-    required: true
+<script lang="ts">
+import Vue from 'vue'
+export default Vue.extend({
+  props: {
+    title: {
+      type: String,
+      default: '',
+      required: true
+    },
+    cancelText: {
+      type: String,
+      default: ''
+    },
+    agreeText: {
+      type: String,
+      default: ''
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    }
   },
-  cancelText: {
-    type: String,
-    default: ''
-  },
-  agreeText: {
-    type: String,
-    default: ''
-  },
-  disabled: {
-    type: Boolean,
-    default: false
+
+  methods: {
+    agree() {
+      this.$emit('agree')
+    },
+    cancel() {
+      this.$emit('cancel')
+    }
   }
 })
-
-const emit = defineEmits(['agree', 'cancel'])
-
-const agree = () => {
-  emit('agree')
-}
-
-const cancel = () => {
-  emit('cancel')
-}
 </script>

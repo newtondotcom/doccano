@@ -37,33 +37,44 @@
   </v-data-table>
 </template>
 
-<script setup lang="ts">
-import { computed, ref } from 'vue'
+<script lang="ts">
+import Vue from 'vue'
 import { mdiMagnify, mdiPencil } from '@mdi/js'
 
-defineProps({
-  isLoading: {
-    type: Boolean,
-    default: false,
-    required: true
+export default Vue.extend({
+  props: {
+    isLoading: {
+      type: Boolean,
+      default: false,
+      required: true
+    },
+    items: {
+      type: Array,
+      default: () => [],
+      required: true
+    },
+    value: {
+      type: Array,
+      default: () => [],
+      required: true
+    }
   },
-  items: {
-    type: Array,
-    default: () => [],
-    required: true
+  data() {
+    return {
+      search: '',
+      mdiMagnify,
+      mdiPencil
+    }
   },
-  value: {
-    type: Array,
-    default: () => [],
-    required: true
+
+  computed: {
+    headers() {
+      return [
+        { text: this.$t('generic.name'), value: 'username' },
+        { text: this.$t('members.role'), value: 'rolename' },
+        { text: 'Actions', value: 'actions', sortable: false }
+      ]
+    }
   }
 })
-
-const search = ref('')
-
-const headers = computed(() => [
-  { text: $t('generic.name'), value: 'username' },
-  { text: $t('members.role'), value: 'rolename' },
-  { text: 'Actions', value: 'actions', sortable: false }
-])
 </script>

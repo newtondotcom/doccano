@@ -64,32 +64,36 @@
   </v-stepper-content>
 </template>
 
-<script setup lang="ts">
-defineProps({
-  value: {
-    type: String,
-    default: '',
-    required: true
-  },
-  errorMessages: {
-    type: Array,
-    default: () => [],
-    required: true
-  },
-  isPassed: {
-    type: Boolean,
-    default: false,
-    required: true
-  },
-  response: {
-    type: [String, Object, Array],
-    default: () => [],
-    required: true
-  },
-  result: {
-    type: Array,
-    default: () => [],
-    required: true
+<script lang="ts">
+import Vue from 'vue'
+
+export default Vue.extend({
+  props: {
+    value: {
+      type: String,
+      default: '',
+      required: true
+    },
+    errorMessages: {
+      type: Array,
+      default: () => [],
+      required: true
+    },
+    isPassed: {
+      type: Boolean,
+      default: false,
+      required: true
+    },
+    response: {
+      type: [String, Object, Array],
+      default: () => [],
+      required: true
+    },
+    result: {
+      type: Array,
+      default: () => [],
+      required: true
+    }
   }
 })
 </script>

@@ -19,47 +19,53 @@
   </base-card>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import Vue from 'vue'
 import BaseCard from './BaseCard.vue'
 
-defineProps({
-  title: {
-    type: String,
-    default: '',
-    required: true
+export default Vue.extend({
+  components: {
+    BaseCard
   },
-  message: {
-    type: String,
-    default: '',
-    required: true
+
+  props: {
+    title: {
+      type: String,
+      default: '',
+      required: true
+    },
+    message: {
+      type: String,
+      default: '',
+      required: true
+    },
+    items: {
+      type: Array,
+      default: () => [],
+      required: false
+    },
+    itemKey: {
+      type: String,
+      default: '',
+      required: false
+    },
+    buttonTrueText: {
+      type: String,
+      default: 'Yes'
+    },
+    buttonFalseText: {
+      type: String,
+      default: 'Cancel'
+    }
   },
-  items: {
-    type: Array,
-    default: () => [],
-    required: false
-  },
-  itemKey: {
-    type: String,
-    default: '',
-    required: false
-  },
-  buttonTrueText: {
-    type: String,
-    default: 'Yes'
-  },
-  buttonFalseText: {
-    type: String,
-    default: 'Cancel'
+
+  methods: {
+    ok() {
+      this.$emit('ok')
+    },
+    cancel() {
+      this.$emit('cancel')
+    }
   }
 })
-
-const emit = defineEmits(['ok', 'cancel'])
-
-const ok = () => {
-  emit('ok')
-}
-
-const cancel = () => {
-  emit('cancel')
-}
 </script>

@@ -11,6 +11,15 @@
   </v-tooltip>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import Vue from 'vue'
 import { mdiAutoFix } from '@mdi/js'
+
+export default Vue.extend({
+  data() {
+    return {
+      mdiAutoFix
+    }
+  }
+})
 </script>

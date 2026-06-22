@@ -18,6 +18,15 @@
   </v-menu>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import Vue from 'vue'
 import { mdiMenuDown } from '@mdi/js'
+
+export default Vue.extend({
+  data() {
+    return {
+      mdiMenuDown
+    }
+  }
+})
 </script>

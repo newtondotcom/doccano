@@ -25,24 +25,35 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import Vue from 'vue'
 import FeatureCard from './FeatureCard.vue'
 
-const featureCards = [
-  {
-    imageSrc: 'feature3.png',
-    title: $t('home.featuresTitle1'),
-    text: $t('home.featuresText1')
+export default Vue.extend({
+  components: {
+    FeatureCard
   },
-  {
-    imageSrc: 'feature2.png',
-    title: $t('home.featuresTitle2'),
-    text: $t('home.featuresText2')
-  },
-  {
-    imageSrc: 'feature1.png',
-    title: $t('home.featuresTitle3'),
-    text: $t('home.featuresText3')
+
+  data() {
+    return {
+      featureCards: [
+        {
+          imageSrc: 'feature3.png',
+          title: this.$t('home.featuresTitle1'),
+          text: this.$t('home.featuresText1')
+        },
+        {
+          imageSrc: 'feature2.png',
+          title: this.$t('home.featuresTitle2'),
+          text: this.$t('home.featuresText2')
+        },
+        {
+          imageSrc: 'feature1.png',
+          title: this.$t('home.featuresTitle3'),
+          text: this.$t('home.featuresText3')
+        }
+      ]
+    }
   }
-]
+})
 </script>

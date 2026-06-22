@@ -13,14 +13,16 @@
   />
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
 import type { PropType } from 'vue'
-
-defineProps({
-  value: {
-    type: Array as PropType<string[]>,
-    default: () => [],
-    required: true
+import Vue from 'vue'
+export default Vue.extend({
+  props: {
+    value: {
+      type: Array as PropType<string[]>,
+      default: () => [],
+      required: true
+    }
   }
 })
 </script>

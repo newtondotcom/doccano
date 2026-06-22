@@ -35,34 +35,48 @@
   </base-card>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
+<script lang="ts">
+import Vue from 'vue'
 import { mdiAccount, mdiLock } from '@mdi/js'
 import { userNameRules, passwordRules } from '@/rules/index'
+import BaseCard from '@/components/utils/BaseCard.vue'
 
-const props = defineProps({
-  login: {
-    type: Function,
-    default: () => Promise
+export default Vue.extend({
+  components: {
+    BaseCard
+  },
+
+  props: {
+    login: {
+      type: Function,
+      default: () => Promise
+    }
+  },
+  data() {
+    return {
+      valid: false,
+      username: '',
+      password: '',
+      userNameRules,
+      passwordRules,
+      showError: false,
+      mdiAccount,
+      mdiLock
+    }
+  },
+
+  methods: {
+    async tryLogin() {
+      try {
+        await this.login({
+          username: this.username,
+          password: this.password
+        })
+        this.$router.push(this.localePath('/projects'))
+      } catch {
+        this.showError = true
+      }
+    }
   }
 })
-
-const valid = ref(false)
-const username = ref('')
-const password = ref('')
-const showError = ref(false)
-const { localePath } = useNuxtApp() as any
-const router = useRouter()
-
-const tryLogin = async () => {
-  try {
-    await props.login({
-      username: username.value,
-      password: password.value
-    })
-    router.push(localePath('/projects'))
-  } catch {
-    showError.value = true
-  }
-}
 </script>

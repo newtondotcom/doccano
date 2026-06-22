@@ -1,60 +1,67 @@
 <template>
-    <form-import
-        :error-message="errorMessage"
-        @clear="clearErrorMessage"
-        @upload="upload"
-    />
+  <form-import :error-message="errorMessage" @clear="clearErrorMessage" @upload="upload" />
 </template>
 
-<script setup lang="ts">
-import { computed, ref } from "vue";
-import FormImport from "@/components/label/FormImport.vue";
-import { useMainStore as useProjectStore } from "@/store/projects";
+<script lang="ts">
+import Vue from 'vue'
+import FormImport from '~/components/label/FormImport.vue'
 
-definePageMeta({
-    layout: "project",
-    middleware: ["check-auth", "auth", "setCurrentProject", "isProjectAdmin"],
-    validate({ params, query, store }) {
-        if (!["category", "span", "relation"].includes(query.type as string)) {
-            return false;
-        }
-        if (/^\d+$/.test(params.id)) {
-            const project = store.getters["projects/project"];
-            return project.canDefineLabel;
-        }
-        return false;
+export default Vue.extend({
+  components: {
+    FormImport
+  },
+
+  layout: 'project',
+
+  middleware: ['check-auth', 'auth', 'setCurrentProject', 'isProjectAdmin'],
+
+  validate({ params, query, store }) {
+    if (!['category', 'span', 'relation'].includes(query.type as string)) {
+      return false
+    }
+    if (/^\d+$/.test(params.id)) {
+      const project = store.getters['projects/project']
+      return project.canDefineLabel
+    }
+    return false
+  },
+
+  data() {
+    return {
+      errorMessage: ''
+    }
+  },
+
+  computed: {
+    projectId(): string {
+      return this.$route.params.id
     },
-});
 
-const errorMessage = ref("");
-const route = useRoute();
-const router = useRouter();
-const { $services } = useNuxtApp() as any;
-const projectStore = useProjectStore();
-
-const projectId = computed(() => route.params.id as string);
-
-const service = computed(() => {
-    const type = route.query.type;
-    if (type === "category") {
-        return $services.categoryType;
-    } else if (type === "span") {
-        return $services.spanType;
-    } else {
-        return $services.relationType;
+    service(): any {
+      const type = this.$route.query.type
+      if (type === 'category') {
+        return this.$services.categoryType
+      } else if (type === 'span') {
+        return this.$services.spanType
+      } else {
+        return this.$services.relationType
+      }
     }
-});
+  },
 
-const upload = async (file: File) => {
-    try {
-        await service.value.upload(projectId.value, file);
-        router.push(`/projects/${projectId.value}/labels`);
-    } catch (e: any) {
-        errorMessage.value = e.message;
+  methods: {
+    async upload(file: File) {
+      try {
+        await this.service.upload(this.projectId, file)
+        this.$router.push(`/projects/${this.projectId}/labels`)
+      } catch (e: any) {
+        this.errorMessage = e.message
+      }
+    },
+
+    clearErrorMessage() {
+      this.errorMessage = ''
     }
-};
-
-const clearErrorMessage = () => {
-    errorMessage.value = "";
-};
+  }
+})
 </script>

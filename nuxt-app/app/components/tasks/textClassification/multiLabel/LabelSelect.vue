@@ -1,108 +1,97 @@
 <template>
-    <v-combobox
-        v-model="annotatedLabels"
-        chips
-        :items="labels"
-        item-text="text"
-        hide-details
-        hide-selected
-        multiple
-        class="pt-0"
-        :search-input.sync="search"
-        @change="search = ''"
-    >
-        <template #selection="{ attrs, item, select, selected }">
-            <v-chip
-                v-bind="attrs"
-                :input-value="selected"
-                :color="item.backgroundColor"
-                :text-color="$contrastColor(item.backgroundColor)"
-                close
-                @click="select"
-                @click:close="remove(item)"
-            >
-                <v-avatar
-                    v-if="item.suffixKey"
-                    left
-                    color="white"
-                    class="black--text font-weight-bold"
-                >
-                    {{ item.suffixKey }}
-                </v-avatar>
-                {{ item.text }}
-            </v-chip>
-        </template>
-        <template #item="{ item }">
-            <v-chip
-                :color="item.backgroundColor"
-                :text-color="$contrastColor(item.backgroundColor)"
-            >
-                <v-avatar
-                    v-if="item.suffixKey"
-                    left
-                    color="white"
-                    class="black--text font-weight-bold"
-                >
-                    {{ item.suffixKey }}
-                </v-avatar>
-                {{ item.text }}
-            </v-chip>
-        </template>
-    </v-combobox>
+  <v-combobox
+    v-model="annotatedLabels"
+    chips
+    :items="labels"
+    item-text="text"
+    hide-details
+    hide-selected
+    multiple
+    class="pt-0"
+    :search-input.sync="search"
+    @change="search = ''"
+  >
+    <template #selection="{ attrs, item, select, selected }">
+      <v-chip
+        v-bind="attrs"
+        :input-value="selected"
+        :color="item.backgroundColor"
+        :text-color="$contrastColor(item.backgroundColor)"
+        close
+        @click="select"
+        @click:close="remove(item)"
+      >
+        <v-avatar v-if="item.suffixKey" left color="white" class="black--text font-weight-bold">
+          {{ item.suffixKey }}
+        </v-avatar>
+        {{ item.text }}
+      </v-chip>
+    </template>
+    <template #item="{ item }">
+      <v-chip :color="item.backgroundColor" :text-color="$contrastColor(item.backgroundColor)">
+        <v-avatar v-if="item.suffixKey" left color="white" class="black--text font-weight-bold">
+          {{ item.suffixKey }}
+        </v-avatar>
+        {{ item.text }}
+      </v-chip>
+    </template>
+  </v-combobox>
 </template>
 
-<script setup>
-import { ref, computed } from "vue";
-
-const props = defineProps({
+<script>
+export default {
+  props: {
     labels: {
-        type: Array,
-        default: () => [],
-        required: true,
+      type: Array,
+      default: () => [],
+      required: true
     },
     annotations: {
-        type: Array,
-        default: () => [],
-        required: true,
-    },
-});
+      type: Array,
+      default: () => [],
+      required: true
+    }
+  },
 
-const emit = defineEmits(["add", "remove"]);
+  data() {
+    return {
+      search: ''
+    }
+  },
 
-const search = ref("");
-
-const annotatedLabels = computed({
-    get() {
-        const labelIds = props.annotations.map((item) => item.label);
-        return props.labels.filter((item) => labelIds.includes(item.id));
-    },
-    set(newValue) {
-        if (newValue.length > props.annotations.length) {
-            const label = newValue[newValue.length - 1];
-            if (typeof label === "object") {
-                add(label);
-            } else {
-                newValue.pop();
-            }
+  computed: {
+    annotatedLabels: {
+      get() {
+        const labelIds = this.annotations.map((item) => item.label)
+        return this.labels.filter((item) => labelIds.includes(item.id))
+      },
+      set(newValue) {
+        if (newValue.length > this.annotations.length) {
+          const label = newValue[newValue.length - 1]
+          if (typeof label === 'object') {
+            this.add(label)
+          } else {
+            newValue.pop()
+          }
         } else {
-            const label = annotatedLabels.value.find(
-                (x) => !newValue.some((y) => y.id === x.id),
-            );
-            if (typeof label === "object") {
-                remove(label);
-            }
+          const label = this.annotatedLabels.find((x) => !newValue.some((y) => y.id === x.id))
+          if (typeof label === 'object') {
+            this.remove(label)
+          }
         }
+      }
+    }
+  },
+
+  methods: {
+    add(label) {
+      this.$emit('add', label.id)
     },
-});
 
-function add(label) {
-    emit("add", label.id);
-}
-
-function remove(label) {
-    const annotation = props.annotations.find(
-        (item) => item.label === label.id,
-    );
-    emit("remove", annotation.id);
+    remove(label) {
+      const annotation = this.annotations.find((item) => item.label === label.id)
+      this.$emit('remove', annotation.id)
+    }
+  }
 }
 </script>

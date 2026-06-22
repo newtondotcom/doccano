@@ -40,8 +40,8 @@
   </v-stepper>
 </template>
 
-<script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+<script lang="ts">
+import Vue from 'vue'
 import ConfigHeader from './form/ConfigHeader.vue'
 import ConfigLabelMapping from './form/ConfigLabelMapping.vue'
 import ConfigParameters from './form/ConfigParameters.vue'
@@ -50,106 +50,112 @@ import ConfigTemplateName from './form/ConfigTemplateName.vue'
 import { StepCounter } from '@/domain/models/utils/stepper'
 import { ConfigItem, Fields } from '@/domain/models/autoLabeling/config'
 
-const emit = defineEmits(['onCreate'])
-const route = useRoute()
-const { $repositories } = useNuxtApp() as any
-
-const config = ref({} as ConfigItem)
-const errors = ref<string[]>([])
-const fields = ref({} as Fields)
-const isLoading = ref(false)
-const step = reactive(new StepCounter())
-const passTesting = ref({
-  parameter: false,
-  template: false,
-  mapping: false
-})
-const response = ref({
-  parameter: [],
-  template: [],
-  mapping: []
-})
-
-watch(
-  () => fields.value.modelName,
-  () => {
-    passTesting.value = { parameter: false, template: false, mapping: false }
-  }
-)
-watch(
-  () => fields.value.modelAttrs,
-  () => {
-    passTesting.value = { parameter: false, template: false, mapping: false }
+export default Vue.extend({
+  components: {
+    ConfigHeader,
+    ConfigLabelMapping,
+    ConfigParameters,
+    ConfigTemplate,
+    ConfigTemplateName
   },
-  { deep: true }
-)
-watch(
-  () => fields.value.template,
-  () => {
-    passTesting.value = { parameter: true, template: false, mapping: false }
-  }
-)
-watch(
-  () => fields.value.labelMapping,
-  () => {
-    passTesting.value = { parameter: true, template: true, mapping: false }
+
+  data() {
+    return {
+      config: {} as ConfigItem,
+      errors: [] as string[],
+      fields: {} as Fields,
+      isLoading: false,
+      step: new StepCounter(),
+      passTesting: {
+        parameter: false,
+        template: false,
+        mapping: false
+      },
+      response: {
+        parameter: [],
+        template: [],
+        mapping: []
+      }
+    }
   },
-  { deep: true }
-)
 
-const testConfig = (promise: Promise<any>, key: 'parameter' | 'template' | 'mapping') => {
-  isLoading.value = true
-  promise
-    .then((value) => {
-      response.value[key] = value
-      passTesting.value[key] = true
-      errors.value = []
-    })
-    .catch((error) => {
-      errors.value = [error.response.data]
-    })
-    .finally(() => {
-      isLoading.value = false
-    })
-}
+  watch: {
+    'fields.modelName'() {
+      this.passTesting = { parameter: false, template: false, mapping: false }
+    },
+    'fields.modelAttrs': {
+      handler() {
+        this.passTesting = {
+          parameter: false,
+          template: false,
+          mapping: false
+        }
+      },
+      deep: true
+    },
+    'fields.template'() {
+      this.passTesting = { parameter: true, template: false, mapping: false }
+    },
+    'fields.labelMapping': {
+      handler() {
+        this.passTesting = { parameter: true, template: true, mapping: false }
+      },
+      deep: true
+    }
+  },
 
-const testParameters = (text: string) => {
-  const projectId = route.params.id
-  const item = ConfigItem.parseFromUI(fields.value)
-  const promise = $repositories.config.testParameters(projectId, item, text)
-  testConfig(promise, 'parameter')
-}
-
-const testTemplate = () => {
-  const projectId = route.params.id
-  const item = ConfigItem.parseFromUI(fields.value)
-  const promise = $repositories.config.testTemplate(
-    projectId,
-    response.value.parameter,
-    item
-  )
-  testConfig(promise, 'template')
-}
-
-const testMapping = () => {
-  const projectId = route.params.id
-  const item = ConfigItem.parseFromUI(fields.value)
-  const promise = $repositories.config.testMapping(projectId, item, response.value.template)
-  testConfig(promise, 'mapping')
-}
-
-const saveConfig = () => {
-  const projectId = route.params.id
-  const item = ConfigItem.parseFromUI(fields.value)
-  isLoading.value = true
-  $repositories.config
-    .create(projectId, item)
-    .then(() => {
-      step.first()
-      emit('onCreate')
-    })
-    .finally(() => {
-      isLoading.value = false
-    })
-}
+  methods: {
+    testConfig(promise: Promise<any>, key: 'parameter' | 'template' | 'mapping') {
+      this.isLoading = true
+      promise
+        .then((value) => {
+          this.response[key] = value
+          this.passTesting[key] = true
+          this.errors = []
+        })
+        .catch((error) => {
+          this.errors = [error.response.data]
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
+    testParameters(text: string) {
+      const projectId = this.$route.params.id
+      const item = ConfigItem.parseFromUI(this.fields)
+      const promise = this.$repositories.config.testParameters(projectId, item, text)
+      this.testConfig(promise, 'parameter')
+    },
+    testTemplate() {
+      const projectId = this.$route.params.id
+      const item = ConfigItem.parseFromUI(this.fields)
+      const promise = this.$repositories.config.testTemplate(
+        projectId,
+        this.response.parameter,
+        item
+      )
+      this.testConfig(promise, 'template')
+    },
+    testMapping() {
+      const projectId = this.$route.params.id
+      const item = ConfigItem.parseFromUI(this.fields)
+      const promise = this.$repositories.config.testMapping(projectId, item, this.response.template)
+      this.testConfig(promise, 'mapping')
+    },
+    saveConfig() {
+      const projectId = this.$route.params.id
+      const item = ConfigItem.parseFromUI(this.fields)
+      this.isLoading = true
+      this.$repositories.config
+        .create(projectId, item)
+        .then(() => {
+          this.step.first()
+          this.$emit('onCreate')
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    }
+  }
+})
 </script>

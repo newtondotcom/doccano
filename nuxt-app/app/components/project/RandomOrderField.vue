@@ -7,12 +7,15 @@
   />
 </template>
 
-<script setup lang="ts">
-defineProps({
-  value: {
-    type: Boolean,
-    default: false,
-    required: true
+<script lang="ts">
+import Vue from 'vue'
+export default Vue.extend({
+  props: {
+    value: {
+      type: Boolean,
+      default: false,
+      required: true
+    }
   }
 })
 </script>

@@ -65,97 +65,104 @@
   </v-data-table>
 </template>
 
-<script setup lang="ts">
-import { nextTick, ref, onMounted } from 'vue'
+<script lang="ts">
+import Vue from 'vue'
 import { mdiPencil, mdiDelete } from '@mdi/js'
 import { labelNameRules } from '@/rules/index'
 
-const props = defineProps({
-  value: {
-    type: Array,
-    default: () => [],
-    required: true
-  }
-})
-const emit = defineEmits(['input'])
-
-const dialog = ref(false)
-const headers = [
-  {
-    text: 'From',
-    align: 'left',
-    value: 'from',
-    sortable: false
+export default Vue.extend({
+  props: {
+    value: {
+      type: Array,
+      default: () => [],
+      required: true
+    }
   },
-  {
-    text: 'To',
-    align: 'left',
-    value: 'to',
-    sortable: false
+  data() {
+    return {
+      dialog: false,
+      headers: [
+        {
+          text: 'From',
+          align: 'left',
+          value: 'from',
+          sortable: false
+        },
+        {
+          text: 'To',
+          align: 'left',
+          value: 'to',
+          sortable: false
+        },
+        {
+          text: 'Actions',
+          value: 'actions',
+          sortable: false
+        }
+      ],
+      valid: false,
+      editedIndex: -1,
+      editedItem: {
+        from: '',
+        to: ''
+      },
+      defaultItem: {
+        from: '',
+        to: ''
+      },
+      items: [] as string[],
+      labelNameRules,
+      mdiPencil,
+      mdiDelete
+    }
   },
-  {
-    text: 'Actions',
-    value: 'actions',
-    sortable: false
+
+  async created() {
+    const project = await this.$services.project.findById(this.$route.params.id)
+    if (project.projectType.endsWith('Classification')) {
+      const labels = await this.$services.categoryType.list(this.$route.params.id)
+      this.items = labels.map((item) => item.text)
+    } else {
+      const labels = await this.$services.spanType.list(this.$route.params.id)
+      this.items = labels.map((item) => item.text)
+    }
+  },
+
+  methods: {
+    editItem(item: { from: string; to: string }) {
+      this.editedIndex = this.value.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+      this.dialog = true
+    },
+
+    deleteItem(item: { from: string; to: string }) {
+      this.editedIndex = this.value.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+      const items = Object.assign([], this.value)
+      items.splice(this.editedIndex, 1)
+      this.editedItem = Object.assign({}, this.defaultItem)
+      this.editedIndex = -1
+      this.$emit('input', items)
+    },
+
+    close() {
+      this.dialog = false
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem)
+        this.editedIndex = -1
+      })
+    },
+
+    save() {
+      const items = Object.assign([], this.value)
+      if (this.editedIndex > -1) {
+        Object.assign(items[this.editedIndex], this.editedItem)
+      } else {
+        items.push(this.editedItem)
+      }
+      this.$emit('input', items)
+      this.close()
+    }
   }
-]
-const valid = ref(false)
-const editedIndex = ref(-1)
-const editedItem = ref({
-  from: '',
-  to: ''
 })
-const defaultItem = {
-  from: '',
-  to: ''
-}
-const items = ref([] as string[])
-
-onMounted(async () => {
-  const route = useRoute()
-  const { $services } = useNuxtApp() as any
-  const project = await $services.project.findById(route.params.id)
-  if (project.projectType.endsWith('Classification')) {
-    const labels = await $services.categoryType.list(route.params.id)
-    items.value = labels.map((item: { text: string }) => item.text)
-  } else {
-    const labels = await $services.spanType.list(route.params.id)
-    items.value = labels.map((item: { text: string }) => item.text)
-  }
-})
-
-const editItem = (item: { from: string; to: string }) => {
-  editedIndex.value = props.value.indexOf(item)
-  editedItem.value = Object.assign({}, item)
-  dialog.value = true
-}
-
-const deleteItem = (item: { from: string; to: string }) => {
-  editedIndex.value = props.value.indexOf(item)
-  editedItem.value = Object.assign({}, item)
-  const currentItems = Object.assign([], props.value)
-  currentItems.splice(editedIndex.value, 1)
-  editedItem.value = Object.assign({}, defaultItem)
-  editedIndex.value = -1
-  emit('input', currentItems)
-}
-
-const close = () => {
-  dialog.value = false
-  nextTick(() => {
-    editedItem.value = Object.assign({}, defaultItem)
-    editedIndex.value = -1
-  })
-}
-
-const save = () => {
-  const currentItems = Object.assign([], props.value)
-  if (editedIndex.value > -1) {
-    Object.assign(currentItems[editedIndex.value], editedItem.value)
-  } else {
-    currentItems.push(editedItem.value)
-  }
-  emit('input', currentItems)
-  close()
-}
 </script>

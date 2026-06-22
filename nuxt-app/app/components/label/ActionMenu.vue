@@ -1,47 +1,56 @@
 <template>
-    <action-menu
-        :items="items"
-        :text="$t('dataset.actions')"
-        @create="$emit('create')"
-        @upload="$emit('upload')"
-        @download="$emit('download')"
-    />
+  <action-menu
+    :items="items"
+    :text="$t('dataset.actions')"
+    @create="$emit('create')"
+    @upload="$emit('upload')"
+    @download="$emit('download')"
+  />
 </template>
 
-<script setup lang="ts">
-import { computed } from "vue";
-import { mdiPencil, mdiUpload, mdiDownload } from "@mdi/js";
-import ActionMenu from "@/components/utils/ActionMenu.vue";
+<script lang="ts">
+import Vue from 'vue'
+import { mdiPencil, mdiUpload, mdiDownload } from '@mdi/js'
+import ActionMenu from '~/components/utils/ActionMenu.vue'
 
-const props = defineProps({
+export default Vue.extend({
+  components: {
+    ActionMenu
+  },
+
+  props: {
     addOnly: {
-        type: Boolean,
-        default: false,
-    },
-});
-
-const items = computed(() => {
-    const baseItems = [
-        {
-            title: $t("labels.createLabel"),
-            icon: mdiPencil,
-            event: "create",
-        },
-    ];
-    if (props.addOnly) {
-        return baseItems;
+      type: Boolean,
+      default: false
     }
-    return baseItems.concat([
+  },
+
+  computed: {
+    items() {
+      const items = [
         {
-            title: $t("labels.importLabels"),
+          title: this.$t('labels.createLabel'),
+          icon: mdiPencil,
+          event: 'create'
+        }
+      ]
+      if (this.addOnly) {
+        return items
+      } else {
+        return items.concat([
+          {
+            title: this.$t('labels.importLabels'),
             icon: mdiUpload,
-            event: "upload",
-        },
-        {
-            title: $t("labels.exportLabels"),
+            event: 'upload'
+          },
+          {
+            title: this.$t('labels.exportLabels'),
             icon: mdiDownload,
-            event: "download",
-        },
-    ]);
-});
+            event: 'download'
+          }
+        ])
+      }
+    }
+  }
+})
 </script>

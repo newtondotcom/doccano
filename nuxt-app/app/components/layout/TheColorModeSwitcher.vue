@@ -9,20 +9,29 @@
   </v-btn>
 </template>
 
-<script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+<script lang="ts">
+import Vue from 'vue'
 import { mdiMoonWaxingCrescent, mdiWhiteBalanceSunny } from '@mdi/js'
 
-const isDark = ref(false)
-const { $vuetify } = useNuxtApp() as any
+export default Vue.extend({
+  data() {
+    return {
+      isDark: false,
+      mdiMoonWaxingCrescent,
+      mdiWhiteBalanceSunny
+    }
+  },
 
-watch(isDark, (value) => {
-  $vuetify.theme.dark = value
-  localStorage.setItem('dark', JSON.stringify(value))
-})
+  watch: {
+    isDark() {
+      this.$vuetify.theme.dark = this.isDark
+      localStorage.setItem('dark', JSON.stringify(this.isDark))
+    }
+  },
 
-onMounted(() => {
-  const dark = localStorage.getItem('dark')
-  isDark.value = dark ? JSON.parse(dark) : false
+  created() {
+    const dark = localStorage.getItem('dark')
+    this.isDark = dark ? JSON.parse(dark) : false
+  }
 })
 </script>

@@ -10,12 +10,16 @@
   </v-stepper-header>
 </template>
 
-<script setup lang="ts">
-defineProps({
-  step: {
-    type: Number,
-    default: 1,
-    required: true,
-  },
-});
+<script lang="ts">
+import Vue from 'vue'
+
+export default Vue.extend({
+  props: {
+    step: {
+      type: Number,
+      default: 1,
+      required: true
+    }
+  }
+})
 </script>
