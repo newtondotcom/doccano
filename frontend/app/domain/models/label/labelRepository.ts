@@ -1,15 +1,15 @@
-import { LabelItem } from '@/domain/models/label/label'
+import { LabelItem } from "@/domain/models/label/label";
 
 export interface LabelRepository {
-  list(projectId: string): Promise<LabelItem[]>
+  list(projectId: string): Promise<LabelItem[]>;
 
-  findById(projectId: string, labelId: number): Promise<LabelItem>
+  findById(projectId: string, labelId: number): Promise<LabelItem>;
 
-  create(projectId: string, item: LabelItem): Promise<LabelItem>
+  create(projectId: string, item: LabelItem): Promise<LabelItem>;
 
-  update(projectId: string, item: LabelItem): Promise<LabelItem>
+  update(projectId: string, item: LabelItem): Promise<LabelItem>;
 
-  bulkDelete(projectId: string, labelIds: number[]): Promise<void>
+  bulkDelete(projectId: string, labelIds: number[]): Promise<void>;
 
-  uploadFile(projectId: string, payload: FormData): Promise<void>
+  uploadFile(projectId: string, payload: FormData): Promise<void>;
 }

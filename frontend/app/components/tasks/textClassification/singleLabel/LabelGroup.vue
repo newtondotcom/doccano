@@ -20,38 +20,38 @@ const props = defineProps({
   labels: {
     type: Array,
     default: () => [],
-    required: true
+    required: true,
   },
   annotations: {
     type: Array,
     default: () => [],
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const emit = defineEmits(['add', 'remove'])
+const emit = defineEmits(["add", "remove"]);
 
 const annotatedLabel = computed(() => {
-  const labelIds = props.annotations.map((item) => item.label)
-  return props.labels.findIndex((item) => labelIds.includes(item.id))
-})
+  const labelIds = props.annotations.map((item) => item.label);
+  return props.labels.findIndex((item) => labelIds.includes(item.id));
+});
 
 function addOrRemove(index) {
   if (index === undefined) {
-    const label = props.labels[annotatedLabel.value]
-    remove(label)
+    const label = props.labels[annotatedLabel.value];
+    remove(label);
   } else {
-    const label = props.labels[index]
-    add(label)
+    const label = props.labels[index];
+    add(label);
   }
 }
 
 function add(label) {
-  emit('add', label.id)
+  emit("add", label.id);
 }
 
 function remove(label) {
-  const annotation = props.annotations.find((item) => item.label === label.id)
-  emit('remove', annotation.id)
+  const annotation = props.annotations.find((item) => item.label === label.id);
+  emit("remove", annotation.id);
 }
 </script>

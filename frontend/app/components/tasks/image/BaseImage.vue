@@ -1,7 +1,7 @@
 <template>
   <v-image
     :config="{
-      image: image
+      image: image,
     }"
   />
 </template>
@@ -10,22 +10,22 @@
 const props = defineProps({
   imageUrl: {
     type: String,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const emit = defineEmits(['loaded'])
+const emit = defineEmits(["loaded"]);
 
-const image = ref(new Image())
+const image = ref(new Image());
 
 watch(
   () => props.imageUrl,
   () => {
-    image.value.src = props.imageUrl
+    image.value.src = props.imageUrl;
     image.value.onload = () => {
-      emit('loaded', image.value.width, image.value.height)
-    }
+      emit("loaded", image.value.width, image.value.height);
+    };
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 </script>

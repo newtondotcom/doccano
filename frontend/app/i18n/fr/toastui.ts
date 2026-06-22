@@ -1,3 +1,3 @@
 export default {
-  localeCode: 'fr_FR'
-}
+  localeCode: "fr_FR",
+};

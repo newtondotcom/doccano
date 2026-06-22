@@ -8,7 +8,7 @@
     <template #content>
       <v-form v-model="valid">
         <v-alert v-show="showError" v-model="showError" type="error" dismissible>
-          {{ $t('errors.invalidUserOrPass') }}
+          {{ $t("errors.invalidUserOrPass") }}
         </v-alert>
         <v-text-field
           v-model="username"
@@ -36,38 +36,38 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from 'vue'
-import { ref } from 'vue'
-import { mdiAccount, mdiLock } from '@mdi/js'
-import { userNameRules, passwordRules } from '@/rules/index'
+import type { PropType } from "vue";
+import { ref } from "vue";
+import { mdiAccount, mdiLock } from "@mdi/js";
+import { userNameRules, passwordRules } from "@/rules/index";
 
 const props = defineProps({
   login: {
     type: Function as PropType<
       (credentials: { username: string; password: string }) => Promise<void>
     >,
-    default: () => Promise.resolve()
-  }
-})
+    default: () => Promise.resolve(),
+  },
+});
 
-const router = useRouter()
-const localePath = useLocalePath()
-const { tm } = useI18n()
+const router = useRouter();
+const localePath = useLocalePath();
+const { tm } = useI18n();
 
-const valid = ref(false)
-const username = ref('')
-const password = ref('')
-const showError = ref(false)
+const valid = ref(false);
+const username = ref("");
+const password = ref("");
+const showError = ref(false);
 
 async function tryLogin() {
   try {
     await props.login({
       username: username.value,
-      password: password.value
-    })
-    router.push(localePath('/projects'))
+      password: password.value,
+    });
+    router.push(localePath("/projects"));
   } catch {
-    showError.value = true
+    showError.value = true;
   }
 }
 </script>

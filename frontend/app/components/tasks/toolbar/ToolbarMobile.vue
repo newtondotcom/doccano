@@ -13,24 +13,24 @@
 </template>
 
 <script setup lang="ts">
-import { mdiChevronLeft, mdiChevronRight } from '@mdi/js'
+import { mdiChevronLeft, mdiChevronRight } from "@mdi/js";
 
 const props = defineProps({
   total: {
     type: Number,
     default: 1,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
-const page = computed(() => parseInt(route.query.page as string, 10))
-const isFirstPage = computed(() => page.value === 1)
-const isLastPage = computed(() => page.value === props.total || props.total === 0)
+const page = computed(() => parseInt(route.query.page as string, 10));
+const isFirstPage = computed(() => page.value === 1);
+const isLastPage = computed(() => page.value === props.total || props.total === 0);
 
 function updatePage(pageNum: number) {
-  router.push({ query: { page: pageNum.toString() } })
+  router.push({ query: { page: pageNum.toString() } });
 }
 </script>

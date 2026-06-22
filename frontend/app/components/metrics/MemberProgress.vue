@@ -13,19 +13,19 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
-import { Progress } from '@/domain/models/metrics/metrics'
+import { onBeforeMount, ref } from "vue";
+import { Progress } from "@/domain/models/metrics/metrics";
 
-const route = useRoute()
-const { $repositories } = useNuxtApp()
+const route = useRoute();
+const { $repositories } = useNuxtApp();
 
-const stats = ref({} as Progress)
+const stats = ref({} as Progress);
 
 function rate(done: number, total: number) {
-  return (done / total) * 100
+  return (done / total) * 100;
 }
 
 onBeforeMount(async () => {
-  stats.value = await $repositories.metrics.fetchMemberProgress(route.params.id as string)
-})
+  stats.value = await $repositories.metrics.fetchMemberProgress(route.params.id as string);
+});
 </script>

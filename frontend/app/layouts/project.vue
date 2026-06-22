@@ -23,21 +23,21 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useMainStore as useProjectsStore } from '@/store/projects'
+import { ref, onBeforeMount } from "vue";
+import { storeToRefs } from "pinia";
+import { useMainStore as useProjectsStore } from "@/store/projects";
 
-const route = useRoute()
-const { $repositories } = useNuxtApp()
+const route = useRoute();
+const { $repositories } = useNuxtApp();
 
-const projectsStore = useProjectsStore()
-const { currentProject } = storeToRefs(projectsStore)
+const projectsStore = useProjectsStore();
+const { currentProject } = storeToRefs(projectsStore);
 
-const drawerLeft = ref(null)
-const isProjectAdmin = ref(false)
+const drawerLeft = ref(null);
+const isProjectAdmin = ref(false);
 
 onBeforeMount(async () => {
-  const member = await $repositories.member.fetchMyRole(route.params.id)
-  isProjectAdmin.value = member.isProjectAdmin
-})
+  const member = await $repositories.member.fetchMyRole(route.params.id);
+  isProjectAdmin.value = member.isProjectAdmin;
+});
 </script>

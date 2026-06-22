@@ -16,46 +16,46 @@
 </template>
 
 <script setup>
-import _ from 'lodash'
+import _ from "lodash";
 
 const props = defineProps({
   labels: {
     type: Array,
     default: () => [],
-    required: true
+    required: true,
   },
   annotations: {
     type: Array,
     default: () => [],
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const emit = defineEmits(['add', 'remove'])
+const emit = defineEmits(["add", "remove"]);
 
 const annotatedLabel = computed(() => {
-  const labelIds = props.annotations.map((item) => item.label)
-  return labelIds.map((id) => props.labels.findIndex((item) => item.id === id))
-})
+  const labelIds = props.annotations.map((item) => item.label);
+  return labelIds.map((id) => props.labels.findIndex((item) => item.id === id));
+});
 
 function addOrRemove(indexes) {
   if (indexes.length > annotatedLabel.value.length) {
-    const index = _.difference(indexes, annotatedLabel.value)
-    const label = props.labels[index]
-    add(label)
+    const index = _.difference(indexes, annotatedLabel.value);
+    const label = props.labels[index];
+    add(label);
   } else {
-    const index = _.difference(annotatedLabel.value, indexes)
-    const label = props.labels[index]
-    remove(label)
+    const index = _.difference(annotatedLabel.value, indexes);
+    const label = props.labels[index];
+    remove(label);
   }
 }
 
 function add(label) {
-  emit('add', label.id)
+  emit("add", label.id);
 }
 
 function remove(label) {
-  const annotation = props.annotations.find((item) => item.label === label.id)
-  emit('remove', annotation.id)
+  const annotation = props.annotations.find((item) => item.label === label.id);
+  emit("remove", annotation.id);
 }
 </script>

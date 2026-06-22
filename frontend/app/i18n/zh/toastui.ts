@@ -1,3 +1,3 @@
 export default {
-  localeCode: 'zh_CN'
-}
+  localeCode: "zh_CN",
+};

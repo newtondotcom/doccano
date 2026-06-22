@@ -54,43 +54,43 @@
 </template>
 
 <script setup>
-import { mdiFormatListBulleted, mdiText } from '@mdi/js'
-import _ from 'lodash'
-import { useLabelList } from '@/composables/useLabelList'
-import { Category } from '@/domain/models/tasks/category'
+import { mdiFormatListBulleted, mdiText } from "@mdi/js";
+import _ from "lodash";
+import { useLabelList } from "@/composables/useLabelList";
+import { Category } from "@/domain/models/tasks/category";
 
 definePageMeta({
-  layout: 'workspace',
+  layout: "workspace",
   validate(route) {
-    return /^\d+$/.test(route.params.id) && /^\d+$/.test(route.query.page)
-  }
-})
+    return /^\d+$/.test(route.params.id) && /^\d+$/.test(route.query.page);
+  },
+});
 
-const route = useRoute()
-const { $services, $repositories } = useNuxtApp()
+const route = useRoute();
+const { $services, $repositories } = useNuxtApp();
 
-const { state: labelState, getLabelList, shortKeys } = useLabelList($services.categoryType)
-const { labels } = toRefs(labelState)
+const { state: labelState, getLabelList, shortKeys } = useLabelList($services.categoryType);
+const { labels } = toRefs(labelState);
 
-const annotations = ref([])
-const images = ref([])
-const project = ref({})
-const enableAutoLabeling = ref(false)
-const labelOption = ref(0)
+const annotations = ref([]);
+const images = ref([]);
+const project = ref({});
+const enableAutoLabeling = ref(false);
+const labelOption = ref(0);
 const imageSize = reactive({
   height: 0,
-  width: 0
-})
-const progress = ref({})
+  width: 0,
+});
+const progress = ref({});
 
-const projectId = computed(() => route.params.id)
+const projectId = computed(() => route.params.id);
 
 const image = computed(() => {
   if (_.isEmpty(images.value) || images.value.items.length === 0) {
-    return {}
+    return {};
   }
-  return images.value.items[0]
-})
+  return images.value.items[0];
+});
 
 async function load() {
   images.value = await $services.example.fetchOne(
@@ -98,85 +98,85 @@ async function load() {
     route.query.page,
     route.query.q,
     route.query.isChecked,
-    route.query.ordering
-  )
-  const currentImage = images.value.items[0]
-  setImageSize(currentImage)
+    route.query.ordering,
+  );
+  const currentImage = images.value.items[0];
+  setImageSize(currentImage);
   if (enableAutoLabeling.value) {
-    await autoLabel(currentImage.id)
+    await autoLabel(currentImage.id);
   }
-  await list(currentImage.id)
+  await list(currentImage.id);
 }
 
-watch(() => route.query, load, { immediate: true, deep: true })
+watch(() => route.query, load, { immediate: true, deep: true });
 watch(enableAutoLabeling, async (val) => {
   if (val && !image.value.isConfirmed) {
-    await autoLabel(image.value.id)
-    await list(image.value.id)
+    await autoLabel(image.value.id);
+    await list(image.value.id);
   }
-})
+});
 
 onMounted(async () => {
-  getLabelList(projectId.value)
-  project.value = await $services.project.findById(projectId.value)
-  progress.value = await $repositories.metrics.fetchMyProgress(projectId.value)
-})
+  getLabelList(projectId.value);
+  project.value = await $services.project.findById(projectId.value);
+  progress.value = await $repositories.metrics.fetchMyProgress(projectId.value);
+});
 
 async function list(imageId) {
-  annotations.value = await $repositories.category.list(projectId.value, imageId)
+  annotations.value = await $repositories.category.list(projectId.value, imageId);
 }
 
 async function remove(id) {
-  await $repositories.category.delete(projectId.value, image.value.id, id)
-  await list(image.value.id)
+  await $repositories.category.delete(projectId.value, image.value.id, id);
+  await list(image.value.id);
 }
 
 async function add(labelId) {
-  const category = Category.create(labelId)
-  await $repositories.category.create(projectId.value, image.value.id, category)
-  await list(image.value.id)
+  const category = Category.create(labelId);
+  await $repositories.category.create(projectId.value, image.value.id, category);
+  await list(image.value.id);
 }
 
 async function addOrRemove(event) {
-  const labelId = parseInt(event.srcKey, 10)
-  const annotation = annotations.value.find((item) => item.label === labelId)
+  const labelId = parseInt(event.srcKey, 10);
+  const annotation = annotations.value.find((item) => item.label === labelId);
   if (annotation) {
-    await remove(annotation.id)
+    await remove(annotation.id);
   } else {
-    await add(labelId)
+    await add(labelId);
   }
 }
 
 async function clear() {
-  await $repositories.category.clear(projectId.value, image.value.id)
-  await list(image.value.id)
+  await $repositories.category.clear(projectId.value, image.value.id);
+  await list(image.value.id);
 }
 
 async function autoLabel(imageId) {
   try {
-    await $repositories.category.autoLabel(projectId.value, imageId)
+    await $repositories.category.autoLabel(projectId.value, imageId);
   } catch (e) {
-    console.log(e.response.data.detail)
+    console.log(e.response.data.detail);
   }
 }
 
 async function updateProgress() {
-  progress.value = await $repositories.metrics.fetchMyProgress(projectId.value)
+  progress.value = await $repositories.metrics.fetchMyProgress(projectId.value);
 }
 
 async function confirm() {
-  await $services.example.confirm(projectId.value, image.value.id)
-  await load()
-  updateProgress()
+  await $services.example.confirm(projectId.value, image.value.id);
+  await load();
+  updateProgress();
 }
 
 function setImageSize(val) {
-  const img = new Image()
+  const img = new Image();
   img.onload = function () {
-    imageSize.height = this.height
-    imageSize.width = this.width
-  }
-  img.src = val.url
+    imageSize.height = this.height;
+    imageSize.width = this.width;
+  };
+  img.src = val.url;
 }
 </script>
 

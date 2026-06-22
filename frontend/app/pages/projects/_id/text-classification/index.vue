@@ -42,26 +42,26 @@
 </template>
 
 <script setup>
-import { useExampleItem } from '@/composables/useExampleItem'
-import { useLabelList } from '@/composables/useLabelList'
-import { useProjectItem } from '@/composables/useProjectItem'
-import { useTeacherList } from '@/composables/useTeacherList'
+import { useExampleItem } from "@/composables/useExampleItem";
+import { useLabelList } from "@/composables/useLabelList";
+import { useProjectItem } from "@/composables/useProjectItem";
+import { useTeacherList } from "@/composables/useTeacherList";
 
 definePageMeta({
-  layout: 'workspace',
+  layout: "workspace",
   validate(route) {
-    return /^\d+$/.test(route.params.id) && /^\d+$/.test(route.query.page)
-  }
-})
+    return /^\d+$/.test(route.params.id) && /^\d+$/.test(route.query.page);
+  },
+});
 
-const route = useRoute()
-const { $repositories } = useNuxtApp()
-const projectId = route.params.id
+const route = useRoute();
+const { $repositories } = useNuxtApp();
+const projectId = route.params.id;
 
-const { state: projectState, getProjectById } = useProjectItem()
-const { project } = toRefs(projectState)
-const { state: exampleState, confirm, getExample, updateProgress } = useExampleItem()
-const { example, totalExample, progress } = toRefs(exampleState)
+const { state: projectState, getProjectById } = useProjectItem();
+const { project } = toRefs(projectState);
+const { state: exampleState, confirm, getExample, updateProgress } = useExampleItem();
+const { example, totalExample, progress } = toRefs(exampleState);
 const {
   state: teacherState,
   annotateLabel,
@@ -69,37 +69,41 @@ const {
   autoLabel,
   clearTeacherList,
   getTeacherList,
-  removeTeacher
-} = useTeacherList($repositories.category)
-const { teacherList } = toRefs(teacherState)
-const enableAutoLabeling = ref(false)
-const { state: labelState, getLabelList, shortKeys } = useLabelList(useNuxtApp().$services.categoryType)
-const { labels } = toRefs(labelState)
-const labelComponent = ref('TasksTextClassificationLabelGroup')
+  removeTeacher,
+} = useTeacherList($repositories.category);
+const { teacherList } = toRefs(teacherState);
+const enableAutoLabeling = ref(false);
+const {
+  state: labelState,
+  getLabelList,
+  shortKeys,
+} = useLabelList(useNuxtApp().$services.categoryType);
+const { labels } = toRefs(labelState);
+const labelComponent = ref("TasksTextClassificationLabelGroup");
 
-getLabelList(projectId)
-getProjectById(projectId)
-updateProgress(projectId)
+getLabelList(projectId);
+getProjectById(projectId);
+updateProgress(projectId);
 
 async function load() {
-  await getExample(projectId, route.query)
+  await getExample(projectId, route.query);
   if (enableAutoLabeling.value) {
     try {
-      await autoLabel(projectId, exampleState.example.id)
+      await autoLabel(projectId, exampleState.example.id);
     } catch (e) {
-      enableAutoLabeling.value = false
-      alert(e.response.data.detail)
+      enableAutoLabeling.value = false;
+      alert(e.response.data.detail);
     }
   } else {
-    await getTeacherList(projectId, exampleState.example.id)
+    await getTeacherList(projectId, exampleState.example.id);
   }
 }
 
-watch(() => route.query, load, { immediate: true, deep: true })
+watch(() => route.query, load, { immediate: true, deep: true });
 watch(enableAutoLabeling, async (val) => {
   if (val && !exampleState.example.isConfirmed) {
-    await autoLabel(exampleState.example.id)
-    await getTeacherList(exampleState.example.id)
+    await autoLabel(exampleState.example.id);
+    await getTeacherList(exampleState.example.id);
   }
-})
+});
 </script>

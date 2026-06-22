@@ -68,30 +68,30 @@
 defineProps({
   value: {
     type: String,
-    default: '',
-    required: true
+    default: "",
+    required: true,
   },
   errorMessages: {
     type: Array,
     default: () => [],
-    required: true
+    required: true,
   },
   isPassed: {
     type: Boolean,
     default: false,
-    required: true
+    required: true,
   },
   response: {
     type: [String, Object, Array],
     default: () => [],
-    required: true
+    required: true,
   },
   result: {
     type: Array,
     default: () => [],
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-defineEmits(['prev', 'next', 'onTest', 'input'])
+defineEmits(["prev", "next", "onTest", "input"]);
 </script>

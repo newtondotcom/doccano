@@ -21,41 +21,41 @@
 defineProps({
   title: {
     type: String,
-    default: '',
-    required: true
+    default: "",
+    required: true,
   },
   message: {
     type: String,
-    default: '',
-    required: true
+    default: "",
+    required: true,
   },
   items: {
     type: Array,
     default: () => [],
-    required: false
+    required: false,
   },
   itemKey: {
     type: String,
-    default: '',
-    required: false
+    default: "",
+    required: false,
   },
   buttonTrueText: {
     type: String,
-    default: 'Yes'
+    default: "Yes",
   },
   buttonFalseText: {
     type: String,
-    default: 'Cancel'
-  }
-})
+    default: "Cancel",
+  },
+});
 
-const emit = defineEmits(['ok', 'cancel'])
+const emit = defineEmits(["ok", "cancel"]);
 
 function ok() {
-  emit('ok')
+  emit("ok");
 }
 
 function cancel() {
-  emit('cancel')
+  emit("cancel");
 }
 </script>

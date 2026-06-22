@@ -29,48 +29,48 @@
         class="mr-4 text-capitalize"
         @click="save"
       >
-        {{ $t('generic.save') }}
+        {{ $t("generic.save") }}
       </v-btn>
       <v-btn v-show="isEditing" :disabled="isUpdating" class="text-capitalize" @click="cancel">
-        {{ $t('generic.cancel') }}
+        {{ $t("generic.cancel") }}
       </v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { Project } from '@/domain/models/project/project'
+import { onMounted, ref } from "vue";
+import { Project } from "@/domain/models/project/project";
 
-const route = useRoute()
-const { $services } = useNuxtApp()
+const route = useRoute();
+const { $services } = useNuxtApp();
 
-const project = ref({} as Project)
-const tags = ref<string[]>([])
-const valid = ref(false)
-const isEditing = ref(false)
-const isUpdating = ref(false)
+const project = ref({} as Project);
+const tags = ref<string[]>([]);
+const valid = ref(false);
+const isEditing = ref(false);
+const isUpdating = ref(false);
 
 async function loadProject() {
-  const projectId = route.params.id as string
-  project.value = await $services.project.findById(projectId)
-  tags.value = project.value.tags.map((item) => item.text)
-  isEditing.value = false
+  const projectId = route.params.id as string;
+  project.value = await $services.project.findById(projectId);
+  tags.value = project.value.tags.map((item) => item.text);
+  isEditing.value = false;
 }
 
 function cancel() {
-  loadProject()
+  loadProject();
 }
 
 async function save() {
-  isUpdating.value = true
-  await $services.project.update(project.value.id, project.value)
-  await $services.tag.bulkUpdate(project.value.id, tags.value)
-  await loadProject()
-  isUpdating.value = false
+  isUpdating.value = true;
+  await $services.project.update(project.value.id, project.value);
+  await $services.tag.bulkUpdate(project.value.id, tags.value);
+  await loadProject();
+  isUpdating.value = false;
 }
 
 onMounted(() => {
-  loadProject()
-})
+  loadProject();
+});
 </script>

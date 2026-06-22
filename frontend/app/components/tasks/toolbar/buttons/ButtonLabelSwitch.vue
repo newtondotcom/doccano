@@ -10,17 +10,17 @@
 </template>
 
 <script setup>
-import { mdiFormatListBulleted, mdiText } from '@mdi/js'
+import { mdiFormatListBulleted, mdiText } from "@mdi/js";
 
-const emit = defineEmits(['change'])
+const emit = defineEmits(["change"]);
 
-const option = ref(0)
+const option = ref(0);
 
 watch(option, (val) => {
   if (val === 0) {
-    emit('change', 'TasksTextClassificationLabelGroup')
+    emit("change", "TasksTextClassificationLabelGroup");
   } else {
-    emit('change', 'TasksTextClassificationLabelSelect')
+    emit("change", "TasksTextClassificationLabelSelect");
   }
-})
+});
 </script>

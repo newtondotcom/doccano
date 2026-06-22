@@ -1,4 +1,4 @@
-import ApiService from '@/services/api.service'
+import ApiService from "@/services/api.service";
 
 export class APIParseRepository {
   constructor(private readonly request = ApiService) {}
@@ -8,21 +8,21 @@ export class APIParseRepository {
     format: string,
     task: string,
     uploadIds: number[],
-    option: object
+    option: object,
   ): Promise<string> {
-    const url = `/projects/${projectId}/upload`
+    const url = `/projects/${projectId}/upload`;
     const data = {
       format,
       task,
       uploadIds,
-      ...option
-    }
-    const response = await this.request.post(url, data)
-    return response.data.task_id
+      ...option,
+    };
+    const response = await this.request.post(url, data);
+    return response.data.task_id;
   }
 
   revert(serverId: string): void {
-    const url = `/fp/revert/`
-    this.request.delete(url, serverId)
+    const url = `/fp/revert/`;
+    this.request.delete(url, serverId);
   }
 }

@@ -9,7 +9,7 @@
             </v-icon>
           </v-btn>
         </template>
-        <span>{{ $t('annotation.selectFilterTooltip') }}</span>
+        <span>{{ $t("annotation.selectFilterTooltip") }}</span>
       </v-tooltip>
     </template>
     <v-list>
@@ -29,35 +29,35 @@
 </template>
 
 <script setup>
-import { mdiSort, mdiCheck } from '@mdi/js'
+import { mdiSort, mdiCheck } from "@mdi/js";
 
 const props = defineProps({
   value: {
     type: String,
-    default: '',
-    required: true
-  }
-})
+    default: "",
+    required: true,
+  },
+});
 
-const emit = defineEmits(['click:order'])
+const emit = defineEmits(["click:order"]);
 
 const items = [
-  { title: 'Lowest score first', param: 'score' },
-  { title: 'Highest score first', param: '-score' }
-]
+  { title: "Lowest score first", param: "score" },
+  { title: "Highest score first", param: "-score" },
+];
 
 const selected = computed({
   get() {
-    const index = items.findIndex((item) => item.param === props.value)
-    return index === -1 ? undefined : index
+    const index = items.findIndex((item) => item.param === props.value);
+    return index === -1 ? undefined : index;
   },
   set(value) {
-    console.log(value)
+    console.log(value);
     if (value !== undefined) {
-      emit('click:order', items[value].param)
+      emit("click:order", items[value].param);
     } else {
-      emit('click:order', '')
+      emit("click:order", "");
     }
-  }
-})
+  },
+});
 </script>

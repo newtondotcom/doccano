@@ -19,12 +19,12 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'project',
-  middleware: ['check-auth', 'auth', 'setCurrentProject', 'isProjectAdmin'],
+  layout: "project",
+  middleware: ["check-auth", "auth", "setCurrentProject", "isProjectAdmin"],
   validate(route) {
-    return /^\d+$/.test(route.params.id)
-  }
-})
+    return /^\d+$/.test(route.params.id);
+  },
+});
 
-const tab = ref('tab-project')
+const tab = ref("tab-project");
 </script>

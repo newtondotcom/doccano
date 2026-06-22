@@ -43,47 +43,47 @@ const props = defineProps({
   labels: {
     type: Array,
     default: () => [],
-    required: true
+    required: true,
   },
   annotations: {
     type: Array,
     default: () => [],
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const emit = defineEmits(['add', 'remove'])
+const emit = defineEmits(["add", "remove"]);
 
-const search = ref('')
+const search = ref("");
 
 const annotatedLabels = computed({
   get() {
-    const labelIds = props.annotations.map((item) => item.label)
-    return props.labels.filter((item) => labelIds.includes(item.id))
+    const labelIds = props.annotations.map((item) => item.label);
+    return props.labels.filter((item) => labelIds.includes(item.id));
   },
   set(newValue) {
     if (newValue.length > props.annotations.length) {
-      const label = newValue[newValue.length - 1]
-      if (typeof label === 'object') {
-        add(label)
+      const label = newValue[newValue.length - 1];
+      if (typeof label === "object") {
+        add(label);
       } else {
-        newValue.pop()
+        newValue.pop();
       }
     } else {
-      const label = annotatedLabels.value.find((x) => !newValue.some((y) => y.id === x.id))
-      if (typeof label === 'object') {
-        remove(label)
+      const label = annotatedLabels.value.find((x) => !newValue.some((y) => y.id === x.id));
+      if (typeof label === "object") {
+        remove(label);
       }
     }
-  }
-})
+  },
+});
 
 function add(label) {
-  emit('add', label.id)
+  emit("add", label.id);
 }
 
 function remove(label) {
-  const annotation = props.annotations.find((item) => item.label === label.id)
-  emit('remove', annotation.id)
+  const annotation = props.annotations.find((item) => item.label === label.id);
+  emit("remove", annotation.id);
 }
 </script>

@@ -35,44 +35,44 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  labels: any[]
-  opened: boolean
-  selectedLabel?: any
-  x: number
-  y: number
-}>()
+  labels: any[];
+  opened: boolean;
+  selectedLabel?: any;
+  x: number;
+  y: number;
+}>();
 
 const emit = defineEmits<{
-  close: []
-  'click:label': [labelId: number]
-}>()
+  close: [];
+  "click:label": [labelId: number];
+}>();
 
-const autocomplete = ref<{ selectedItems: any[] }>()
+const autocomplete = ref<{ selectedItems: any[] }>();
 
-const hasAnySuffixKey = computed(() => props.labels.some((label: any) => label.suffixKey !== null))
+const hasAnySuffixKey = computed(() => props.labels.some((label: any) => label.suffixKey !== null));
 
 const value = computed({
   get() {
-    return props.selectedLabel
+    return props.selectedLabel;
   },
   set(labelId: number) {
-    onLabelSelected(labelId)
-  }
-})
+    onLabelSelected(labelId);
+  },
+});
 
 function close() {
   // Todo: a bit hacky. I want to fix this problem.
   // https://github.com/vuetifyjs/vuetify/issues/10765
   nextTick(() => {
     if (autocomplete.value) {
-      autocomplete.value.selectedItems = []
+      autocomplete.value.selectedItems = [];
     }
-  })
-  emit('close')
+  });
+  emit("close");
 }
 
 function onLabelSelected(labelId: number) {
-  emit('click:label', labelId)
-  close()
+  emit("click:label", labelId);
+  close();
 }
 </script>

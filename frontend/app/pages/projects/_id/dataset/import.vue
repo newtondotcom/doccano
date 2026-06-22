@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      {{ $t('dataset.importDataTitle') }}
+      {{ $t("dataset.importDataTitle") }}
     </v-card-title>
     <v-card-text>
       <v-overlay :value="isImporting">
@@ -85,189 +85,189 @@
     </v-card-text>
     <v-card-actions>
       <v-btn class="text-capitalize ms-2 primary" :disabled="isDisabled" @click="importDataset">
-        {{ $t('generic.import') }}
+        {{ $t("generic.import") }}
       </v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script setup>
-import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type'
-import 'filepond/dist/filepond.min.css'
-import Cookies from 'js-cookie'
-import vueFilePond from 'vue-filepond'
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import "filepond/dist/filepond.min.css";
+import Cookies from "js-cookie";
+import vueFilePond from "vue-filepond";
 
-const FilePond = vueFilePond(FilePondPluginFileValidateType)
+const FilePond = vueFilePond(FilePondPluginFileValidateType);
 
 definePageMeta({
-  layout: 'project',
-  middleware: ['check-auth', 'auth', 'setCurrentProject', 'isProjectAdmin'],
+  layout: "project",
+  middleware: ["check-auth", "auth", "setCurrentProject", "isProjectAdmin"],
   validate(route) {
-    return /^\d+$/.test(route.params.id)
-  }
-})
+    return /^\d+$/.test(route.params.id);
+  },
+});
 
-const route = useRoute()
-const router = useRouter()
-const { $repositories } = useNuxtApp()
+const route = useRoute();
+const router = useRouter();
+const { $repositories } = useNuxtApp();
 
-const catalog = ref([])
-const selected = ref(null)
-const myFiles = ref([])
-const option = ref({ column_data: '', column_label: '', delimiter: '' })
-const taskId = ref(null)
-const polling = ref(null)
-const errors = ref([])
+const catalog = ref([]);
+const selected = ref(null);
+const myFiles = ref([]);
+const option = ref({ column_data: "", column_label: "", delimiter: "" });
+const taskId = ref(null);
+const polling = ref(null);
+const errors = ref([]);
 const headers = [
-  { text: 'Filename', value: 'filename' },
-  { text: 'Line', value: 'line' },
-  { text: 'Message', value: 'message' }
-]
-const requiredRules = [(v) => !!v || 'Field value is required']
+  { text: "Filename", value: "filename" },
+  { text: "Line", value: "line" },
+  { text: "Message", value: "message" },
+];
+const requiredRules = [(v) => !!v || "Field value is required"];
 const server = {
-  url: '/v1/fp',
+  url: "/v1/fp",
   headers: {
-    'X-CSRFToken': Cookies.get('csrftoken')
+    "X-CSRFToken": Cookies.get("csrftoken"),
   },
   process: {
-    url: '/process/',
-    method: 'POST'
+    url: "/process/",
+    method: "POST",
   },
-  patch: '/patch/',
-  revert: '/revert/',
-  restore: '/restore/',
-  load: '/load/',
-  fetch: '/fetch/'
-}
-const uploadedFiles = ref([])
-const valid = ref(false)
-const isImporting = ref(false)
+  patch: "/patch/",
+  revert: "/revert/",
+  restore: "/restore/",
+  load: "/load/",
+  fetch: "/fetch/",
+};
+const uploadedFiles = ref([]);
+const valid = ref(false);
+const isImporting = ref(false);
 
 const isDisabled = computed(
-  () => uploadedFiles.value.length === 0 || taskId.value !== null || !valid.value
-)
+  () => uploadedFiles.value.length === 0 || taskId.value !== null || !valid.value,
+);
 
 const properties = computed(() => {
-  const item = catalog.value.find((item) => item.displayName === selected.value)
+  const item = catalog.value.find((item) => item.displayName === selected.value);
   if (item) {
-    return item.properties
+    return item.properties;
   }
-  return {}
-})
+  return {};
+});
 
 const textFields = computed(() => {
-  const asArray = Object.entries(properties.value)
-  const fields = asArray.filter(([_, value]) => !('enum' in value))
-  return Object.fromEntries(fields)
-})
+  const asArray = Object.entries(properties.value);
+  const fields = asArray.filter(([_, value]) => !("enum" in value));
+  return Object.fromEntries(fields);
+});
 
 const selectFields = computed(() => {
-  const asArray = Object.entries(properties.value)
-  const fields = asArray.filter(([_, value]) => 'enum' in value)
-  return Object.fromEntries(fields)
-})
+  const asArray = Object.entries(properties.value);
+  const fields = asArray.filter(([_, value]) => "enum" in value);
+  return Object.fromEntries(fields);
+});
 
 const acceptedFileTypes = computed(() => {
-  const item = catalog.value.find((item) => item.displayName === selected.value)
+  const item = catalog.value.find((item) => item.displayName === selected.value);
   if (item) {
-    return item.acceptTypes
+    return item.acceptTypes;
   }
-  return ''
-})
+  return "";
+});
 
 const example = computed(() => {
-  const item = catalog.value.find((item) => item.displayName === selected.value)
+  const item = catalog.value.find((item) => item.displayName === selected.value);
   if (item) {
-    const column_data = 'column_data'
-    const column_label = 'column_label'
+    const column_data = "column_data";
+    const column_label = "column_label";
     if (column_data in option.value && column_label in option.value) {
       return item.example
         .replaceAll(column_data, option.value[column_data])
         .replaceAll(column_label, option.value[column_label])
-        .trim()
+        .trim();
     }
-    return item.example.trim()
+    return item.example.trim();
   }
-  return ''
-})
+  return "";
+});
 
 watch(selected, () => {
-  const item = catalog.value.find((item) => item.displayName === selected.value)
+  const item = catalog.value.find((item) => item.displayName === selected.value);
   for (const [key, value] of Object.entries(item.properties)) {
-    option.value[key] = value.default
+    option.value[key] = value.default;
   }
-  myFiles.value = []
+  myFiles.value = [];
   for (const file of uploadedFiles.value) {
-    $repositories.parse.revert(file.serverId)
+    $repositories.parse.revert(file.serverId);
   }
-  uploadedFiles.value = []
-  errors.value = []
-})
+  uploadedFiles.value = [];
+  errors.value = [];
+});
 
 onMounted(async () => {
-  catalog.value = await $repositories.catalog.list(route.params.id)
-  pollData()
-})
+  catalog.value = await $repositories.catalog.list(route.params.id);
+  pollData();
+});
 
 onBeforeUnmount(() => {
-  clearInterval(polling.value)
-})
+  clearInterval(polling.value);
+});
 
 function handleFilePondProcessFile(error, file) {
-  console.log(error)
-  uploadedFiles.value.push(file)
-  nextTick()
+  console.log(error);
+  uploadedFiles.value.push(file);
+  nextTick();
 }
 
 function handleFilePondRemoveFile(error, file) {
-  console.log(error)
-  const index = uploadedFiles.value.findIndex((item) => item.id === file.id)
+  console.log(error);
+  const index = uploadedFiles.value.findIndex((item) => item.id === file.id);
   if (index > -1) {
-    uploadedFiles.value.splice(index, 1)
-    nextTick()
+    uploadedFiles.value.splice(index, 1);
+    nextTick();
   }
 }
 
 async function importDataset() {
-  isImporting.value = true
-  const item = catalog.value.find((item) => item.displayName === selected.value)
+  isImporting.value = true;
+  const item = catalog.value.find((item) => item.displayName === selected.value);
   taskId.value = await $repositories.parse.analyze(
     route.params.id,
     item.name,
     item.taskId,
     uploadedFiles.value.map((item) => item.serverId),
-    option.value
-  )
+    option.value,
+  );
 }
 
 function pollData() {
   polling.value = setInterval(async () => {
     if (taskId.value) {
-      const res = await $repositories.taskStatus.get(taskId.value)
+      const res = await $repositories.taskStatus.get(taskId.value);
       if (res.ready) {
-        taskId.value = null
-        errors.value = res.result.error
-        myFiles.value = []
-        uploadedFiles.value = []
-        isImporting.value = false
+        taskId.value = null;
+        errors.value = res.result.error;
+        myFiles.value = [];
+        uploadedFiles.value = [];
+        isImporting.value = false;
         if (errors.value.length === 0) {
-          router.push(`/projects/${route.params.id}/dataset`)
+          router.push(`/projects/${route.params.id}/dataset`);
         }
       }
     }
-  }, 3000)
+  }, 3000);
 }
 
 function toVisualize(text) {
-  if (text === '\t') {
-    return 'Tab'
+  if (text === "\t") {
+    return "Tab";
   }
-  if (text === ' ') {
-    return 'Space'
+  if (text === " ") {
+    return "Space";
   }
-  if (text === '') {
-    return 'None'
+  if (text === "") {
+    return "None";
   }
-  return text
+  return text;
 }
 </script>

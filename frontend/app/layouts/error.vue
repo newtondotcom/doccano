@@ -13,21 +13,19 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed } from "vue";
 
 const props = defineProps({
   error: {
     type: Object,
-    default: null
-  }
-})
+    default: null,
+  },
+});
 
-const pageNotFound = '404 Not Found'
-const otherError = "The page you were looking for wasn't allowed to access."
+const pageNotFound = "404 Not Found";
+const otherError = "The page you were looking for wasn't allowed to access.";
 
 useHead({
-  title: computed(() =>
-    props.error?.statusCode === 404 ? pageNotFound : otherError
-  )
-})
+  title: computed(() => (props.error?.statusCode === 404 ? pageNotFound : otherError)),
+});
 </script>

@@ -27,35 +27,35 @@ const props = defineProps({
   metadata: {
     type: Object,
     default: () => ({}),
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const instance = getCurrentInstance()
+const instance = getCurrentInstance();
 
 const headers = computed(() => [
   {
-    text: instance?.proxy?.$t('annotation.key'),
-    align: 'left',
-    value: 'key',
-    sortable: false
+    text: instance?.proxy?.$t("annotation.key"),
+    align: "left",
+    value: "key",
+    sortable: false,
   },
   {
-    text: instance?.proxy?.$t('annotation.value'),
-    align: 'left',
-    value: 'value',
-    sortable: false
-  }
-])
+    text: instance?.proxy?.$t("annotation.value"),
+    align: "left",
+    value: "value",
+    sortable: false,
+  },
+]);
 
 const metaArray = computed(() => {
-  const items = []
+  const items = [];
   for (const [key, value] of Object.entries(props.metadata)) {
     items.push({
       key,
-      value
-    })
+      value,
+    });
   }
-  return items
-})
+  return items;
+});
 </script>

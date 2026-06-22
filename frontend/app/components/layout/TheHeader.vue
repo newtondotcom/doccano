@@ -27,12 +27,12 @@
       class="text-capitalize"
       @click="$router.push(localePath('/projects'))"
     >
-      {{ $t('header.projects') }}
+      {{ $t("header.projects") }}
     </v-btn>
     <v-menu v-if="!isAuthenticated" open-on-hover offset-y>
       <template #activator="{ props }">
         <v-btn text v-bind="props">
-          {{ $t('home.demoDropDown') }}
+          {{ $t("home.demoDropDown") }}
           <v-icon>{{ mdiMenuDown }}</v-icon>
         </v-btn>
       </template>
@@ -47,7 +47,7 @@
       </v-list>
     </v-menu>
     <v-btn v-if="!isAuthenticated" outlined @click="$router.push(localePath('/auth'))">
-      {{ $t('user.login') }}
+      {{ $t("user.login") }}
     </v-btn>
     <v-menu v-if="isAuthenticated" offset-y z-index="200">
       <template #activator="{ props }">
@@ -71,7 +71,7 @@
             <v-icon>{{ mdiLogout }}</v-icon>
           </template>
           <v-list-item-title>
-            {{ $t('user.signOut') }}
+            {{ $t("user.signOut") }}
           </v-list-item-title>
         </v-list-item>
       </v-list>
@@ -80,50 +80,50 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { storeToRefs } from 'pinia'
-import { mdiLogout, mdiDotsVertical, mdiMenuDown, mdiHexagonMultiple } from '@mdi/js'
-import { useMainStore as useAuthStore } from '@/store/auth'
-import { useMainStore as useProjectsStore } from '@/store/projects'
-import { useMainStore as useConfigStore } from '@/store/config'
+import { computed } from "vue";
+import { storeToRefs } from "pinia";
+import { mdiLogout, mdiDotsVertical, mdiMenuDown, mdiHexagonMultiple } from "@mdi/js";
+import { useMainStore as useAuthStore } from "@/store/auth";
+import { useMainStore as useProjectsStore } from "@/store/projects";
+import { useMainStore as useConfigStore } from "@/store/config";
 
-const router = useRouter()
-const route = useRoute()
-const { localePath, t } = useI18n()
+const router = useRouter();
+const route = useRoute();
+const { localePath, t } = useI18n();
 
-const authStore = useAuthStore()
-const projectsStore = useProjectsStore()
-const configStore = useConfigStore()
-const { isAuthenticated, getUsername } = storeToRefs(authStore)
-const { currentProject } = storeToRefs(projectsStore)
-const { isRTL } = storeToRefs(configStore)
-const { logout } = authStore
-const { setRTL } = configStore
+const authStore = useAuthStore();
+const projectsStore = useProjectsStore();
+const configStore = useConfigStore();
+const { isAuthenticated, getUsername } = storeToRefs(authStore);
+const { currentProject } = storeToRefs(projectsStore);
+const { isRTL } = storeToRefs(configStore);
+const { logout } = authStore;
+const { setRTL } = configStore;
 
 const items = computed(() => [
-  { title: t('home.demoNER'), link: 'named-entity-recognition' },
-  { title: t('home.demoSent'), link: 'sentiment-analysis' },
-  { title: t('home.demoTranslation'), link: 'translation' },
+  { title: t("home.demoNER"), link: "named-entity-recognition" },
+  { title: t("home.demoSent"), link: "sentiment-analysis" },
+  { title: t("home.demoTranslation"), link: "translation" },
   {
-    title: t('home.demoIntenDetectSlotFil'),
-    link: 'intent-detection-and-slot-filling'
+    title: t("home.demoIntenDetectSlotFil"),
+    link: "intent-detection-and-slot-filling",
   },
-  { title: t('home.demoTextToSQL'), link: 'text-to-sql' },
-  { title: t('home.demoImageClas'), link: 'image-classification' },
-  { title: t('home.demoImageCapt'), link: 'image-caption' },
-  { title: t('home.demoObjDetect'), link: 'object-detection' },
-  { title: t('home.demoPolygSegm'), link: 'segmentation' },
-  { title: t('home.demoSTT'), link: 'speech-to-text' }
-])
+  { title: t("home.demoTextToSQL"), link: "text-to-sql" },
+  { title: t("home.demoImageClas"), link: "image-classification" },
+  { title: t("home.demoImageCapt"), link: "image-caption" },
+  { title: t("home.demoObjDetect"), link: "object-detection" },
+  { title: t("home.demoPolygSegm"), link: "segmentation" },
+  { title: t("home.demoSTT"), link: "speech-to-text" },
+]);
 
 const isIndividualProject = computed(
-  () => route.name && String(route.name).startsWith('projects-id')
-)
+  () => route.name && String(route.name).startsWith("projects-id"),
+);
 
-const direction = computed(() => (isRTL.value ? 'RTL' : 'LTR'))
+const direction = computed(() => (isRTL.value ? "RTL" : "LTR"));
 
 function signout() {
-  logout()
-  router.push(localePath('/'))
+  logout();
+  router.push(localePath("/"));
 }
 </script>

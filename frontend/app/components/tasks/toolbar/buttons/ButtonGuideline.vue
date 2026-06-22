@@ -7,12 +7,12 @@
         </v-icon>
       </v-btn>
     </template>
-    <span>{{ $t('annotation.guidelineTooltip') }}</span>
+    <span>{{ $t("annotation.guidelineTooltip") }}</span>
   </v-tooltip>
 </template>
 
 <script setup>
-import { mdiBookOpenOutline } from '@mdi/js'
+import { mdiBookOpenOutline } from "@mdi/js";
 
-defineEmits(['click:guideline'])
+defineEmits(["click:guideline"]);
 </script>

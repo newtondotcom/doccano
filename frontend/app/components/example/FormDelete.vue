@@ -11,16 +11,16 @@
 defineProps({
   selected: {
     type: Array,
-    default: () => []
+    default: () => [],
   },
   itemKey: {
     type: String,
-    default: 'text'
-  }
-})
+    default: "text",
+  },
+});
 
 defineEmits<{
-  remove: []
-  cancel: []
-}>()
+  remove: [];
+  cancel: [];
+}>();
 </script>

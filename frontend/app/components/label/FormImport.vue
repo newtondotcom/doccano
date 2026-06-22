@@ -3,7 +3,7 @@
     <v-card-title v-text="$t('labels.importLabels')" />
     <v-card-text>
       <v-form ref="form" v-model="valid">
-        <h3>{{ $t('labels.importMessage1') }}</h3>
+        <h3>{{ $t("labels.importMessage1") }}</h3>
         <v-sheet
           v-if="exampleFormat"
           :dark="!$vuetify.theme.dark"
@@ -37,41 +37,41 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { uploadSingleFileRules } from '@/rules/index'
+import { computed, ref } from "vue";
+import { uploadSingleFileRules } from "@/rules/index";
 
-const { tm } = useI18n()
+const { tm } = useI18n();
 
 defineProps({
   errorMessage: {
     type: String,
-    default: ''
-  }
-})
+    default: "",
+  },
+});
 
 defineEmits<{
-  clear: []
-  upload: [file: File | null]
-}>()
+  clear: [];
+  upload: [file: File | null];
+}>();
 
-const file = ref(null)
-const valid = ref(false)
+const file = ref(null);
+const valid = ref(false);
 
 const exampleFormat = computed(() => {
   const data = [
     {
-      text: 'Dog',
-      suffix_key: 'a',
-      background_color: '#FF0000',
-      text_color: '#ffffff'
+      text: "Dog",
+      suffix_key: "a",
+      background_color: "#FF0000",
+      text_color: "#ffffff",
     },
     {
-      text: 'Cat',
-      suffix_key: 'c',
-      background_color: '#FF0000',
-      text_color: '#ffffff'
-    }
-  ]
-  return JSON.stringify(data, null, 4)
-})
+      text: "Cat",
+      suffix_key: "c",
+      background_color: "#FF0000",
+      text_color: "#ffffff",
+    },
+  ];
+  return JSON.stringify(data, null, 4);
+});
 </script>

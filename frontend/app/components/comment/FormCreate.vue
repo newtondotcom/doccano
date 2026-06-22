@@ -17,24 +17,24 @@
       :disabled="!valid"
       @click="addComment"
     >
-      {{ $t('comments.send') }}
+      {{ $t("comments.send") }}
     </v-btn>
   </v-form>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 const emit = defineEmits<{
-  'add-comment': [message: string]
-}>()
+  "add-comment": [message: string];
+}>();
 
-const commentRules = [(v: string) => !!v.trim() || 'Comment is required']
-const message = ref('')
-const valid = ref(false)
+const commentRules = [(v: string) => !!v.trim() || "Comment is required"];
+const message = ref("");
+const valid = ref(false);
 
 function addComment() {
-  emit('add-comment', message.value)
-  message.value = ''
+  emit("add-comment", message.value);
+  message.value = "";
 }
 </script>

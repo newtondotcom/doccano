@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 defineEmits<{
-  reset: []
-  cancel: []
-}>()
+  reset: [];
+  cancel: [];
+}>();
 </script>

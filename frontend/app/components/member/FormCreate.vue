@@ -33,10 +33,10 @@
           :prepend-icon="mdiCreditCardOutline"
         >
           <template #item="props">
-            {{ $translateRole(props.item.name, $t('members.roles')) }}
+            {{ $translateRole(props.item.name, $t("members.roles")) }}
           </template>
           <template #selection="props">
-            {{ $translateRole(props.item.name, $t('members.roles')) }}
+            {{ $translateRole(props.item.name, $t("members.roles")) }}
           </template>
         </v-select>
         <v-alert v-show="errorMessage" prominent type="error">
@@ -52,41 +52,41 @@
 </template>
 
 <script setup lang="ts">
-import { mdiAccount, mdiCreditCardOutline } from '@mdi/js'
-import type { PropType } from 'vue'
-import { computed, onBeforeMount, ref, watch } from 'vue'
-import { MemberItem } from '@/domain/models/member/member'
-import { RoleItem } from '@/domain/models/role/role'
-import { UserItem } from '@/domain/models/user/user'
+import { mdiAccount, mdiCreditCardOutline } from "@mdi/js";
+import type { PropType } from "vue";
+import { computed, onBeforeMount, ref, watch } from "vue";
+import { MemberItem } from "@/domain/models/member/member";
+import { RoleItem } from "@/domain/models/role/role";
+import { UserItem } from "@/domain/models/user/user";
 
 const props = defineProps({
   value: {
     type: Object as PropType<MemberItem>,
-    required: true
+    required: true,
   },
   errorMessage: {
     type: String,
-    default: ''
-  }
-})
+    default: "",
+  },
+});
 
 const emit = defineEmits<{
-  input: [value: MemberItem]
-  save: []
-  cancel: []
-}>()
+  input: [value: MemberItem];
+  save: [];
+  cancel: [];
+}>();
 
-const { $repositories } = useNuxtApp()
+const { $repositories } = useNuxtApp();
 
-const isLoading = ref(false)
-const valid = ref(false)
-const users = ref<UserItem[]>([])
-const roles = ref<RoleItem[]>([])
-const username = ref('')
+const isLoading = ref(false);
+const valid = ref(false);
+const users = ref<UserItem[]>([]);
+const roles = ref<RoleItem[]>([]);
+const username = ref("");
 const rules = {
-  userRequired: (v: UserItem) => (!!v && !!v.username) || 'Required',
-  roleRequired: (v: RoleItem) => (!!v && !!v.name) || 'Required'
-}
+  userRequired: (v: UserItem) => (!!v && !!v.username) || "Required",
+  roleRequired: (v: RoleItem) => (!!v && !!v.name) || "Required",
+};
 
 const user = computed({
   get(): UserItem {
@@ -94,42 +94,42 @@ const user = computed({
       id: props.value.user,
       username: props.value.username,
       isStaff: false,
-      isSuperuser: false
-    }
+      isSuperuser: false,
+    };
   },
   set(val: UserItem) {
-    if (val === undefined) return
-    const userData = { user: val.id, username: val.username }
-    emit('input', { ...props.value, ...userData })
-  }
-})
+    if (val === undefined) return;
+    const userData = { user: val.id, username: val.username };
+    emit("input", { ...props.value, ...userData });
+  },
+});
 
 const role = computed({
   get(): RoleItem {
     return {
       id: props.value.role,
-      name: props.value.rolename
-    }
+      name: props.value.rolename,
+    };
   },
   set(val: RoleItem) {
-    const roleData = { role: val.id, rolename: val.name }
-    emit('input', { ...props.value, ...roleData })
-  }
-})
+    const roleData = { role: val.id, rolename: val.name };
+    emit("input", { ...props.value, ...roleData });
+  },
+});
 
 async function fetchUsers() {
-  isLoading.value = true
-  users.value = await $repositories.user.list(username.value)
-  isLoading.value = false
+  isLoading.value = true;
+  users.value = await $repositories.user.list(username.value);
+  isLoading.value = false;
 }
 
 watch(username, () => {
-  if (users.value.length > 0) return
-  if (isLoading.value) return
-  fetchUsers()
-})
+  if (users.value.length > 0) return;
+  if (isLoading.value) return;
+  fetchUsers();
+});
 
 onBeforeMount(async () => {
-  roles.value = await $repositories.role.list()
-})
+  roles.value = await $repositories.role.list();
+});
 </script>

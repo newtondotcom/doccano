@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-title>{{ $t('overview.createProjectTitle') }}</v-card-title>
+    <v-card-title>{{ $t("overview.createProjectTitle") }}</v-card-title>
     <v-card-text>
       <v-form v-model="valid">
         <ProjectTypeField v-model="editedItem.projectType" />
@@ -60,7 +60,7 @@
         outlined
         @click="create"
       >
-        {{ $t('generic.create') }}
+        {{ $t("generic.create") }}
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -71,20 +71,20 @@ import {
   DocumentClassification,
   ImageClassification,
   SequenceLabeling,
-  canDefineLabel
-} from '@/domain/models/project/project'
+  canDefineLabel,
+} from "@/domain/models/project/project";
 
 definePageMeta({
-  layout: 'projects',
-  middleware: ['check-auth', 'auth']
-})
+  layout: "projects",
+  middleware: ["check-auth", "auth"],
+});
 
-const router = useRouter()
-const { $services } = useNuxtApp()
+const router = useRouter();
+const { $services } = useNuxtApp();
 
 const initializeProject = () => ({
-  name: '',
-  description: '',
+  name: "",
+  description: "",
   projectType: DocumentClassification,
   enableRandomOrder: false,
   enableSharingMode: false,
@@ -93,28 +93,26 @@ const initializeProject = () => ({
   enableGraphemeMode: false,
   useRelation: false,
   tags: [] as string[],
-  guideline: '',
-  allowMemberToCreateLabelType: false
-})
+  guideline: "",
+  allowMemberToCreateLabelType: false,
+});
 
-const valid = ref(false)
-const editedItem = ref(initializeProject())
+const valid = ref(false);
+const editedItem = ref(initializeProject());
 
 const showExclusiveCategories = computed(() =>
-  [DocumentClassification, ImageClassification].includes(editedItem.value.projectType)
-)
+  [DocumentClassification, ImageClassification].includes(editedItem.value.projectType),
+);
 
-const isSequenceLabelingProject = computed(
-  () => editedItem.value.projectType === SequenceLabeling
-)
+const isSequenceLabelingProject = computed(() => editedItem.value.projectType === SequenceLabeling);
 
-const _canDefineLabel = computed(() => canDefineLabel(editedItem.value.projectType as any))
+const _canDefineLabel = computed(() => canDefineLabel(editedItem.value.projectType as any));
 
 async function create() {
-  const project = await $services.project.create(editedItem.value)
-  router.push(`/projects/${project.id}`)
+  const project = await $services.project.create(editedItem.value);
+  router.push(`/projects/${project.id}`);
   nextTick(() => {
-    editedItem.value = initializeProject()
-  })
+    editedItem.value = initializeProject();
+  });
 }
 </script>

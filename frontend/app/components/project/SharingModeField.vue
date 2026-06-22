@@ -12,11 +12,11 @@ defineProps({
   value: {
     type: Boolean,
     default: false,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
 defineEmits<{
-  input: [value: boolean]
-}>()
+  input: [value: boolean];
+}>();
 </script>

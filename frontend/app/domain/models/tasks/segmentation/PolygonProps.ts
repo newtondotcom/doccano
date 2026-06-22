@@ -1,5 +1,5 @@
 export default interface PolygonProps {
-  id: string
-  label: number
-  points: number[]
+  id: string;
+  label: number;
+  points: number[];
 }

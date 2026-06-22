@@ -1,4 +1,4 @@
-import { LabelDTO } from './labelData'
+import { LabelDTO } from "./labelData";
 
-export type CreateLabelCommand = Omit<LabelDTO, 'id'>
-export type UpdateLabelCommand = LabelDTO
+export type CreateLabelCommand = Omit<LabelDTO, "id">;
+export type UpdateLabelCommand = LabelDTO;

@@ -20,37 +20,37 @@
 </template>
 
 <script setup lang="ts">
-import { ExampleDTO } from '@/services/application/example/exampleData'
+import { ExampleDTO } from "@/services/application/example/exampleData";
 
 definePageMeta({
-  layout: 'project',
-  middleware: ['check-auth', 'auth', 'setCurrentProject', 'isProjectAdmin', 'is-text-project'],
+  layout: "project",
+  middleware: ["check-auth", "auth", "setCurrentProject", "isProjectAdmin", "is-text-project"],
   validate(route) {
     return (
       /^\d+$/.test(route.params.id as string) && /^\d+$/.test(route.params.example_id as string)
-    )
-  }
-})
+    );
+  },
+});
 
-const route = useRoute()
-const router = useRouter()
-const { $services } = useNuxtApp()
+const route = useRoute();
+const router = useRouter();
+const { $services } = useNuxtApp();
 
-const editedItem = ref({} as ExampleDTO)
-const valid = ref(true)
+const editedItem = ref({} as ExampleDTO);
+const valid = ref(true);
 const rules = {
-  required: (v: string) => !!v || 'Required'
-}
+  required: (v: string) => !!v || "Required",
+};
 
-const projectId = computed(() => route.params.id as string)
+const projectId = computed(() => route.params.id as string);
 
 onMounted(async () => {
-  const exampleId = parseInt(route.params.example_id as string, 10)
-  editedItem.value = await $services.example.findById(projectId.value, exampleId)
-})
+  const exampleId = parseInt(route.params.example_id as string, 10);
+  editedItem.value = await $services.example.findById(projectId.value, exampleId);
+});
 
 async function save() {
-  await $services.example.update(projectId.value, editedItem.value)
-  router.push(`/projects/${projectId.value}/dataset`)
+  await $services.example.update(projectId.value, editedItem.value);
+  router.push(`/projects/${projectId.value}/dataset`);
 }
 </script>

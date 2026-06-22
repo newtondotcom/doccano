@@ -33,23 +33,23 @@
 </template>
 
 <script setup>
-import { useExampleItem } from '@/composables/useExampleItem'
-import { useProjectItem } from '@/composables/useProjectItem'
-import { useTextLabel } from '@/composables/useTextLabel'
+import { useExampleItem } from "@/composables/useExampleItem";
+import { useProjectItem } from "@/composables/useProjectItem";
+import { useTextLabel } from "@/composables/useTextLabel";
 
 definePageMeta({
-  layout: 'workspace',
+  layout: "workspace",
   validate(route) {
-    return /^\d+$/.test(route.params.id) && /^\d+$/.test(route.query.page)
-  }
-})
+    return /^\d+$/.test(route.params.id) && /^\d+$/.test(route.query.page);
+  },
+});
 
-const route = useRoute()
-const { $repositories } = useNuxtApp()
-const projectId = route.params.id
+const route = useRoute();
+const { $repositories } = useNuxtApp();
+const projectId = route.params.id;
 
-const { state: projectState, getProjectById } = useProjectItem()
-const { project } = toRefs(projectState)
+const { state: projectState, getProjectById } = useProjectItem();
+const { project } = toRefs(projectState);
 const {
   state: labelState,
   autoLabel,
@@ -57,35 +57,35 @@ const {
   clear,
   remove,
   add,
-  update
-} = useTextLabel($repositories.textLabel, projectId)
-const { labels } = toRefs(labelState)
-const { state: exampleState, confirm, getExample, updateProgress } = useExampleItem()
-const { example, totalExample, progress } = toRefs(exampleState)
-const enableAutoLabeling = ref(false)
+  update,
+} = useTextLabel($repositories.textLabel, projectId);
+const { labels } = toRefs(labelState);
+const { state: exampleState, confirm, getExample, updateProgress } = useExampleItem();
+const { example, totalExample, progress } = toRefs(exampleState);
+const enableAutoLabeling = ref(false);
 
-getProjectById(projectId)
-updateProgress(projectId)
+getProjectById(projectId);
+updateProgress(projectId);
 
 async function load() {
-  await getExample(projectId, route.query)
+  await getExample(projectId, route.query);
   if (enableAutoLabeling.value) {
     try {
-      await autoLabel(projectId, exampleState.example.id)
+      await autoLabel(projectId, exampleState.example.id);
     } catch (e) {
-      enableAutoLabeling.value = false
+      enableAutoLabeling.value = false;
     }
   } else {
-    await list(exampleState.example.id)
+    await list(exampleState.example.id);
   }
 }
 
-watch(() => route.query, load, { immediate: true, deep: true })
+watch(() => route.query, load, { immediate: true, deep: true });
 watch(enableAutoLabeling, async (val) => {
   if (val && !exampleState.example.isConfirmed) {
-    await autoLabel(exampleState.example.id)
+    await autoLabel(exampleState.example.id);
   }
-})
+});
 </script>
 
 <style scoped>

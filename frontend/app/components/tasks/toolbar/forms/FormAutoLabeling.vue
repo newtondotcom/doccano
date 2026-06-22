@@ -1,5 +1,9 @@
 <template>
-  <UtilsBaseCard title="Settings" :cancel-text="$t('generic.close')" @cancel="$emit('click:cancel')">
+  <UtilsBaseCard
+    title="Settings"
+    :cancel-text="$t('generic.close')"
+    @cancel="$emit('click:cancel')"
+  >
     <template #content>
       <h3>Auto Labeling</h3>
       <p>
@@ -26,14 +30,14 @@ defineProps({
   isEnabled: {
     type: Boolean,
     default: false,
-    required: true
+    required: true,
   },
   errorMessage: {
     type: String,
-    default: '',
-    required: true
-  }
-})
+    default: "",
+    required: true,
+  },
+});
 
-defineEmits(['click:cancel', 'input'])
+defineEmits(["click:cancel", "input"]);
 </script>

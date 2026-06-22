@@ -61,87 +61,87 @@
 </template>
 
 <script setup lang="ts">
-import { mdiPencil, mdiDelete } from '@mdi/js'
+import { mdiPencil, mdiDelete } from "@mdi/js";
 
 const props = defineProps({
   value: {
     type: Array,
     default: () => [],
-    required: true
+    required: true,
   },
   title: {
     type: String,
-    default: '',
-    required: true
-  }
-})
+    default: "",
+    required: true,
+  },
+});
 
-const emit = defineEmits(['input'])
+const emit = defineEmits(["input"]);
 
 const headers = [
   {
-    text: 'Key',
-    align: 'left',
-    value: 'key',
-    sortable: false
+    text: "Key",
+    align: "left",
+    value: "key",
+    sortable: false,
   },
   {
-    text: 'Value',
-    align: 'left',
-    value: 'value',
-    sortable: false
+    text: "Value",
+    align: "left",
+    value: "value",
+    sortable: false,
   },
   {
-    text: 'Actions',
-    value: 'actions',
-    sortable: false
-  }
-]
-const dialog = ref(false)
-const valid = ref(false)
-const editedIndex = ref(-1)
+    text: "Actions",
+    value: "actions",
+    sortable: false,
+  },
+];
+const dialog = ref(false);
+const valid = ref(false);
+const editedIndex = ref(-1);
 const editedItem = ref({
-  key: '',
-  value: ''
-})
+  key: "",
+  value: "",
+});
 const defaultItem = {
-  key: '',
-  value: ''
-}
+  key: "",
+  value: "",
+};
 
 function editItem(item: { key: string; value: string }) {
-  editedIndex.value = props.value.indexOf(item)
-  editedItem.value = Object.assign({}, item)
-  dialog.value = true
+  editedIndex.value = props.value.indexOf(item);
+  editedItem.value = Object.assign({}, item);
+  dialog.value = true;
 }
 
 function deleteItem(item: { key: string; value: string }) {
-  editedIndex.value = props.value.indexOf(item)
-  editedItem.value = Object.assign({}, item)
-  const items = Object.assign([], props.value)
-  items.splice(editedIndex.value, 1)
-  editedItem.value = Object.assign({}, defaultItem)
-  editedIndex.value = -1
-  emit('input', items)
+  editedIndex.value = props.value.indexOf(item);
+  editedItem.value = Object.assign({}, item);
+  const items = Object.assign([], props.value);
+  items.splice(editedIndex.value, 1);
+  editedItem.value = Object.assign({}, defaultItem);
+  editedIndex.value = -1;
+  emit("input", items);
 }
 
 function close() {
-  dialog.value = false
+  dialog.value = false;
   nextTick(() => {
-    editedItem.value = Object.assign({}, defaultItem)
-    editedIndex.value = -1
-  })
+    editedItem.value = Object.assign({}, defaultItem);
+    editedIndex.value = -1;
+  });
 }
 
 function save() {
-  const items = Object.assign([], props.value)
+  const items = Object.assign([], props.value);
   if (editedIndex.value > -1) {
-    Object.assign(items[editedIndex.value], editedItem.value)
+    Object.assign(items[editedIndex.value], editedItem.value);
   } else {
-    items.push(editedItem.value)
+    items.push(editedItem.value);
   }
-  close()
-  emit('input', items)
+  close();
+  emit("input", items);
 }
 </script>
 

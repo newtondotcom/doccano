@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { mdiAutoFix } from '@mdi/js'
+import { mdiAutoFix } from "@mdi/js";
 
-defineEmits(['click:auto'])
+defineEmits(["click:auto"]);
 </script>

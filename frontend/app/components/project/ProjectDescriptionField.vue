@@ -10,23 +10,23 @@
 </template>
 
 <script setup lang="ts">
-import { validateMinLength } from '@/domain/models/project/project'
+import { validateMinLength } from "@/domain/models/project/project";
 
 defineProps({
   value: {
     type: String,
-    default: '',
-    required: true
-  }
-})
+    default: "",
+    required: true,
+  },
+});
 
 defineEmits<{
-  input: [value: string]
-}>()
+  input: [value: string];
+}>();
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 const descriptionRules = [
-  (text: string) => validateMinLength(text) || t('rules.description.required')
-]
+  (text: string) => validateMinLength(text) || t("rules.description.required"),
+];
 </script>

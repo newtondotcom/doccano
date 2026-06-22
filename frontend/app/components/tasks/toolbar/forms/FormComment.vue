@@ -19,52 +19,52 @@
 </template>
 
 <script setup lang="ts">
-import type { CommentItem } from '@/domain/models/comment/comment'
-import type { UserItem } from '@/domain/models/user/user'
+import type { CommentItem } from "@/domain/models/comment/comment";
+import type { UserItem } from "@/domain/models/user/user";
 
 const props = defineProps({
   exampleId: {
     type: Number,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-defineEmits(['click:cancel'])
+defineEmits(["click:cancel"]);
 
-const route = useRoute()
-const { $repositories } = useNuxtApp()
+const route = useRoute();
+const { $repositories } = useNuxtApp();
 
-const user = ref({} as UserItem)
-const comments = ref([] as CommentItem[])
+const user = ref({} as UserItem);
+const comments = ref([] as CommentItem[]);
 
 watch(
   () => props.exampleId,
   (val) => {
     if (val !== undefined) {
-      list()
+      list();
     }
   },
-  { immediate: true, deep: true }
-)
+  { immediate: true, deep: true },
+);
 
-user.value = await $repositories.user.getProfile()
+user.value = await $repositories.user.getProfile();
 
 async function list() {
-  comments.value = await $repositories.comment.list(route.params.id as string, props.exampleId)
+  comments.value = await $repositories.comment.list(route.params.id as string, props.exampleId);
 }
 
 async function add(message: string) {
-  await $repositories.comment.create(route.params.id as string, props.exampleId, message)
-  list()
+  await $repositories.comment.create(route.params.id as string, props.exampleId, message);
+  list();
 }
 
 async function remove(item: CommentItem) {
-  await $repositories.comment.delete(route.params.id as string, item)
-  list()
+  await $repositories.comment.delete(route.params.id as string, item);
+  list();
 }
 
 async function maybeUpdate(item: CommentItem) {
-  await $repositories.comment.update(route.params.id as string, item)
-  list()
+  await $repositories.comment.update(route.params.id as string, item);
+  list();
 }
 </script>

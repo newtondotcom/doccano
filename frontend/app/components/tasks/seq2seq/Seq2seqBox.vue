@@ -49,63 +49,63 @@
 </template>
 
 <script setup lang="ts">
-import { mdiPencil, mdiDeleteOutline } from '@mdi/js'
+import { mdiPencil, mdiDeleteOutline } from "@mdi/js";
 
 defineProps({
   annotations: {
     type: Array,
     default: () => [],
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const emit = defineEmits(['update:annotation', 'create:annotation', 'delete:annotation'])
+const emit = defineEmits(["update:annotation", "create:annotation", "delete:annotation"]);
 
-const newText = ref('')
+const newText = ref("");
 const headers = [
   {
-    text: 'Text',
-    align: 'left',
-    value: 'text'
+    text: "Text",
+    align: "left",
+    value: "text",
   },
   {
-    text: 'Actions',
-    align: 'right',
-    value: 'action'
-  }
-]
-const isComposing = ref(false)
-const hasCompositionJustEnded = ref(false)
+    text: "Actions",
+    align: "right",
+    value: "action",
+  },
+];
+const isComposing = ref(false);
+const hasCompositionJustEnded = ref(false);
 
 function update(annotationId: number, text: string) {
   if (text.length > 0) {
-    emit('update:annotation', annotationId, text)
+    emit("update:annotation", annotationId, text);
   } else {
-    remove(annotationId)
+    remove(annotationId);
   }
 }
 
 function create() {
   if (isComposing.value || hasCompositionJustEnded.value) {
-    hasCompositionJustEnded.value = false
-    return
+    hasCompositionJustEnded.value = false;
+    return;
   }
   if (newText.value.length > 0) {
-    emit('create:annotation', newText.value)
-    newText.value = ''
+    emit("create:annotation", newText.value);
+    newText.value = "";
   }
 }
 
 function remove(annotationId: number) {
-  emit('delete:annotation', annotationId)
+  emit("delete:annotation", annotationId);
 }
 
 function compositionStart() {
-  isComposing.value = true
+  isComposing.value = true;
 }
 
 function compositionEnd() {
-  isComposing.value = false
-  hasCompositionJustEnded.value = true
+  isComposing.value = false;
+  hasCompositionJustEnded.value = true;
 }
 </script>

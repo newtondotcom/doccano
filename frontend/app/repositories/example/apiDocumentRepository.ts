@@ -1,6 +1,9 @@
-import ApiService from '@/services/api.service'
-import { type ExampleRepository, type SearchOption } from '@/domain/models/example/exampleRepository'
-import { ExampleItem, ExampleItemList } from '@/domain/models/example/example'
+import ApiService from "@/services/api.service";
+import {
+  type ExampleRepository,
+  type SearchOption,
+} from "@/domain/models/example/exampleRepository";
+import { ExampleItem, ExampleItemList } from "@/domain/models/example/example";
 
 function toModel(item: { [key: string]: any }): ExampleItem {
   return new ExampleItem(
@@ -12,8 +15,8 @@ function toModel(item: { [key: string]: any }): ExampleItem {
     item.filename,
     item.is_confirmed,
     item.upload_name,
-    item.assignments
-  )
+    item.assignments,
+  );
 }
 
 function toPayload(item: ExampleItem): { [key: string]: any } {
@@ -22,8 +25,8 @@ function toPayload(item: ExampleItem): { [key: string]: any } {
     text: item.text,
     meta: item.meta,
     annotation_approver: item.annotationApprover,
-    comment_count: item.commentCount
-  }
+    comment_count: item.commentCount,
+  };
 }
 
 /**
@@ -35,13 +38,13 @@ function toPayload(item: ExampleItem): { [key: string]: any } {
  *                  - If the parameter is not found, the extracted value will be null.
  */
 function extractParamFromQuery(q: string, name: string): [string, string | null] {
-  const pattern = new RegExp(`${name}:(".+?"|\\S+)`)
+  const pattern = new RegExp(`${name}:(".+?"|\\S+)`);
   if (pattern.test(q)) {
-    const value = pattern.exec(q)![1]
-    q = q.replace(pattern, '')
-    return [q, value]
+    const value = pattern.exec(q)![1];
+    q = q.replace(pattern, "");
+    return [q, value];
   }
-  return [q, null]
+  return [q, null];
 }
 
 function buildQueryParams(
@@ -49,26 +52,26 @@ function buildQueryParams(
   offset: string,
   q: string,
   isChecked: string,
-  ordering: string
+  ordering: string,
 ): string {
-  const params = new URLSearchParams()
-  params.append('limit', limit)
-  params.append('offset', offset)
-  params.append('confirmed', isChecked)
-  params.append('ordering', ordering)
+  const params = new URLSearchParams();
+  params.append("limit", limit);
+  params.append("offset", offset);
+  params.append("confirmed", isChecked);
+  params.append("ordering", ordering);
 
-  const customParams = ['label', 'assignee']
-  let updatedQuery: string = q
+  const customParams = ["label", "assignee"];
+  let updatedQuery: string = q;
   customParams.forEach((param: string) => {
-    let value: string | null
-    ;[updatedQuery, value] = extractParamFromQuery(updatedQuery, param)
+    let value: string | null;
+    [updatedQuery, value] = extractParamFromQuery(updatedQuery, param);
     if (value !== null) {
-      params.append(param, value)
+      params.append(param, value);
     }
-  })
+  });
 
-  params.append('q', updatedQuery)
-  return params.toString()
+  params.append("q", updatedQuery);
+  return params.toString();
 }
 
 export class APIExampleRepository implements ExampleRepository {
@@ -76,52 +79,52 @@ export class APIExampleRepository implements ExampleRepository {
 
   async list(
     projectId: string,
-    { limit = '10', offset = '0', q = '', isChecked = '', ordering = '' }: SearchOption
+    { limit = "10", offset = "0", q = "", isChecked = "", ordering = "" }: SearchOption,
   ): Promise<ExampleItemList> {
     // @ts-ignore
-    const params = buildQueryParams(limit, offset, q, isChecked, ordering)
-    const url = `/projects/${projectId}/examples?${params}`
-    const response = await this.request.get(url)
+    const params = buildQueryParams(limit, offset, q, isChecked, ordering);
+    const url = `/projects/${projectId}/examples?${params}`;
+    const response = await this.request.get(url);
     return new ExampleItemList(
       response.data.count,
       response.data.next,
       response.data.previous,
-      response.data.results.map((item: { [key: string]: any }) => toModel(item))
-    )
+      response.data.results.map((item: { [key: string]: any }) => toModel(item)),
+    );
   }
 
   async create(projectId: string, item: ExampleItem): Promise<ExampleItem> {
-    const url = `/projects/${projectId}/examples`
-    const payload = toPayload(item)
-    const response = await this.request.post(url, payload)
-    return toModel(response.data)
+    const url = `/projects/${projectId}/examples`;
+    const payload = toPayload(item);
+    const response = await this.request.post(url, payload);
+    return toModel(response.data);
   }
 
   async update(projectId: string, item: ExampleItem): Promise<ExampleItem> {
-    const url = `/projects/${projectId}/examples/${item.id}`
-    const payload = toPayload(item)
-    const response = await this.request.patch(url, payload)
-    return toModel(response.data)
+    const url = `/projects/${projectId}/examples/${item.id}`;
+    const payload = toPayload(item);
+    const response = await this.request.patch(url, payload);
+    return toModel(response.data);
   }
 
   async bulkDelete(projectId: string, ids: number[]): Promise<void> {
-    const url = `/projects/${projectId}/examples`
-    await this.request.delete(url, { ids })
+    const url = `/projects/${projectId}/examples`;
+    await this.request.delete(url, { ids });
   }
 
   async deleteAll(projectId: string): Promise<void> {
-    const url = `/projects/${projectId}/examples`
-    await this.request.delete(url)
+    const url = `/projects/${projectId}/examples`;
+    await this.request.delete(url);
   }
 
   async findById(projectId: string, exampleId: number): Promise<ExampleItem> {
-    const url = `/projects/${projectId}/examples/${exampleId}`
-    const response = await this.request.get(url)
-    return toModel(response.data)
+    const url = `/projects/${projectId}/examples/${exampleId}`;
+    const response = await this.request.get(url);
+    return toModel(response.data);
   }
 
   async confirm(projectId: string, exampleId: number): Promise<void> {
-    const url = `/projects/${projectId}/examples/${exampleId}/states`
-    await this.request.post(url, {})
+    const url = `/projects/${projectId}/examples/${exampleId}/states`;
+    await this.request.post(url, {});
   }
 }

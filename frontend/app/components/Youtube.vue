@@ -5,7 +5,15 @@
     height="100%"
     title="YouTube video"
     frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allow="
+      accelerometer;
+      autoplay;
+      clipboard-write;
+      encrypted-media;
+      gyroscope;
+      picture-in-picture;
+      web-share;
+    "
     referrerpolicy="strict-origin-when-cross-origin"
     allowfullscreen
   />
@@ -13,10 +21,8 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  videoId: string
-}>()
+  videoId: string;
+}>();
 
-const embedUrl = computed(
-  () => `https://www.youtube.com/embed/${props.videoId}?rel=0`
-)
+const embedUrl = computed(() => `https://www.youtube.com/embed/${props.videoId}?rel=0`);
 </script>

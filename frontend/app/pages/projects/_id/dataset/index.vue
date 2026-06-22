@@ -13,7 +13,7 @@
         outlined
         @click.stop="dialogDelete = true"
       >
-        {{ $t('generic.delete') }}
+        {{ $t("generic.delete") }}
       </v-btn>
       <v-spacer />
       <v-btn
@@ -22,7 +22,7 @@
         color="error"
         @click="dialogDeleteAll = true"
       >
-        {{ $t('generic.deleteAll') }}
+        {{ $t("generic.deleteAll") }}
       </v-btn>
       <v-dialog v-model="dialogDelete">
         <ExampleFormDelete
@@ -86,123 +86,123 @@
 </template>
 
 <script setup lang="ts">
-import _ from 'lodash'
-import { useMainStore as useProjectsStore } from '@/store/projects'
-import { getLinkToAnnotationPage } from '@/presenter/linkToAnnotationPage'
-import { ExampleDTO, ExampleListDTO } from '@/services/application/example/exampleData'
-import { MemberItem } from '@/domain/models/member/member'
+import _ from "lodash";
+import { useMainStore as useProjectsStore } from "@/store/projects";
+import { getLinkToAnnotationPage } from "@/presenter/linkToAnnotationPage";
+import { ExampleDTO, ExampleListDTO } from "@/services/application/example/exampleData";
+import { MemberItem } from "@/domain/models/member/member";
 
 definePageMeta({
-  layout: 'project',
-  middleware: ['check-auth', 'auth', 'setCurrentProject'],
+  layout: "project",
+  middleware: ["check-auth", "auth", "setCurrentProject"],
   validate(route) {
     return (
       /^\d+$/.test(route.params.id as string) &&
       /^\d+|$/.test(route.query.limit as string) &&
       /^\d+|$/.test(route.query.offset as string)
-    )
-  }
-})
+    );
+  },
+});
 
-const route = useRoute()
-const router = useRouter()
-const { localePath } = useI18n()
-const { $services, $repositories } = useNuxtApp()
-const projectsStore = useProjectsStore()
+const route = useRoute();
+const router = useRouter();
+const { localePath } = useI18n();
+const { $services, $repositories } = useNuxtApp();
+const projectsStore = useProjectsStore();
 
-const dialogDelete = ref(false)
-const dialogDeleteAll = ref(false)
-const dialogAssignment = ref(false)
-const dialogReset = ref(false)
-const item = ref({} as ExampleListDTO)
-const selected = ref([] as ExampleDTO[])
-const members = ref([] as MemberItem[])
-const user = ref({} as MemberItem)
-const isLoading = ref(false)
-const isProjectAdmin = ref(false)
+const dialogDelete = ref(false);
+const dialogDeleteAll = ref(false);
+const dialogAssignment = ref(false);
+const dialogReset = ref(false);
+const item = ref({} as ExampleListDTO);
+const selected = ref([] as ExampleDTO[]);
+const members = ref([] as MemberItem[]);
+const user = ref({} as MemberItem);
+const isLoading = ref(false);
+const isProjectAdmin = ref(false);
 
-const project = computed(() => projectsStore.project)
-const canDelete = computed(() => selected.value.length > 0)
-const projectId = computed(() => route.params.id as string)
+const project = computed(() => projectsStore.project);
+const canDelete = computed(() => selected.value.length > 0);
+const projectId = computed(() => route.params.id as string);
 const itemKey = computed(() => {
   if (project.value.isImageProject || project.value.isAudioProject) {
-    return 'filename'
+    return "filename";
   }
-  return 'text'
-})
+  return "text";
+});
 
 async function load() {
-  isLoading.value = true
-  item.value = await $services.example.list(projectId.value, route.query)
-  user.value = await $repositories.member.fetchMyRole(projectId.value)
+  isLoading.value = true;
+  item.value = await $services.example.list(projectId.value, route.query);
+  user.value = await $repositories.member.fetchMyRole(projectId.value);
   if (user.value.isProjectAdmin) {
-    members.value = await $repositories.member.list(projectId.value)
+    members.value = await $repositories.member.list(projectId.value);
   }
-  isLoading.value = false
+  isLoading.value = false;
 }
 
 watch(
   () => route.query,
   _.debounce(() => {
-    load()
+    load();
   }, 1000),
-  { immediate: true, deep: true }
-)
+  { immediate: true, deep: true },
+);
 
 onMounted(async () => {
-  const member = await $repositories.member.fetchMyRole(projectId.value)
-  isProjectAdmin.value = member.isProjectAdmin
-})
+  const member = await $repositories.member.fetchMyRole(projectId.value);
+  isProjectAdmin.value = member.isProjectAdmin;
+});
 
 async function remove() {
-  await $services.example.bulkDelete(projectId.value, selected.value)
-  await load()
-  dialogDelete.value = false
-  selected.value = []
+  await $services.example.bulkDelete(projectId.value, selected.value);
+  await load();
+  dialogDelete.value = false;
+  selected.value = [];
 }
 
 async function removeAll() {
-  await $services.example.bulkDelete(projectId.value, [])
-  await load()
-  dialogDeleteAll.value = false
-  selected.value = []
+  await $services.example.bulkDelete(projectId.value, []);
+  await load();
+  dialogDeleteAll.value = false;
+  selected.value = [];
 }
 
 function updateQuery(query: object) {
-  router.push(query)
+  router.push(query);
 }
 
 function movePage(query: object) {
-  const link = getLinkToAnnotationPage(projectId.value, project.value.projectType)
+  const link = getLinkToAnnotationPage(projectId.value, project.value.projectType);
   updateQuery({
     path: localePath(link),
-    query
-  })
+    query,
+  });
 }
 
 function editItem(example: ExampleDTO) {
-  router.push(`dataset/${example.id}/edit`)
+  router.push(`dataset/${example.id}/edit`);
 }
 
 async function assign(exampleId: number, userId: number) {
-  await $repositories.assignment.assign(projectId.value, exampleId, userId)
-  item.value = await $services.example.list(projectId.value, route.query)
+  await $repositories.assignment.assign(projectId.value, exampleId, userId);
+  item.value = await $services.example.list(projectId.value, route.query);
 }
 
 async function unassign(assignmentId: string) {
-  await $repositories.assignment.unassign(projectId.value, assignmentId)
-  item.value = await $services.example.list(projectId.value, route.query)
+  await $repositories.assignment.unassign(projectId.value, assignmentId);
+  item.value = await $services.example.list(projectId.value, route.query);
 }
 
 async function assigned() {
-  dialogAssignment.value = false
-  item.value = await $services.example.list(projectId.value, route.query)
+  dialogAssignment.value = false;
+  item.value = await $services.example.list(projectId.value, route.query);
 }
 
 async function resetAssignment() {
-  dialogReset.value = false
-  await $repositories.assignment.reset(projectId.value)
-  item.value = await $services.example.list(projectId.value, route.query)
+  dialogReset.value = false;
+  await $repositories.assignment.reset(projectId.value);
+  item.value = await $services.example.list(projectId.value, route.query);
 }
 </script>
 

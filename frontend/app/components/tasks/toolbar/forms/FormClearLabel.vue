@@ -10,5 +10,5 @@
 </template>
 
 <script setup lang="ts">
-defineEmits(['click:ok', 'click:cancel'])
+defineEmits(["click:ok", "click:cancel"]);
 </script>

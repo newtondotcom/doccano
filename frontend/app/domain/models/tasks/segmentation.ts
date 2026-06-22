@@ -3,6 +3,6 @@ export class Segment {
     readonly id: number,
     readonly uuid: string,
     readonly label: number,
-    readonly points: number[]
+    readonly points: number[],
   ) {}
 }

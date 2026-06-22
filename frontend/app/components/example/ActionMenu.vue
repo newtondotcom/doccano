@@ -11,39 +11,39 @@
 </template>
 
 <script setup lang="ts">
-import { mdiAccountCheck, mdiUpload, mdiDownload, mdiUpdate } from '@mdi/js'
-import { computed } from 'vue'
+import { mdiAccountCheck, mdiUpload, mdiDownload, mdiUpdate } from "@mdi/js";
+import { computed } from "vue";
 
 defineEmits<{
-  create: []
-  upload: []
-  download: []
-  assign: []
-  reset: []
-}>()
+  create: [];
+  upload: [];
+  download: [];
+  assign: [];
+  reset: [];
+}>();
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 const items = computed(() => [
   {
-    title: t('dataset.importDataset'),
+    title: t("dataset.importDataset"),
     icon: mdiUpload,
-    event: 'upload'
+    event: "upload",
   },
   {
-    title: t('dataset.exportDataset'),
+    title: t("dataset.exportDataset"),
     icon: mdiDownload,
-    event: 'download'
+    event: "download",
   },
   {
-    title: 'Assign to member',
+    title: "Assign to member",
     icon: mdiAccountCheck,
-    event: 'assign'
+    event: "assign",
   },
   {
-    title: 'Reset Assignment',
+    title: "Reset Assignment",
     icon: mdiUpdate,
-    event: 'reset'
-  }
-])
+    event: "reset",
+  },
+]);
 </script>

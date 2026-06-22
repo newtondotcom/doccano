@@ -14,12 +14,12 @@
 </template>
 
 <script setup lang="ts">
-import { useMainStore as useAuthStore } from '@/store/auth'
+import { useMainStore as useAuthStore } from "@/store/auth";
 
-const authStore = useAuthStore()
+const authStore = useAuthStore();
 
 const authenticateUser = (authData: { username: string; password: string }) =>
-  authStore.authenticateUser(authData)
+  authStore.authenticateUser(authData);
 
-const fetchSocialLink = () => authStore.fetchSocialLink()
+const fetchSocialLink = () => authStore.fetchSocialLink();
 </script>

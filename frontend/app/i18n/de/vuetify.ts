@@ -1,4 +1,4 @@
 export default {
-  itemsPerPageText: 'Einträge pro Seite',
-  noDataAvailable: 'Keine Daten verfügbar'
-}
+  itemsPerPageText: "Einträge pro Seite",
+  noDataAvailable: "Keine Daten verfügbar",
+};

@@ -43,38 +43,38 @@ const props = defineProps({
   value: {
     type: Array,
     default: () => [],
-    required: true
+    required: true,
   },
   errorMessages: {
     type: Array,
     default: () => [],
-    required: true
+    required: true,
   },
   isPassed: {
     type: Boolean,
     default: false,
-    required: true
+    required: true,
   },
   response: {
     type: [String, Object, Array],
     default: () => [],
-    required: true
+    required: true,
   },
   result: {
     type: Array,
     default: () => [],
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const emit = defineEmits(['input', 'prev', 'next', 'onTest'])
+const emit = defineEmits(["input", "prev", "next", "onTest"]);
 
 const mapping = computed({
   get() {
-    return props.value
+    return props.value;
   },
   set(newVal) {
-    emit('input', newVal)
-  }
-})
+    emit("input", newVal);
+  },
+});
 </script>

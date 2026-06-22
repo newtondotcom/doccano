@@ -62,62 +62,62 @@
 </template>
 
 <script setup lang="ts">
-import { mdiPageFirst, mdiPageLast, mdiChevronLeft, mdiChevronRight } from '@mdi/js'
+import { mdiPageFirst, mdiPageLast, mdiChevronLeft, mdiChevronRight } from "@mdi/js";
 
 const props = defineProps({
   value: {
     type: Number,
     default: 1,
-    required: true
+    required: true,
   },
   total: {
     type: Number,
     default: 1,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const emit = defineEmits(['click:prev', 'click:next', 'click:first', 'click:last', 'click:jump'])
+const emit = defineEmits(["click:prev", "click:next", "click:first", "click:last", "click:jump"]);
 
-const editedPage = ref('1')
+const editedPage = ref("1");
 const rules = [
   (v: string) =>
-    (v && parseInt(v, 10) > 0 && parseInt(v, 10) <= props.total) || 'Invalid page number!'
-]
+    (v && parseInt(v, 10) > 0 && parseInt(v, 10) <= props.total) || "Invalid page number!",
+];
 
-const isFirstPage = computed(() => props.value === 1)
-const isLastPage = computed(() => props.value === props.total || props.total === 0)
+const isFirstPage = computed(() => props.value === 1);
+const isLastPage = computed(() => props.value === props.total || props.total === 0);
 
 function changePageNumber() {
   if (!editedPage.value) {
-    return
+    return;
   }
-  const page = parseInt(editedPage.value, 10)
+  const page = parseInt(editedPage.value, 10);
   if (page < 0 || page > props.total) {
-    return
+    return;
   }
-  emit('click:jump', page)
+  emit("click:jump", page);
 }
 
 function prevPage() {
   if (props.value === 1) {
-    return
+    return;
   }
-  emit('click:prev')
+  emit("click:prev");
 }
 
 function nextPage() {
   if (props.value === props.total) {
-    return
+    return;
   }
-  emit('click:next')
+  emit("click:next");
 }
 
 function firstPage() {
-  emit('click:first')
+  emit("click:first");
 }
 
 function lastPage() {
-  emit('click:last')
+  emit("click:last");
 }
 </script>

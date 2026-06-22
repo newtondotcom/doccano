@@ -25,44 +25,44 @@
 
 <script setup>
 definePageMeta({
-  layout: 'demo'
-})
+  layout: "demo",
+});
 
 const currentDoc = ref({
   id: 8,
-  text: '',
+  text: "",
   annotations: [
     {
       id: 17,
-      text: 'Hi! Welcome to doccano!',
+      text: "Hi! Welcome to doccano!",
       user: 1,
-      document: 8
-    }
+      document: 8,
+    },
   ],
   meta: {
-    url: 'https://github.com/doccano'
+    url: "https://github.com/doccano",
   },
-  annotation_approver: null
-})
+  annotation_approver: null,
+});
 
-const src = require('@/assets/examples/speech_1.mp3').default
+const src = require("@/assets/examples/speech_1.mp3").default;
 
 function _deleteAnnotation(annotationId) {
   currentDoc.value.annotations = currentDoc.value.annotations.filter(
-    (item) => item.id !== annotationId
-  )
+    (item) => item.id !== annotationId,
+  );
 }
 
 function _updateAnnotation(annotationId, text) {
-  const index = currentDoc.value.annotations.findIndex((item) => item.id === annotationId)
-  currentDoc.value.annotations[index].text = text
+  const index = currentDoc.value.annotations.findIndex((item) => item.id === annotationId);
+  currentDoc.value.annotations[index].text = text;
 }
 
 function _createAnnotation(text) {
   const payload = {
     id: Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER)),
-    text
-  }
-  currentDoc.value.annotations.push(payload)
+    text,
+  };
+  currentDoc.value.annotations.push(payload);
 }
 </script>

@@ -23,63 +23,63 @@
 </template>
 
 <script setup lang="ts">
-import { LabelDTO } from '@/services/application/label/labelData'
+import { LabelDTO } from "@/services/application/label/labelData";
 
 definePageMeta({
-  layout: 'project',
-  middleware: ['check-auth', 'auth', 'setCurrentProject', 'can-define-label'],
+  layout: "project",
+  middleware: ["check-auth", "auth", "setCurrentProject", "can-define-label"],
   validate(route) {
-    return /^\d+$/.test(route.params.id as string)
-  }
-})
+    return /^\d+$/.test(route.params.id as string);
+  },
+});
 
-const route = useRoute()
-const router = useRouter()
-const { $services } = useNuxtApp()
+const route = useRoute();
+const router = useRouter();
+const { $services } = useNuxtApp();
 
 const editedItem = ref({
-  text: '',
+  text: "",
   prefixKey: null,
   suffixKey: null,
-  backgroundColor: '#73D8FF',
-  textColor: '#ffffff'
-} as LabelDTO)
+  backgroundColor: "#73D8FF",
+  textColor: "#ffffff",
+} as LabelDTO);
 
 const defaultItem = {
-  text: '',
+  text: "",
   prefixKey: null,
   suffixKey: null,
-  backgroundColor: '#73D8FF',
-  textColor: '#ffffff'
-} as LabelDTO
+  backgroundColor: "#73D8FF",
+  textColor: "#ffffff",
+} as LabelDTO;
 
-const items = ref([] as LabelDTO[])
+const items = ref([] as LabelDTO[]);
 
-const projectId = computed(() => route.params.id as string)
+const projectId = computed(() => route.params.id as string);
 
 const service = computed(() => {
-  const type = route.query.type
-  if (type === 'category') {
-    return $services.categoryType
+  const type = route.query.type;
+  if (type === "category") {
+    return $services.categoryType;
   }
-  if (type === 'span') {
-    return $services.spanType
+  if (type === "span") {
+    return $services.spanType;
   }
-  return $services.relationType
-})
+  return $services.relationType;
+});
 
 onMounted(async () => {
-  items.value = await service.value.list(projectId.value)
-})
+  items.value = await service.value.list(projectId.value);
+});
 
 async function save() {
-  await service.value.create(projectId.value, editedItem.value)
-  router.push(`/projects/${projectId.value}/labels`)
+  await service.value.create(projectId.value, editedItem.value);
+  router.push(`/projects/${projectId.value}/labels`);
 }
 
 async function saveAndAnother() {
-  await service.value.create(projectId.value, editedItem.value)
-  editedItem.value = Object.assign({}, defaultItem)
-  items.value = await service.value.list(projectId.value)
+  await service.value.create(projectId.value, editedItem.value);
+  editedItem.value = Object.assign({}, defaultItem);
+  items.value = await service.value.list(projectId.value);
 }
 </script>

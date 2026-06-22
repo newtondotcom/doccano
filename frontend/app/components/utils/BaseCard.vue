@@ -36,30 +36,30 @@
 defineProps({
   title: {
     type: String,
-    default: '',
-    required: true
+    default: "",
+    required: true,
   },
   cancelText: {
     type: String,
-    default: ''
+    default: "",
   },
   agreeText: {
     type: String,
-    default: ''
+    default: "",
   },
   disabled: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 
-const emit = defineEmits(['agree', 'cancel'])
+const emit = defineEmits(["agree", "cancel"]);
 
 function agree() {
-  emit('agree')
+  emit("agree");
 }
 
 function cancel() {
-  emit('cancel')
+  emit("cancel");
 }
 </script>

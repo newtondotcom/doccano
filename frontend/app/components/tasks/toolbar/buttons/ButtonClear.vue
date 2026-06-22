@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { mdiDeleteOutline } from '@mdi/js'
+import { mdiDeleteOutline } from "@mdi/js";
 
-defineEmits(['click:clear'])
+defineEmits(["click:clear"]);
 </script>

@@ -74,38 +74,38 @@
 </template>
 
 <script setup lang="ts">
-import type { Project } from '@/domain/models/project/project'
+import type { Project } from "@/domain/models/project/project";
 
 defineProps({
   value: {
     type: Array,
     default: () => [],
-    required: true
+    required: true,
   },
   errorMessages: {
     type: Array,
     default: () => [],
-    required: true
+    required: true,
   },
   isPassed: {
     type: Boolean,
     default: false,
-    required: true
+    required: true,
   },
   response: {
     type: [String, Array, Object],
     default: () => [],
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-defineEmits(['prev', 'next', 'onTest'])
+defineEmits(["prev", "next", "onTest"]);
 
-const route = useRoute()
-const { $services } = useNuxtApp()
+const route = useRoute();
+const { $services } = useNuxtApp();
 
-const payload = ref('')
-const project = ref({} as Project)
+const payload = ref("");
+const project = ref({} as Project);
 
-project.value = await $services.project.findById(route.params.id as string)
+project.value = await $services.project.findById(route.params.id as string);
 </script>

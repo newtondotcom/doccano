@@ -1,11 +1,11 @@
-import { AnnotationRepository } from '@/domain/models/tasks/annotationRepository'
-import { Relation } from '@/domain/models/tasks/relation'
+import { AnnotationRepository } from "@/domain/models/tasks/annotationRepository";
+import { Relation } from "@/domain/models/tasks/relation";
 
 export class APIRelationRepository extends AnnotationRepository<Relation> {
-  labelName = 'relations'
+  labelName = "relations";
 
   toModel(item: { [key: string]: any }): Relation {
-    return new Relation(item.id, item.from_id, item.to_id, item.type)
+    return new Relation(item.id, item.from_id, item.to_id, item.type);
   }
 
   toPayload(item: Relation): { [key: string]: any } {
@@ -13,7 +13,7 @@ export class APIRelationRepository extends AnnotationRepository<Relation> {
       id: item.id,
       from_id: item.fromId,
       to_id: item.toId,
-      type: item.type
-    }
+      type: item.type,
+    };
   }
 }

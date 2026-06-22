@@ -53,74 +53,74 @@
 </template>
 
 <script setup>
-import WaveSurfer from 'wavesurfer.js'
+import WaveSurfer from "wavesurfer.js";
 import {
   mdiPlayCircleOutline,
   mdiPauseCircleOutline,
   mdiVolumeHigh,
   mdiMagnifyPlusOutline,
-  mdiMagnifyMinusOutline
-} from '@mdi/js'
+  mdiMagnifyMinusOutline,
+} from "@mdi/js";
 
 const props = defineProps({
   source: {
     type: String,
-    default: '',
-    required: true
-  }
-})
+    default: "",
+    required: true,
+  },
+});
 
-const wavesurfer = ref(null)
-const isPlaying = ref(false)
-const zoom = ref(0)
-const volume = ref(0.6)
-const speed = ref(1)
-const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
+const wavesurfer = ref(null);
+const isPlaying = ref(false);
+const zoom = ref(0);
+const volume = ref(0.6);
+const speed = ref(1);
+const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
 
 watch(
   () => props.source,
   () => {
-    load()
-    isPlaying.value = false
-  }
-)
+    load();
+    isPlaying.value = false;
+  },
+);
 
 onMounted(() => {
   wavesurfer.value = WaveSurfer.create({
-    container: '#waveform',
-    backend: 'MediaElement'
-  })
-  load()
-})
+    container: "#waveform",
+    backend: "MediaElement",
+  });
+  load();
+});
 
 function load() {
-  wavesurfer.value?.load(props.source)
+  wavesurfer.value?.load(props.source);
 }
 
 function play() {
-  isPlaying.value = !isPlaying.value
-  wavesurfer.value?.playPause()
+  isPlaying.value = !isPlaying.value;
+  wavesurfer.value?.playPause();
 }
 
 function zoomOut() {
-  zoom.value = zoom.value - 10 || 0
-  onChangeZoom(zoom.value)
+  zoom.value = zoom.value - 10 || 0;
+  onChangeZoom(zoom.value);
 }
 
 function zoomIn() {
-  zoom.value = zoom.value + 10 || 500
-  onChangeZoom(zoom.value)
+  zoom.value = zoom.value + 10 || 500;
+  onChangeZoom(zoom.value);
 }
 
 function onChangeVolume(value) {
-  wavesurfer.value?.setVolume(value)
+  wavesurfer.value?.setVolume(value);
 }
 
 function onChangeZoom(value) {
-  wavesurfer.value?.zoom(value)
+  wavesurfer.value?.zoom(value);
 }
 
 function onChangeSpeed(value) {
-  wavesurfer.value?.setPlaybackRate(value)
+  wavesurfer.value?.setPlaybackRate(value);
 }
 </script>

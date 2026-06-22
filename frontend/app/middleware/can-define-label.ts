@@ -1,12 +1,12 @@
-import { useMainStore as useProjectsStore } from '@/store/projects'
+import { useMainStore as useProjectsStore } from "@/store/projects";
 
 export default defineNuxtRouteMiddleware((to) => {
-  if (!['category', 'span', 'relation'].includes(to.query.type as string)) {
-    return abortNavigation()
+  if (!["category", "span", "relation"].includes(to.query.type as string)) {
+    return abortNavigation();
   }
 
-  const projectsStore = useProjectsStore()
+  const projectsStore = useProjectsStore();
   if (!projectsStore.project?.canDefineLabel) {
-    return abortNavigation()
+    return abortNavigation();
   }
-})
+});

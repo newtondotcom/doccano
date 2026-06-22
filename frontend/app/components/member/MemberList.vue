@@ -10,7 +10,7 @@
     :footer-props="{
       showFirstLastPage: true,
       'items-per-page-text': $t('vuetify.itemsPerPageText'),
-      'page-text': $t('dataset.pageText')
+      'page-text': $t('dataset.pageText'),
     }"
     item-key="id"
     show-select
@@ -27,7 +27,7 @@
       />
     </template>
     <template #[`item.rolename`]="{ item }">
-      {{ $translateRole(item.rolename, $t('members.roles')) }}
+      {{ $translateRole(item.rolename, $t("members.roles")) }}
     </template>
     <template #[`item.actions`]="{ item }">
       <v-icon small @click="$emit('edit', item)">
@@ -38,39 +38,39 @@
 </template>
 
 <script setup lang="ts">
-import { mdiMagnify, mdiPencil } from '@mdi/js'
-import { computed, ref } from 'vue'
+import { mdiMagnify, mdiPencil } from "@mdi/js";
+import { computed, ref } from "vue";
 
 defineProps({
   isLoading: {
     type: Boolean,
     default: false,
-    required: true
+    required: true,
   },
   items: {
     type: Array,
     default: () => [],
-    required: true
+    required: true,
   },
   value: {
     type: Array,
     default: () => [],
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
 defineEmits<{
-  input: [value: unknown[]]
-  edit: [item: unknown]
-}>()
+  input: [value: unknown[]];
+  edit: [item: unknown];
+}>();
 
-const { t } = useI18n()
+const { t } = useI18n();
 
-const search = ref('')
+const search = ref("");
 
 const headers = computed(() => [
-  { text: t('generic.name'), value: 'username' },
-  { text: t('members.role'), value: 'rolename' },
-  { text: 'Actions', value: 'actions', sortable: false }
-])
+  { text: t("generic.name"), value: "username" },
+  { text: t("members.role"), value: "rolename" },
+  { text: "Actions", value: "actions", sortable: false },
+]);
 </script>

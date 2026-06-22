@@ -62,45 +62,45 @@
 </template>
 
 <script setup lang="ts">
-import { mdiAccountCircle, mdiDotsVertical } from '@mdi/js'
-import type { PropType } from 'vue'
-import { ref } from 'vue'
-import { CommentItem } from '@/domain/models/comment/comment'
-import { COMMENT_DATETIME_FORMAT, formatApiDateTime } from '@/utils/date'
+import { mdiAccountCircle, mdiDotsVertical } from "@mdi/js";
+import type { PropType } from "vue";
+import { ref } from "vue";
+import { CommentItem } from "@/domain/models/comment/comment";
+import { COMMENT_DATETIME_FORMAT, formatApiDateTime } from "@/utils/date";
 
 const props = defineProps({
   comment: {
     required: true,
-    type: Object as PropType<CommentItem>
+    type: Object as PropType<CommentItem>,
   },
   userId: {
     required: true,
-    type: Number
-  }
-})
+    type: Number,
+  },
+});
 
 const emit = defineEmits<{
-  'update-comment': [comment: CommentItem]
-  'delete-comment': [comment: CommentItem]
-}>()
+  "update-comment": [comment: CommentItem];
+  "delete-comment": [comment: CommentItem];
+}>();
 
-const showEdit = ref(false)
-const editText = ref(props.comment.text)
-const commentRules = [(v: string) => !!v.trim() || 'Comment is required']
-const valid = ref(false)
+const showEdit = ref(false);
+const editText = ref(props.comment.text);
+const commentRules = [(v: string) => !!v.trim() || "Comment is required"];
+const valid = ref(false);
 
 function formatDate(date: string) {
-  return formatApiDateTime(date, COMMENT_DATETIME_FORMAT)
+  return formatApiDateTime(date, COMMENT_DATETIME_FORMAT);
 }
 
 function updateComment(newText: string) {
-  showEdit.value = false
-  const comment = { ...props.comment, text: newText }
-  emit('update-comment', comment)
+  showEdit.value = false;
+  const comment = { ...props.comment, text: newText };
+  emit("update-comment", comment);
 }
 
 function cancel() {
-  showEdit.value = false
-  editText.value = props.comment.text
+  showEdit.value = false;
+  editText.value = props.comment.text;
 }
 </script>

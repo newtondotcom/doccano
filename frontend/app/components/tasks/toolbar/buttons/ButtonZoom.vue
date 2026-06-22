@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { mdiMagnifyPlusOutline, mdiMagnifyMinusOutline } from '@mdi/js'
+import { mdiMagnifyPlusOutline, mdiMagnifyMinusOutline } from "@mdi/js";
 
-defineEmits(['zoom-out', 'zoom-in'])
+defineEmits(["zoom-out", "zoom-in"]);
 </script>

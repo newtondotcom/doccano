@@ -19,10 +19,10 @@
 </template>
 
 <script setup lang="ts">
-import { mdiMenuDown } from '@mdi/js'
-import { useTheme } from 'vuetify'
+import { mdiMenuDown } from "@mdi/js";
+import { useTheme } from "vuetify";
 
-const theme = useTheme()
+const theme = useTheme();
 
-const { locales, setLocale } = useI18n()
+const { locales, setLocale } = useI18n();
 </script>

@@ -1,4 +1,4 @@
-import { type RoleName } from '../role/role'
+import { type RoleName } from "../role/role";
 
 export class MemberItem {
   constructor(
@@ -6,10 +6,10 @@ export class MemberItem {
     readonly user: number,
     readonly role: number,
     readonly username: string,
-    readonly rolename: RoleName
+    readonly rolename: RoleName,
   ) {}
 
   get isProjectAdmin(): boolean {
-    return this.rolename === 'project_admin'
+    return this.rolename === "project_admin";
   }
 }

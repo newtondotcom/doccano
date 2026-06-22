@@ -30,14 +30,14 @@
 </template>
 
 <script setup>
-import { mdiEyeOutline, mdiEyeOffOutline, mdiDelete } from '@mdi/js'
+import { mdiEyeOutline, mdiEyeOffOutline, mdiDelete } from "@mdi/js";
 
 defineProps({
   regions: {
     type: Array,
-    default: () => []
-  }
-})
+    default: () => [],
+  },
+});
 
-defineEmits(['hover-region', 'unhover-region', 'change-visibility', 'delete-region'])
+defineEmits(["hover-region", "unhover-region", "change-visibility", "delete-region"]);
 </script>

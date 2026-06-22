@@ -7,12 +7,12 @@
         </v-icon>
       </v-btn>
     </template>
-    <span>{{ $t('annotation.commentTooltip') }}</span>
+    <span>{{ $t("annotation.commentTooltip") }}</span>
   </v-tooltip>
 </template>
 
 <script setup lang="ts">
-import { mdiMessageText } from '@mdi/js'
+import { mdiMessageText } from "@mdi/js";
 
-defineEmits(['click:comment'])
+defineEmits(["click:comment"]);
 </script>

@@ -10,8 +10,8 @@
 </template>
 
 <script setup lang="ts">
-import { mdiMoonWaxingCrescent, mdiWhiteBalanceSunny } from '@mdi/js'
-import { useTheme } from 'vuetify'
+import { mdiMoonWaxingCrescent, mdiWhiteBalanceSunny } from "@mdi/js";
+import { useTheme } from "vuetify";
 
-const theme = useTheme()
+const theme = useTheme();
 </script>

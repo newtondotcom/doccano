@@ -14,17 +14,17 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from 'vue'
+import type { PropType } from "vue";
 
 defineProps({
   value: {
     type: Array as PropType<string[]>,
     default: () => [],
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
 defineEmits<{
-  input: [value: string[]]
-}>()
+  input: [value: string[]];
+}>();
 </script>

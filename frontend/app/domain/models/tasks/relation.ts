@@ -3,14 +3,14 @@ export class Relation {
     readonly id: number,
     readonly fromId: number,
     readonly toId: number,
-    private _type: number
+    private _type: number,
   ) {}
 
   get type(): number {
-    return this._type
+    return this._type;
   }
 
   changeType(type: number) {
-    this._type = type
+    this._type = type;
   }
 }

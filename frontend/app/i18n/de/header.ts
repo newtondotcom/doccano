@@ -1,3 +1,3 @@
 export default {
-  projects: 'Projekte'
-}
+  projects: "Projekte",
+};

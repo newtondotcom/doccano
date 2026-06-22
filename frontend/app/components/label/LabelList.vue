@@ -10,7 +10,7 @@
     :footer-props="{
       showFirstLastPage: true,
       'items-per-page-text': $t('vuetify.itemsPerPageText'),
-      'page-text': $t('dataset.pageText')
+      'page-text': $t('dataset.pageText'),
     }"
     item-key="id"
     show-select
@@ -43,51 +43,51 @@
 </template>
 
 <script setup lang="ts">
-import { mdiMagnify, mdiPencil } from '@mdi/js'
-import type { PropType } from 'vue'
-import { computed, ref } from 'vue'
-import { LabelDTO } from '@/services/application/label/labelData'
+import { mdiMagnify, mdiPencil } from "@mdi/js";
+import type { PropType } from "vue";
+import { computed, ref } from "vue";
+import { LabelDTO } from "@/services/application/label/labelData";
 
 const props = defineProps({
   isLoading: {
     type: Boolean,
     default: false,
-    required: true
+    required: true,
   },
   items: {
     type: Array as PropType<LabelDTO[]>,
     default: () => [],
-    required: true
+    required: true,
   },
   value: {
     type: Array as PropType<LabelDTO[]>,
     default: () => [],
-    required: true
+    required: true,
   },
   disableEdit: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 
 defineEmits<{
-  input: [value: LabelDTO[]]
-  edit: [item: LabelDTO]
-}>()
+  input: [value: LabelDTO[]];
+  edit: [item: LabelDTO];
+}>();
 
-const { t } = useI18n()
+const { t } = useI18n();
 
-const search = ref('')
+const search = ref("");
 
 const headers = computed(() => {
   const headerList = [
-    { text: t('generic.name'), value: 'text', sortable: true },
-    { text: t('labels.shortkey'), value: 'suffixKey', sortable: true },
-    { text: t('labels.color'), value: 'backgroundColor', sortable: true }
-  ]
+    { text: t("generic.name"), value: "text", sortable: true },
+    { text: t("labels.shortkey"), value: "suffixKey", sortable: true },
+    { text: t("labels.color"), value: "backgroundColor", sortable: true },
+  ];
   if (!props.disableEdit) {
-    headerList.push({ text: 'Actions', value: 'actions', sortable: false })
+    headerList.push({ text: "Actions", value: "actions", sortable: false });
   }
-  return headerList
-})
+  return headerList;
+});
 </script>

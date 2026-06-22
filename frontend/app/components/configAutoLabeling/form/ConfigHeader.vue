@@ -13,10 +13,10 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    step?: number
+    step?: number;
   }>(),
   {
-    step: 1
-  }
-)
+    step: 1,
+  },
+);
 </script>

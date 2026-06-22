@@ -1,12 +1,12 @@
-import axios from 'axios'
-axios.defaults.xsrfCookieName = 'csrftoken'
-axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+import axios from "axios";
+axios.defaults.xsrfCookieName = "csrftoken";
+axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
 class ApiService {
   constructor() {
     this.instance = axios.create({
-      baseURL: process.env.baseUrl
-    })
+      baseURL: process.env.baseUrl,
+    });
   }
 
   request(method, url, data = {}, config = {}) {
@@ -14,29 +14,29 @@ class ApiService {
       method,
       url,
       data,
-      ...config
-    })
+      ...config,
+    });
   }
 
   get(url, config = {}) {
-    return this.request('GET', url, {}, config)
+    return this.request("GET", url, {}, config);
   }
 
   post(url, data, config = {}) {
-    return this.request('POST', url, data, config)
+    return this.request("POST", url, data, config);
   }
 
   put(url, data, config = {}) {
-    return this.request('PUT', url, data, config)
+    return this.request("PUT", url, data, config);
   }
 
   patch(url, data, config = {}) {
-    return this.request('PATCH', url, data, config)
+    return this.request("PATCH", url, data, config);
   }
 
   delete(url, data = {}, config = {}) {
-    return this.request('DELETE', url, data, config)
+    return this.request("DELETE", url, data, config);
   }
 }
 
-export default new ApiService()
+export default new ApiService();

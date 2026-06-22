@@ -37,70 +37,70 @@
 
 <script setup>
 definePageMeta({
-  layout: 'demo'
-})
+  layout: "demo",
+});
 
 const entityLabels = [
   {
     id: 4,
-    text: 'City',
+    text: "City",
     prefixKey: null,
-    suffixKey: 'l',
-    color: '#fbb028',
-    textColor: '#ffffff'
+    suffixKey: "l",
+    color: "#fbb028",
+    textColor: "#ffffff",
   },
   {
     id: 5,
-    text: 'MISC',
+    text: "MISC",
     prefixKey: null,
-    suffixKey: 'm',
-    color: '#7c20e0',
-    textColor: '#000000'
+    suffixKey: "m",
+    color: "#7c20e0",
+    textColor: "#000000",
   },
   {
     id: 6,
-    text: 'ORG',
+    text: "ORG",
     prefixKey: null,
-    suffixKey: 'o',
-    color: '#e6d176',
-    textColor: '#000000'
+    suffixKey: "o",
+    color: "#e6d176",
+    textColor: "#000000",
   },
   {
     id: 7,
-    text: 'Time',
+    text: "Time",
     prefixKey: null,
-    suffixKey: 'p',
-    color: '#6a74b9',
-    textColor: '#ffffff'
-  }
-]
+    suffixKey: "p",
+    color: "#6a74b9",
+    textColor: "#ffffff",
+  },
+];
 
 const items = [
   {
     id: 4,
-    text: 'Flight',
+    text: "Flight",
     prefixKey: null,
-    suffixKey: 'f',
-    backgroundColor: '#7c20e0',
-    textColor: '#ffffff'
+    suffixKey: "f",
+    backgroundColor: "#7c20e0",
+    textColor: "#ffffff",
   },
   {
     id: 5,
-    text: 'FlightTime',
+    text: "FlightTime",
     prefixKey: null,
-    suffixKey: 't',
-    backgroundColor: '#fbb028',
-    textColor: '#000000'
+    suffixKey: "t",
+    backgroundColor: "#fbb028",
+    textColor: "#000000",
   },
   {
     id: 6,
-    text: 'Airfare',
+    text: "Airfare",
     prefixKey: null,
-    suffixKey: 'a',
-    backgroundColor: '#1e90ff',
-    textColor: '#000000'
-  }
-]
+    suffixKey: "a",
+    backgroundColor: "#1e90ff",
+    textColor: "#000000",
+  },
+];
 
 const categoryAnnotations = ref([
   {
@@ -108,15 +108,15 @@ const categoryAnnotations = ref([
     prob: 0.0,
     label: 4,
     user: 1,
-    document: 8
-  }
-])
+    document: 8,
+  },
+]);
 
-const exclusive = ref(true)
+const exclusive = ref(true);
 
 const currentDoc = ref({
   id: 8,
-  text: 'I want to fly from Boston at 8:38 am and arrive in Denver at 11:10 in the morning.',
+  text: "I want to fly from Boston at 8:38 am and arrive in Denver at 11:10 in the morning.",
   annotations: [
     {
       id: 17,
@@ -124,7 +124,7 @@ const currentDoc = ref({
       label: 4,
       startOffset: 19,
       endOffset: 25,
-      user: 1
+      user: 1,
     },
     {
       id: 19,
@@ -132,7 +132,7 @@ const currentDoc = ref({
       label: 7,
       startOffset: 29,
       endOffset: 36,
-      user: 1
+      user: 1,
     },
     {
       id: 16,
@@ -140,7 +140,7 @@ const currentDoc = ref({
       label: 4,
       startOffset: 51,
       endOffset: 57,
-      user: 1
+      user: 1,
     },
     {
       id: 18,
@@ -148,23 +148,23 @@ const currentDoc = ref({
       label: 7,
       startOffset: 61,
       endOffset: 66,
-      user: 1
-    }
+      user: 1,
+    },
   ],
   meta: { wikiPageId: 2 },
-  annotation_approver: null
-})
+  annotation_approver: null,
+});
 
 function deleteEntity(annotationId) {
   currentDoc.value.annotations = currentDoc.value.annotations.filter(
-    (item) => item.id !== annotationId
-  )
+    (item) => item.id !== annotationId,
+  );
 }
 
 function updateEntity(annotationId, labelId) {
-  const index = currentDoc.value.annotations.findIndex((item) => item.id === annotationId)
-  currentDoc.value.annotations[index].label = labelId
-  currentDoc.value.annotations = [...currentDoc.value.annotations]
+  const index = currentDoc.value.annotations.findIndex((item) => item.id === annotationId);
+  currentDoc.value.annotations[index].label = labelId;
+  currentDoc.value.annotations = [...currentDoc.value.annotations];
 }
 
 function addEntity(startOffset, endOffset, labelId) {
@@ -172,21 +172,21 @@ function addEntity(startOffset, endOffset, labelId) {
     id: Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER)),
     startOffset,
     endOffset,
-    label: labelId
-  }
-  currentDoc.value.annotations = [...currentDoc.value.annotations, payload]
+    label: labelId,
+  };
+  currentDoc.value.annotations = [...currentDoc.value.annotations, payload];
 }
 
 function removeLabel(annotationId) {
-  categoryAnnotations.value = categoryAnnotations.value.filter((item) => item.id !== annotationId)
+  categoryAnnotations.value = categoryAnnotations.value.filter((item) => item.id !== annotationId);
 }
 
 function addLabel(labelId) {
   const payload = {
     id: Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER)),
-    label: labelId
-  }
-  categoryAnnotations.value.push(payload)
+    label: labelId,
+  };
+  categoryAnnotations.value.push(payload);
 }
 </script>
 
@@ -195,7 +195,7 @@ function addLabel(labelId) {
   font-size: 1.25rem !important;
   font-weight: 500;
   line-height: 2rem;
-  font-family: 'Roboto', sans-serif !important;
+  font-family: "Roboto", sans-serif !important;
   opacity: 0.6;
 }
 </style>

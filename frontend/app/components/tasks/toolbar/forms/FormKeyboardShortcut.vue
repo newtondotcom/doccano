@@ -32,32 +32,32 @@
 </template>
 
 <script setup>
-const emit = defineEmits(['click:close'])
+const emit = defineEmits(["click:close"]);
 
 const items = [
   {
-    name: 'Jump to the first data',
-    key: ['shift', '←']
+    name: "Jump to the first data",
+    key: ["shift", "←"],
   },
   {
-    name: 'Jump to the last data',
-    key: ['shift', '→']
+    name: "Jump to the last data",
+    key: ["shift", "→"],
   },
   {
-    name: 'Move to the previous data',
-    key: ['←']
+    name: "Move to the previous data",
+    key: ["←"],
   },
   {
-    name: 'Move to the next data',
-    key: ['→']
+    name: "Move to the next data",
+    key: ["→"],
   },
   {
-    name: 'Confirm the data',
-    key: ['enter']
-  }
-]
+    name: "Confirm the data",
+    key: ["enter"],
+  },
+];
 
 function close() {
-  emit('click:close')
+  emit("click:close");
 }
 </script>

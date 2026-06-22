@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title>
       <v-btn class="text-capitalize" color="primary" @click.stop="dialogCreate = true">
-        {{ $t('generic.add') }}
+        {{ $t("generic.add") }}
       </v-btn>
       <v-btn
         class="text-capitalize ms-2"
@@ -10,7 +10,7 @@
         outlined
         @click.stop="dialogDelete = true"
       >
-        {{ $t('generic.delete') }}
+        {{ $t("generic.delete") }}
       </v-btn>
       <v-dialog v-model="dialogCreate">
         <MemberFormCreate
@@ -29,104 +29,104 @@
 </template>
 
 <script setup lang="ts">
-import { MemberItem } from '@/domain/models/member/member'
+import { MemberItem } from "@/domain/models/member/member";
 
 definePageMeta({
-  layout: 'project',
-  middleware: ['check-auth', 'auth', 'setCurrentProject', 'isProjectAdmin'],
+  layout: "project",
+  middleware: ["check-auth", "auth", "setCurrentProject", "isProjectAdmin"],
   validate(route) {
-    return /^\d+$/.test(route.params.id)
-  }
-})
+    return /^\d+$/.test(route.params.id);
+  },
+});
 
-const route = useRoute()
-const router = useRouter()
-const { $repositories } = useNuxtApp()
+const route = useRoute();
+const router = useRouter();
+const { $repositories } = useNuxtApp();
 
-const dialogCreate = ref(false)
-const dialogDelete = ref(false)
-const editedIndex = ref(-1)
+const dialogCreate = ref(false);
+const dialogDelete = ref(false);
+const editedIndex = ref(-1);
 const editedItem = ref({
   user: -1,
   role: -1,
-  username: '',
-  rolename: 'annotator'
-} as MemberItem)
+  username: "",
+  rolename: "annotator",
+} as MemberItem);
 const defaultItem = {
   user: -1,
   role: -1,
-  username: '',
-  rolename: 'annotator'
-} as MemberItem
-const items = ref([] as MemberItem[])
-const selected = ref([] as MemberItem[])
-const isLoading = ref(false)
-const errorMessage = ref('')
+  username: "",
+  rolename: "annotator",
+} as MemberItem;
+const items = ref([] as MemberItem[]);
+const selected = ref([] as MemberItem[]);
+const isLoading = ref(false);
+const errorMessage = ref("");
 
-const canDelete = computed(() => selected.value.length > 0)
-const projectId = computed(() => route.params.id as string)
+const canDelete = computed(() => selected.value.length > 0);
+const projectId = computed(() => route.params.id as string);
 
 async function load() {
-  isLoading.value = true
+  isLoading.value = true;
   try {
-    items.value = await $repositories.member.list(projectId.value)
+    items.value = await $repositories.member.list(projectId.value);
   } catch (e) {
-    router.push(`/projects/${projectId.value}`)
+    router.push(`/projects/${projectId.value}`);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
-onMounted(load)
+onMounted(load);
 
 async function create() {
   try {
-    await $repositories.member.create(projectId.value, editedItem.value)
-    close()
-    await load()
+    await $repositories.member.create(projectId.value, editedItem.value);
+    close();
+    await load();
   } catch (e: any) {
-    errorMessage.value = e.response.data.detail
+    errorMessage.value = e.response.data.detail;
   }
 }
 
 async function update() {
   try {
-    await $repositories.member.update(projectId.value, editedItem.value)
-    close()
-    await load()
+    await $repositories.member.update(projectId.value, editedItem.value);
+    close();
+    await load();
   } catch (e: any) {
-    errorMessage.value = e.response.data.detail
+    errorMessage.value = e.response.data.detail;
   }
 }
 
 function save() {
   if (editedIndex.value > -1) {
-    update()
+    update();
   } else {
-    create()
+    create();
   }
 }
 
 function close() {
-  dialogCreate.value = false
-  errorMessage.value = ''
+  dialogCreate.value = false;
+  errorMessage.value = "";
   nextTick(() => {
-    editedItem.value = Object.assign({}, defaultItem)
-    editedIndex.value = -1
-  })
+    editedItem.value = Object.assign({}, defaultItem);
+    editedIndex.value = -1;
+  });
 }
 
 async function remove() {
-  await $repositories.member.bulkDelete(projectId.value, selected.value)
-  await load()
-  dialogDelete.value = false
-  selected.value = []
+  await $repositories.member.bulkDelete(projectId.value, selected.value);
+  await load();
+  dialogDelete.value = false;
+  selected.value = [];
 }
 
 function editItem(item: MemberItem) {
-  editedIndex.value = items.value.indexOf(item)
-  editedItem.value = Object.assign({}, item)
-  dialogCreate.value = true
+  editedIndex.value = items.value.indexOf(item);
+  editedItem.value = Object.assign({}, item);
+  dialogCreate.value = true;
 }
 </script>
 

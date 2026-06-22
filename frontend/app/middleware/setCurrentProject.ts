@@ -1,19 +1,19 @@
-import { useMainStore as useProjectsStore } from '@/store/projects'
+import { useMainStore as useProjectsStore } from "@/store/projects";
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  const projectId = to.params.id as string
+  const projectId = to.params.id as string;
   if (!projectId) {
-    return
+    return;
   }
 
-  const projectsStore = useProjectsStore()
-  const current = projectsStore.currentProject
+  const projectsStore = useProjectsStore();
+  const current = projectsStore.currentProject;
 
   if (String(current?.id) !== projectId) {
     try {
-      await projectsStore.setCurrentProject(projectId)
+      await projectsStore.setCurrentProject(projectId);
     } catch {
-      return navigateTo('/projects')
+      return navigateTo("/projects");
     }
   }
-})
+});

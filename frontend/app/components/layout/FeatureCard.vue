@@ -16,18 +16,18 @@
 defineProps({
   title: {
     type: String,
-    default: '',
-    required: true
+    default: "",
+    required: true,
   },
   text: {
     type: String,
-    default: '',
-    required: true
+    default: "",
+    required: true,
   },
   imageSrc: {
     type: String,
-    default: '',
-    required: true
-  }
-})
+    default: "",
+    required: true,
+  },
+});
 </script>

@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { mdiKeyboardOutline } from '@mdi/js'
+import { mdiKeyboardOutline } from "@mdi/js";
 
-defineEmits(['click:open'])
+defineEmits(["click:open"]);
 </script>

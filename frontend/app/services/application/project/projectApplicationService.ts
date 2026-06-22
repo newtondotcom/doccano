@@ -1,29 +1,29 @@
-import { Page } from '@/domain/models/page'
-import { Project } from '@/domain/models/project/project'
-import { TagItem } from '@/domain/models/tag/tag'
-import { APIProjectRepository, SearchQuery } from '@/repositories/project/apiProjectRepository'
+import { Page } from "@/domain/models/page";
+import { Project } from "@/domain/models/project/project";
+import { TagItem } from "@/domain/models/tag/tag";
+import { APIProjectRepository, SearchQuery } from "@/repositories/project/apiProjectRepository";
 
 type ProjectFields = {
-  name: string
-  description: string
-  guideline: string
-  projectType: string
-  enableRandomOrder: boolean
-  enableSharingMode: boolean
-  exclusiveCategories: boolean
-  tags: string[]
-  allowOverlappingSpans: boolean
-  enableGraphemeMode: boolean
-  useRelation: boolean
-  allowMemberToCreateLabelType: boolean
-}
+  name: string;
+  description: string;
+  guideline: string;
+  projectType: string;
+  enableRandomOrder: boolean;
+  enableSharingMode: boolean;
+  exclusiveCategories: boolean;
+  tags: string[];
+  allowOverlappingSpans: boolean;
+  enableGraphemeMode: boolean;
+  useRelation: boolean;
+  allowMemberToCreateLabelType: boolean;
+};
 
 export interface SearchQueryData {
-  limit: string
-  offset: string
-  q?: string
-  sortBy?: string
-  sortDesc?: string
+  limit: string;
+  offset: string;
+  q?: string;
+  sortBy?: string;
+  sortDesc?: string;
 }
 
 export class ProjectApplicationService {
@@ -31,15 +31,15 @@ export class ProjectApplicationService {
 
   public async list(q: SearchQueryData): Promise<Page<Project>> {
     try {
-      const query = new SearchQuery(q.limit, q.offset, q.q, q.sortBy, q.sortDesc)
-      return await this.repository.list(query)
+      const query = new SearchQuery(q.limit, q.offset, q.q, q.sortBy, q.sortDesc);
+      return await this.repository.list(query);
     } catch (e: any) {
-      throw new Error(e.response.data.detail)
+      throw new Error(e.response.data.detail);
     }
   }
 
   public async findById(id: string): Promise<Project> {
-    return await this.repository.findById(id)
+    return await this.repository.findById(id);
   }
 
   public async create({
@@ -53,8 +53,8 @@ export class ProjectApplicationService {
     enableGraphemeMode,
     useRelation,
     tags,
-    guideline = '',
-    allowMemberToCreateLabelType = false
+    guideline = "",
+    allowMemberToCreateLabelType = false,
   }: ProjectFields): Promise<Project> {
     const project = Project.create(
       0,
@@ -69,12 +69,12 @@ export class ProjectApplicationService {
       enableGraphemeMode,
       useRelation,
       tags.map((tag) => TagItem.create(tag)),
-      allowMemberToCreateLabelType
-    )
+      allowMemberToCreateLabelType,
+    );
     try {
-      return await this.repository.create(project)
+      return await this.repository.create(project);
     } catch (e: any) {
-      throw new Error(e.response.data.detail)
+      throw new Error(e.response.data.detail);
     }
   }
 
@@ -90,9 +90,9 @@ export class ProjectApplicationService {
       allowOverlappingSpans,
       enableGraphemeMode,
       useRelation,
-      guideline = '',
-      allowMemberToCreateLabelType
-    }: Omit<ProjectFields, 'tags'>
+      guideline = "",
+      allowMemberToCreateLabelType,
+    }: Omit<ProjectFields, "tags">,
   ): Promise<void> {
     const project = Project.create(
       projectId,
@@ -107,26 +107,26 @@ export class ProjectApplicationService {
       enableGraphemeMode,
       useRelation,
       [],
-      allowMemberToCreateLabelType
-    )
+      allowMemberToCreateLabelType,
+    );
 
     try {
-      await this.repository.update(project)
+      await this.repository.update(project);
     } catch (e: any) {
-      throw new Error(e.response.data.detail)
+      throw new Error(e.response.data.detail);
     }
   }
 
   public bulkDelete(projects: Project[]): Promise<void> {
-    const ids = projects.map((project) => project.id)
-    return this.repository.bulkDelete(ids)
+    const ids = projects.map((project) => project.id);
+    return this.repository.bulkDelete(ids);
   }
 
   public async clone(project: Project): Promise<Project> {
     try {
-      return await this.repository.clone(project)
+      return await this.repository.clone(project);
     } catch (e: any) {
-      throw new Error(e.response.data.detail)
+      throw new Error(e.response.data.detail);
     }
   }
 }

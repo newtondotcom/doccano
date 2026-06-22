@@ -16,21 +16,21 @@
         </v-icon>
       </v-btn>
     </template>
-    <span v-if="isReviewd">{{ $t('annotation.checkedTooltip') }}</span>
-    <span v-else>{{ $t('annotation.notCheckedTooltip') }}</span>
+    <span v-if="isReviewd">{{ $t("annotation.checkedTooltip") }}</span>
+    <span v-else>{{ $t("annotation.notCheckedTooltip") }}</span>
   </v-tooltip>
 </template>
 
 <script setup lang="ts">
-import { mdiClose, mdiCheck } from '@mdi/js'
+import { mdiClose, mdiCheck } from "@mdi/js";
 
 defineProps({
   isReviewd: {
     type: Boolean,
     default: false,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-defineEmits(['click:review'])
+defineEmits(["click:review"]);
 </script>

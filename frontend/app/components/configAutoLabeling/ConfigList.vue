@@ -12,7 +12,7 @@
     <template #top>
       <div class="ma-4">
         <v-btn class="primary text-capitalize" @click="dialogCreate = true">
-          {{ $t('generic.create') }}
+          {{ $t("generic.create") }}
         </v-btn>
         <v-btn
           class="text-capitalize ms-2"
@@ -20,14 +20,14 @@
           outlined
           @click="dialogDelete = true"
         >
-          {{ $t('generic.delete') }}
+          {{ $t("generic.delete") }}
         </v-btn>
         <v-dialog v-model="dialogCreate">
           <ConfigAutoLabelingConfigCreationForm
             @onCreate="
-            () => {
-                onCreate()
-                dialogCreate = false
+              () => {
+                onCreate();
+                dialogCreate = false;
               }
             "
           />
@@ -40,9 +40,9 @@
             item-key="modelName"
             @ok="
               () => {
-                remove()
-                dialogDelete = false
-                }
+                remove();
+                dialogDelete = false;
+              }
             "
             @cancel="dialogDelete = false"
           />
@@ -53,49 +53,49 @@
 </template>
 
 <script setup lang="ts">
-import type { ConfigItemResponse } from '@/repositories/autoLabeling/config/apiConfigRepository'
-import { ConfigItemList } from '@/domain/models/autoLabeling/config'
+import type { ConfigItemResponse } from "@/repositories/autoLabeling/config/apiConfigRepository";
+import { ConfigItemList } from "@/domain/models/autoLabeling/config";
 
-const route = useRoute()
-const { $repositories } = useNuxtApp()
+const route = useRoute();
+const { $repositories } = useNuxtApp();
 
-const dialogCreate = ref(false)
-const dialogDelete = ref(false)
-const isLoading = ref(false)
-const items = ref(ConfigItemList.valueOf([]) as ConfigItemList)
-const selected = ref([] as ConfigItemResponse[])
+const dialogCreate = ref(false);
+const dialogDelete = ref(false);
+const isLoading = ref(false);
+const items = ref(ConfigItemList.valueOf([]) as ConfigItemList);
+const selected = ref([] as ConfigItemResponse[]);
 const headers = [
   {
-    text: 'Model name',
-    align: 'left',
-    value: 'modelName',
-    sortable: false
-  }
-]
+    text: "Model name",
+    align: "left",
+    value: "modelName",
+    sortable: false,
+  },
+];
 
-isLoading.value = true
-items.value = await $repositories.config.list(route.params.id as string)
-isLoading.value = false
+isLoading.value = true;
+items.value = await $repositories.config.list(route.params.id as string);
+isLoading.value = false;
 
 async function remove() {
-  isLoading.value = true
-  const projectId = route.params.id as string
+  isLoading.value = true;
+  const projectId = route.params.id as string;
   for (const item of selected.value) {
-    await $repositories.config.delete(projectId, item.id)
+    await $repositories.config.delete(projectId, item.id);
   }
-  items.value = await $repositories.config.list(projectId)
-  selected.value = []
-  isLoading.value = false
+  items.value = await $repositories.config.list(projectId);
+  selected.value = [];
+  isLoading.value = false;
 }
 
 function isDeletable(): boolean {
-  return selected.value.length > 0
+  return selected.value.length > 0;
 }
 
 async function onCreate() {
-  isLoading.value = true
-  items.value = await $repositories.config.list(route.params.id as string)
-  isLoading.value = false
+  isLoading.value = true;
+  items.value = await $repositories.config.list(route.params.id as string);
+  isLoading.value = false;
 }
 </script>
 

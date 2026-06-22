@@ -17,35 +17,35 @@
 </template>
 
 <script setup>
-import { ref, watch, onBeforeMount } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useMainStore as useProjectsStore } from '@/store/projects'
+import { ref, watch, onBeforeMount } from "vue";
+import { storeToRefs } from "pinia";
+import { useMainStore as useProjectsStore } from "@/store/projects";
 
-const route = useRoute()
-const { $repositories, $services } = useNuxtApp()
+const route = useRoute();
+const { $repositories, $services } = useNuxtApp();
 
-const projectsStore = useProjectsStore()
-const { currentProject } = storeToRefs(projectsStore)
-const { setCurrentProject } = projectsStore
+const projectsStore = useProjectsStore();
+const { currentProject } = storeToRefs(projectsStore);
+const { setCurrentProject } = projectsStore;
 
-const drawerLeft = ref(null)
-const isProjectAdmin = ref(false)
+const drawerLeft = ref(null);
+const isProjectAdmin = ref(false);
 
 watch(
   () => route.query,
   () => {
-    $services.option.save(route.params.id, route.query)
-  }
-)
+    $services.option.save(route.params.id, route.query);
+  },
+);
 
 onBeforeMount(async () => {
-  const project = currentProject.value
-  const isEmpty = Object.keys(project).length === 0 && project.constructor === Object
+  const project = currentProject.value;
+  const isEmpty = Object.keys(project).length === 0 && project.constructor === Object;
   if (isEmpty) {
-    await setCurrentProject(route.params.id)
+    await setCurrentProject(route.params.id);
   }
 
-  const member = await $repositories.member.fetchMyRole(route.params.id)
-  isProjectAdmin.value = member.isProjectAdmin
-})
+  const member = await $repositories.member.fetchMyRole(route.params.id);
+  isProjectAdmin.value = member.isProjectAdmin;
+});
 </script>

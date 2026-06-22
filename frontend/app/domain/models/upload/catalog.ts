@@ -5,6 +5,6 @@ export class Catalog {
     readonly properties: object,
     readonly taskId: string,
     readonly displayName: string,
-    readonly acceptTypes: string
+    readonly acceptTypes: string,
   ) {}
 }

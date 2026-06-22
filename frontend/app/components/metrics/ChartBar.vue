@@ -3,83 +3,76 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import {
-  BarController,
-  BarElement,
-  CategoryScale,
-  Chart,
-  LinearScale,
-  Legend
-} from 'chart.js'
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { BarController, BarElement, CategoryScale, Chart, LinearScale, Legend } from "chart.js";
 
-Chart.register(BarController, BarElement, CategoryScale, LinearScale, Legend)
+Chart.register(BarController, BarElement, CategoryScale, LinearScale, Legend);
 
 const props = defineProps({
   chartData: {
     type: Object,
     default: () => ({}),
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const chartCanvas = ref<HTMLCanvasElement | null>(null)
-let chartInstance: Chart | null = null
+const chartCanvas = ref<HTMLCanvasElement | null>(null);
+let chartInstance: Chart | null = null;
 
 const options = {
-  indexAxis: 'y' as const,
+  indexAxis: "y" as const,
   scales: {
     y: {
-      barPercentage: 0.3
+      barPercentage: 0.3,
     },
     x: {
       ticks: {
         beginAtZero: true,
-        min: 0
-      }
-    }
+        min: 0,
+      },
+    },
   },
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      display: false
-    }
-  }
-}
+      display: false,
+    },
+  },
+};
 
 function renderChart() {
-  if (!chartCanvas.value) return
+  if (!chartCanvas.value) return;
   if (chartInstance) {
-    chartInstance.destroy()
+    chartInstance.destroy();
   }
   chartInstance = new Chart(chartCanvas.value, {
-    type: 'bar',
+    type: "bar",
     data: props.chartData as any,
-    options
-  })
+    options,
+  });
 }
 
 onMounted(() => {
-  renderChart()
-})
+  renderChart();
+});
 
 watch(
   () => props.chartData,
   () => {
     if (chartInstance) {
-      chartInstance.data = props.chartData as any
-      chartInstance.update()
+      chartInstance.data = props.chartData as any;
+      chartInstance.update();
     } else {
-      renderChart()
+      renderChart();
     }
   },
-  { deep: true }
-)
+  { deep: true },
+);
 
 onBeforeUnmount(() => {
   if (chartInstance) {
-    chartInstance.destroy()
-    chartInstance = null
+    chartInstance.destroy();
+    chartInstance = null;
   }
-})
+});
 </script>

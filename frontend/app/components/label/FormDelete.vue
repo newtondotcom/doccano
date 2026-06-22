@@ -13,12 +13,12 @@
 defineProps({
   selected: {
     type: Array,
-    default: () => []
-  }
-})
+    default: () => [],
+  },
+});
 
 defineEmits<{
-  remove: []
-  cancel: []
-}>()
+  remove: [];
+  cancel: [];
+}>();
 </script>

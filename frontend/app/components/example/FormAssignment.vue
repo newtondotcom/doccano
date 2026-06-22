@@ -62,76 +62,76 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { MemberItem } from '@/domain/models/member/member'
+import { computed, onMounted, ref } from "vue";
+import { MemberItem } from "@/domain/models/member/member";
 
 const emit = defineEmits<{
-  assigned: []
-  cancel: []
-}>()
+  assigned: [];
+  cancel: [];
+}>();
 
-const route = useRoute()
-const { $repositories } = useNuxtApp()
+const route = useRoute();
+const { $repositories } = useNuxtApp();
 
-const members = ref<MemberItem[]>([])
-const workloadAllocation = ref<number[]>([])
-const selectedStrategy = ref('weighted_sequential')
-const isWaiting = ref(false)
+const members = ref<MemberItem[]>([]);
+const workloadAllocation = ref<number[]>([]);
+const selectedStrategy = ref("weighted_sequential");
+const isWaiting = ref(false);
 
-const projectId = computed(() => route.params.id as string)
+const projectId = computed(() => route.params.id as string);
 
 const strategies = computed(() => [
   {
-    displayName: 'Weighted sequential',
-    value: 'weighted_sequential',
+    displayName: "Weighted sequential",
+    value: "weighted_sequential",
     description:
-      'Assign examples to members in order of their workload. The total weight must equal 100.'
+      "Assign examples to members in order of their workload. The total weight must equal 100.",
   },
   {
-    displayName: 'Weighted random',
-    value: 'weighted_random',
+    displayName: "Weighted random",
+    value: "weighted_random",
     description:
-      'Assign examples to members randomly based on their workload. The total weight must equal 100.'
+      "Assign examples to members randomly based on their workload. The total weight must equal 100.",
   },
   {
-    displayName: 'Sampling without replacement',
-    value: 'sampling_without_replacement',
-    description: 'Assign examples to members randomly without replacement.'
-  }
-])
+    displayName: "Sampling without replacement",
+    value: "sampling_without_replacement",
+    description: "Assign examples to members randomly without replacement.",
+  },
+]);
 
 const validateWeight = computed((): boolean => {
-  if (selectedStrategy.value === 'sampling_without_replacement') {
-    return true
+  if (selectedStrategy.value === "sampling_without_replacement") {
+    return true;
   } else {
-    return workloadAllocation.value.reduce((acc, cur) => acc + cur, 0) === 100
+    return workloadAllocation.value.reduce((acc, cur) => acc + cur, 0) === 100;
   }
-})
+});
 
 async function loadMembers() {
-  members.value = await $repositories.member.list(projectId.value)
-  workloadAllocation.value = members.value.map(() => Math.round(100 / members.value.length))
+  members.value = await $repositories.member.list(projectId.value);
+  workloadAllocation.value = members.value.map(() => Math.round(100 / members.value.length));
 }
 
 onMounted(() => {
-  loadMembers()
-})
+  loadMembers();
+});
 
 async function agree() {
-  isWaiting.value = true
+  isWaiting.value = true;
   const workloads = workloadAllocation.value.map((weight, i) => ({
     weight,
-    member_id: members.value[i].id
-  }))
+    member_id: members.value[i].id,
+  }));
   await $repositories.assignment.bulkAssign(projectId.value, {
     strategy_name: selectedStrategy.value,
-    workloads
-  })
-  isWaiting.value = false
-  emit('assigned')
+    workloads,
+  });
+  isWaiting.value = false;
+  emit("assigned");
 }
 
 function cancel() {
-  emit('cancel')
+  emit("cancel");
 }
 </script>

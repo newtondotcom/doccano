@@ -66,97 +66,97 @@
 </template>
 
 <script setup lang="ts">
-import { mdiPencil, mdiDelete } from '@mdi/js'
-import { labelNameRules } from '@/rules/index'
+import { mdiPencil, mdiDelete } from "@mdi/js";
+import { labelNameRules } from "@/rules/index";
 
-const { tm } = useI18n()
+const { tm } = useI18n();
 
 const props = defineProps({
   value: {
     type: Array,
     default: () => [],
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const emit = defineEmits(['input'])
+const emit = defineEmits(["input"]);
 
-const route = useRoute()
-const { $services } = useNuxtApp()
+const route = useRoute();
+const { $services } = useNuxtApp();
 
-const dialog = ref(false)
+const dialog = ref(false);
 const headers = [
   {
-    text: 'From',
-    align: 'left',
-    value: 'from',
-    sortable: false
+    text: "From",
+    align: "left",
+    value: "from",
+    sortable: false,
   },
   {
-    text: 'To',
-    align: 'left',
-    value: 'to',
-    sortable: false
+    text: "To",
+    align: "left",
+    value: "to",
+    sortable: false,
   },
   {
-    text: 'Actions',
-    value: 'actions',
-    sortable: false
-  }
-]
-const valid = ref(false)
-const editedIndex = ref(-1)
+    text: "Actions",
+    value: "actions",
+    sortable: false,
+  },
+];
+const valid = ref(false);
+const editedIndex = ref(-1);
 const editedItem = ref({
-  from: '',
-  to: ''
-})
+  from: "",
+  to: "",
+});
 const defaultItem = {
-  from: '',
-  to: ''
-}
-const items = ref<string[]>([])
+  from: "",
+  to: "",
+};
+const items = ref<string[]>([]);
 
-const project = await $services.project.findById(route.params.id as string)
-if (project.projectType.endsWith('Classification')) {
-  const labels = await $services.categoryType.list(route.params.id as string)
-  items.value = labels.map((item) => item.text)
+const project = await $services.project.findById(route.params.id as string);
+if (project.projectType.endsWith("Classification")) {
+  const labels = await $services.categoryType.list(route.params.id as string);
+  items.value = labels.map((item) => item.text);
 } else {
-  const labels = await $services.spanType.list(route.params.id as string)
-  items.value = labels.map((item) => item.text)
+  const labels = await $services.spanType.list(route.params.id as string);
+  items.value = labels.map((item) => item.text);
 }
 
 function editItem(item: { from: string; to: string }) {
-  editedIndex.value = props.value.indexOf(item)
-  editedItem.value = Object.assign({}, item)
-  dialog.value = true
+  editedIndex.value = props.value.indexOf(item);
+  editedItem.value = Object.assign({}, item);
+  dialog.value = true;
 }
 
 function deleteItem(item: { from: string; to: string }) {
-  editedIndex.value = props.value.indexOf(item)
-  editedItem.value = Object.assign({}, item)
-  const list = Object.assign([], props.value)
-  list.splice(editedIndex.value, 1)
-  editedItem.value = Object.assign({}, defaultItem)
-  editedIndex.value = -1
-  emit('input', list)
+  editedIndex.value = props.value.indexOf(item);
+  editedItem.value = Object.assign({}, item);
+  const list = Object.assign([], props.value);
+  list.splice(editedIndex.value, 1);
+  editedItem.value = Object.assign({}, defaultItem);
+  editedIndex.value = -1;
+  emit("input", list);
 }
 
 function close() {
-  dialog.value = false
+  dialog.value = false;
   nextTick(() => {
-    editedItem.value = Object.assign({}, defaultItem)
-    editedIndex.value = -1
-  })
+    editedItem.value = Object.assign({}, defaultItem);
+    editedIndex.value = -1;
+  });
 }
 
 function save() {
-  const list = Object.assign([], props.value)
+  const list = Object.assign([], props.value);
   if (editedIndex.value > -1) {
-    Object.assign(list[editedIndex.value], editedItem.value)
+    Object.assign(list[editedIndex.value], editedItem.value);
   } else {
-    list.push(editedItem.value)
+    list.push(editedItem.value);
   }
-  emit('input', list)
-  close()
+  emit("input", list);
+  close();
 }
 </script>

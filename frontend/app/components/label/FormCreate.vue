@@ -82,111 +82,111 @@
 </template>
 
 <script setup lang="ts">
-import { mdiReload } from '@mdi/js'
-import type { PropType } from 'vue'
-import { computed, ref, watch } from 'vue'
-import { LabelDTO } from '@/services/application/label/labelData'
+import { mdiReload } from "@mdi/js";
+import type { PropType } from "vue";
+import { computed, ref, watch } from "vue";
+import { LabelDTO } from "@/services/application/label/labelData";
 
 const props = defineProps({
   items: {
     type: Array as PropType<LabelDTO[]>,
     default: () => [],
-    required: true
+    required: true,
   },
   id: {
     type: Number as () => number | undefined,
-    default: undefined
+    default: undefined,
   },
   text: {
     type: String,
-    required: true
+    required: true,
   },
   backgroundColor: {
     type: String,
-    required: true
+    required: true,
   },
   suffixKey: {
     type: String as () => string | null,
-    default: null
-  }
-})
+    default: null,
+  },
+});
 
 const emit = defineEmits<{
-  'update:text': [value: string]
-  'update:suffixKey': [value: string]
-  'update:backgroundColor': [value: string]
-}>()
+  "update:text": [value: string];
+  "update:suffixKey": [value: string];
+  "update:backgroundColor": [value: string];
+}>();
 
-const { tm } = useI18n()
-const { $contrastColor } = useNuxtApp()
+const { tm } = useI18n();
+const { $contrastColor } = useNuxtApp();
 
-const selectedColorIndex = ref(0)
-const valid = ref(false)
+const selectedColorIndex = ref(0);
+const valid = ref(false);
 const rules = {
-  required: (v: string) => !!v || 'Required',
+  required: (v: string) => !!v || "Required",
   counter: (v: string) =>
-    (v && v.length <= 100) || tm('rules.labelNameRules').labelLessThan100Chars,
-  nameDuplicated: (v: string) => !isUsedName(v) || tm('rules.labelNameRules').duplicated,
-  keyDuplicated: (v: string) => !isUsedSuffixKey(v) || tm('rules.keyNameRules').duplicated,
-  validColor: (v: string) => /^#[0-9A-F]{6}$/i.test(v) || 'This string is NOT a valid hex color.'
-}
+    (v && v.length <= 100) || tm("rules.labelNameRules").labelLessThan100Chars,
+  nameDuplicated: (v: string) => !isUsedName(v) || tm("rules.labelNameRules").duplicated,
+  keyDuplicated: (v: string) => !isUsedSuffixKey(v) || tm("rules.keyNameRules").duplicated,
+  validColor: (v: string) => /^#[0-9A-F]{6}$/i.test(v) || "This string is NOT a valid hex color.",
+};
 
 const predefinedColors = [
-  '#73D8FF',
-  '#009CE0',
-  '#0062B1',
-  '#AEA1FF',
-  '#7B64FF',
-  '#653294',
-  '#FDA1FF',
-  '#FA28FF',
-  '#AB149E',
-  '#68CCCA',
-  '#16A5A5',
-  '#0C797D',
-  '#A4DD00',
-  '#68BC00',
-  '#194D33',
-  '#FCDC00',
-  '#FCC400',
-  '#FB9E00',
-  '#F44E3B',
-  '#D33115',
-  '#9F0500'
-]
+  "#73D8FF",
+  "#009CE0",
+  "#0062B1",
+  "#AEA1FF",
+  "#7B64FF",
+  "#653294",
+  "#FDA1FF",
+  "#FA28FF",
+  "#AB149E",
+  "#68CCCA",
+  "#16A5A5",
+  "#0C797D",
+  "#A4DD00",
+  "#68BC00",
+  "#194D33",
+  "#FCDC00",
+  "#FCC400",
+  "#FB9E00",
+  "#F44E3B",
+  "#D33115",
+  "#9F0500",
+];
 
 const availableSuffixKeys = computed((): string[] => {
   const usedSuffixKeys = props.items
     .map((item) => item.suffixKey)
-    .filter((item) => item !== props.suffixKey)
-  const allSuffixKeys = '0123456789abcdefghijklmnopqrstuvwxyz'.split('')
-  return allSuffixKeys.filter((item) => !usedSuffixKeys.includes(item))
-})
+    .filter((item) => item !== props.suffixKey);
+  const allSuffixKeys = "0123456789abcdefghijklmnopqrstuvwxyz".split("");
+  return allSuffixKeys.filter((item) => !usedSuffixKeys.includes(item));
+});
 
-const textColor = computed(() => $contrastColor(props.backgroundColor))
+const textColor = computed(() => $contrastColor(props.backgroundColor));
 
 function isUsedName(text: string): boolean {
-  return props.items.filter((item) => item.id !== props.id && item.text === text).length > 0
+  return props.items.filter((item) => item.id !== props.id && item.text === text).length > 0;
 }
 
 function isUsedSuffixKey(key: string) {
   if (key === null) {
-    return false
+    return false;
   }
-  return props.items.filter((item) => item.id !== props.id && item.suffixKey === key).length > 0
+  return props.items.filter((item) => item.id !== props.id && item.suffixKey === key).length > 0;
 }
 
 function setRandomColor() {
-  const maxVal = 0xffffff
-  const randomNumber = Math.floor(Math.random() * maxVal)
-  const randomString = randomNumber.toString(16)
-  const randColor = randomString.padStart(6, '0')
-  emit('update:backgroundColor', `#${randColor.toUpperCase()}`)
+  const maxVal = 0xffffff;
+  const randomNumber = Math.floor(Math.random() * maxVal);
+  const randomString = randomNumber.toString(16);
+  const randColor = randomString.padStart(6, "0");
+  emit("update:backgroundColor", `#${randColor.toUpperCase()}`);
 }
 
 watch(selectedColorIndex, (value) => {
   if (value < predefinedColors.length) {
-    emit('update:backgroundColor', predefinedColors[selectedColorIndex.value])
+    emit("update:backgroundColor", predefinedColors[selectedColorIndex.value]);
   }
-})
+});
 </script>

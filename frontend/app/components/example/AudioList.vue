@@ -13,7 +13,7 @@
       showFirstLastPage: true,
       'items-per-page-options': [10, 50, 100],
       'items-per-page-text': $t('vuetify.itemsPerPageText'),
-      'page-text': $t('dataset.pageText')
+      'page-text': $t('dataset.pageText'),
     }"
     item-key="id"
     show-select
@@ -31,7 +31,7 @@
     </template>
     <template #[`item.isConfirmed`]="{ item }">
       <v-chip :color="item.isConfirmed ? 'success' : 'warning'" text small>
-        {{ item.isConfirmed ? 'Finished' : 'In progress' }}
+        {{ item.isConfirmed ? "Finished" : "In progress" }}
       </v-chip>
     </template>
     <template #[`item.url`]="{ item }">
@@ -70,154 +70,154 @@
     </template>
     <template #[`item.action`]="{ item }">
       <v-btn small color="primary text-capitalize" @click="toLabeling(item)">
-        {{ $t('dataset.annotate') }}
+        {{ $t("dataset.annotate") }}
       </v-btn>
     </template>
   </v-data-table>
 </template>
 
 <script setup lang="ts">
-import { mdiMagnify } from '@mdi/js'
-import type { PropType } from 'vue'
-import { computed, ref, watch } from 'vue'
-import { ExampleDTO } from '@/services/application/example/exampleData'
-import { MemberItem } from '@/domain/models/member/member'
-import type { DataTableOptions } from '~/domain/models/page'
+import { mdiMagnify } from "@mdi/js";
+import type { PropType } from "vue";
+import { computed, ref, watch } from "vue";
+import { ExampleDTO } from "@/services/application/example/exampleData";
+import { MemberItem } from "@/domain/models/member/member";
+import type { DataTableOptions } from "~/domain/models/page";
 
 const props = defineProps({
   isLoading: {
     type: Boolean,
     default: false,
-    required: true
+    required: true,
   },
   items: {
     type: Array as PropType<ExampleDTO[]>,
     default: () => [],
-    required: true
+    required: true,
   },
   value: {
     type: Array as PropType<ExampleDTO[]>,
     default: () => [],
-    required: true
+    required: true,
   },
   total: {
     type: Number,
     default: 0,
-    required: true
+    required: true,
   },
   members: {
     type: Array as PropType<MemberItem[]>,
     default: () => [],
-    required: true
+    required: true,
   },
   isAdmin: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 
 const emit = defineEmits<{
-  input: [value: ExampleDTO[]]
-  'update:query': [payload: { query: Record<string, string> }]
-  'click:labeling': [payload: { page: string; q: string }]
-  unassign: [assignmentId: number]
-  assign: [exampleId: number, assigneeId: number]
-}>()
+  input: [value: ExampleDTO[]];
+  "update:query": [payload: { query: Record<string, string> }];
+  "click:labeling": [payload: { page: string; q: string }];
+  unassign: [assignmentId: number];
+  assign: [exampleId: number, assigneeId: number];
+}>();
 
-const route = useRoute()
-const { t } = useI18n()
+const route = useRoute();
+const { t } = useI18n();
 
-const search = ref(route.query.q as string)
-const options = ref({} as DataTableOptions)
+const search = ref(route.query.q as string);
+const options = ref({} as DataTableOptions);
 
 const headers = computed(() => {
   const headerList = [
     {
-      text: 'Status',
-      value: 'isConfirmed',
-      sortable: false
+      text: "Status",
+      value: "isConfirmed",
+      sortable: false,
     },
     {
-      text: 'Audio',
-      value: 'url',
-      sortable: false
+      text: "Audio",
+      value: "url",
+      sortable: false,
     },
     {
-      text: 'Filename',
-      value: 'filename',
-      sortable: false
+      text: "Filename",
+      value: "filename",
+      sortable: false,
     },
     {
-      text: t('dataset.metadata'),
-      value: 'meta',
-      sortable: false
+      text: t("dataset.metadata"),
+      value: "meta",
+      sortable: false,
     },
     {
-      text: t('dataset.action'),
-      value: 'action',
-      sortable: false
-    }
-  ]
+      text: t("dataset.action"),
+      value: "action",
+      sortable: false,
+    },
+  ];
   if (props.isAdmin) {
     headerList.splice(4, 0, {
-      text: 'Assignee',
-      value: 'assignee',
-      sortable: false
-    })
+      text: "Assignee",
+      value: "assignee",
+      sortable: false,
+    });
   }
-  return headerList
-})
+  return headerList;
+});
 
 watch(
   options,
   () => {
-    emit('update:query', {
+    emit("update:query", {
       query: {
         limit: options.value.itemsPerPage.toString(),
         offset: ((options.value.page - 1) * options.value.itemsPerPage).toString(),
-        q: search.value
-      }
-    })
+        q: search.value,
+      },
+    });
   },
-  { deep: true }
-)
+  { deep: true },
+);
 
 watch(search, () => {
-  emit('update:query', {
+  emit("update:query", {
     query: {
       limit: options.value.itemsPerPage.toString(),
-      offset: '0',
-      q: search.value
-    }
-  })
-  options.value.page = 1
-})
+      offset: "0",
+      q: search.value,
+    },
+  });
+  options.value.page = 1;
+});
 
 function toLabeling(item: ExampleDTO) {
-  const index = props.items.indexOf(item)
-  const offset = (options.value.page - 1) * options.value.itemsPerPage
-  const page = (offset + index + 1).toString()
-  emit('click:labeling', { page, q: search.value })
+  const index = props.items.indexOf(item);
+  const offset = (options.value.page - 1) * options.value.itemsPerPage;
+  const page = (offset + index + 1).toString();
+  emit("click:labeling", { page, q: search.value });
 }
 
 function toSelected(item: ExampleDTO) {
-  const assigneeIds = item.assignments.map((assignment) => assignment.assignee_id)
-  return props.members.filter((member) => assigneeIds.includes(member.user))
+  const assigneeIds = item.assignments.map((assignment) => assignment.assignee_id);
+  return props.members.filter((member) => assigneeIds.includes(member.user));
 }
 
 function onAssignOrUnassign(item: ExampleDTO, newAssignees: MemberItem[]) {
-  const newAssigneeIds = newAssignees.map((assignee) => assignee.user)
-  const oldAssigneeIds = item.assignments.map((assignment) => assignment.assignee_id)
+  const newAssigneeIds = newAssignees.map((assignee) => assignee.user);
+  const oldAssigneeIds = item.assignments.map((assignment) => assignment.assignee_id);
   if (oldAssigneeIds.length > newAssigneeIds.length) {
     for (const assignment of item.assignments) {
       if (!newAssigneeIds.includes(assignment.assignee_id)) {
-        emit('unassign', assignment.id)
+        emit("unassign", assignment.id);
       }
     }
   } else {
     for (const newAssigneeId of newAssigneeIds) {
       if (!oldAssigneeIds.includes(newAssigneeId)) {
-        emit('assign', item.id, newAssigneeId)
+        emit("assign", item.id, newAssigneeId);
       }
     }
   }

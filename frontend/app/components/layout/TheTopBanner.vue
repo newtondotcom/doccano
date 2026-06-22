@@ -7,7 +7,7 @@
         </v-col>
         <v-col>
           <h1 class="mb-2 display-1 text-xs-center">
-            {{ $t('home.mainTitle') }}
+            {{ $t("home.mainTitle") }}
           </h1>
           <div class="mt-4">
             <v-btn large outlined color="white" href="https://github.com/doccano/doccano">
@@ -17,7 +17,7 @@
               GitHub
             </v-btn>
             <v-btn class="blue lighten-2 ml-5" dark large :href="localePath('/auth')">
-              {{ $t('home.getStarted') }}
+              {{ $t("home.getStarted") }}
             </v-btn>
           </div>
         </v-col>
@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { mdiGithub } from '@mdi/js'
+import { mdiGithub } from "@mdi/js";
 
-const localePath = useLocalePath()
+const localePath = useLocalePath();
 </script>

@@ -10,24 +10,24 @@
 </template>
 
 <script setup lang="ts">
-import { validateMinLength, validateNameMaxLength } from '@/domain/models/project/project'
+import { validateMinLength, validateNameMaxLength } from "@/domain/models/project/project";
 
 defineProps({
   value: {
     type: String,
-    default: '',
-    required: true
-  }
-})
+    default: "",
+    required: true,
+  },
+});
 
 defineEmits<{
-  input: [value: string]
-}>()
+  input: [value: string];
+}>();
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 const projectNameRules = [
-  (text: string) => validateMinLength(text) || t('rules.projectName.required'),
-  (text: string) => validateNameMaxLength(text) || t('rules.projectName.maxLength')
-]
+  (text: string) => validateMinLength(text) || t("rules.projectName.required"),
+  (text: string) => validateNameMaxLength(text) || t("rules.projectName.maxLength"),
+];
 </script>

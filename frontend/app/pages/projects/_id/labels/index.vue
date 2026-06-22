@@ -24,7 +24,7 @@
         outlined
         @click.stop="dialogDelete = true"
       >
-        {{ $t('generic.delete') }}
+        {{ $t("generic.delete") }}
       </v-btn>
       <v-dialog v-model="dialogDelete">
         <LabelFormDelete :selected="selected" @cancel="dialogDelete = false" @remove="remove" />
@@ -41,110 +41,110 @@
 </template>
 
 <script setup lang="ts">
-import { useMainStore as useProjectsStore } from '@/store/projects'
-import { LabelDTO } from '@/services/application/label/labelData'
-import { MemberItem } from '@/domain/models/member/member'
+import { useMainStore as useProjectsStore } from "@/store/projects";
+import { LabelDTO } from "@/services/application/label/labelData";
+import { MemberItem } from "@/domain/models/member/member";
 
 definePageMeta({
-  layout: 'project',
-  middleware: ['check-auth', 'auth', 'set-current-project', 'can-access-labels'],
+  layout: "project",
+  middleware: ["check-auth", "auth", "set-current-project", "can-access-labels"],
   validate(route) {
-    return /^\d+$/.test(route.params.id as string)
-  }
-})
+    return /^\d+$/.test(route.params.id as string);
+  },
+});
 
-const route = useRoute()
-const router = useRouter()
-const { $services, $repositories } = useNuxtApp()
-const projectsStore = useProjectsStore()
+const route = useRoute();
+const router = useRouter();
+const { $services, $repositories } = useNuxtApp();
+const projectsStore = useProjectsStore();
 
-const dialogDelete = ref(false)
-const items = ref([] as LabelDTO[])
-const selected = ref([] as LabelDTO[])
-const isLoading = ref(false)
-const tab = ref(0)
-const member = ref({} as MemberItem)
+const dialogDelete = ref(false);
+const items = ref([] as LabelDTO[]);
+const selected = ref([] as LabelDTO[]);
+const isLoading = ref(false);
+const tab = ref(0);
+const member = ref({} as MemberItem);
 
-const project = computed(() => projectsStore.project)
+const project = computed(() => projectsStore.project);
 
 const canOnlyAdd = computed(() => {
   if (member.value.isProjectAdmin) {
-    return false
+    return false;
   }
-  return project.value.allowMemberToCreateLabelType
-})
+  return project.value.allowMemberToCreateLabelType;
+});
 
-const canDelete = computed(() => selected.value.length > 0)
-const projectId = computed(() => route.params.id as string)
+const canDelete = computed(() => selected.value.length > 0);
+const projectId = computed(() => route.params.id as string);
 
 const hasMultiType = computed(() => {
-  if ('projectType' in project.value) {
-    return isIntentDetectionAndSlotFilling.value || !!project.value.useRelation
+  if ("projectType" in project.value) {
+    return isIntentDetectionAndSlotFilling.value || !!project.value.useRelation;
   }
-  return false
-})
+  return false;
+});
 
 const isIntentDetectionAndSlotFilling = computed(
-  () => project.value.projectType === 'IntentDetectionAndSlotFilling'
-)
+  () => project.value.projectType === "IntentDetectionAndSlotFilling",
+);
 
 const labelType = computed(() => {
   if (hasMultiType.value) {
     if (isIntentDetectionAndSlotFilling.value) {
-      return ['category', 'span'][tab.value!]
+      return ["category", "span"][tab.value!];
     }
-    return ['span', 'relation'][tab.value!]
+    return ["span", "relation"][tab.value!];
   }
   if (project.value.canDefineCategory) {
-    return 'category'
+    return "category";
   }
-  return 'span'
-})
+  return "span";
+});
 
 const service = computed(() => {
-  if (!('projectType' in project.value)) {
-    return
+  if (!("projectType" in project.value)) {
+    return;
   }
   if (hasMultiType.value) {
     if (isIntentDetectionAndSlotFilling.value) {
-      return [$services.categoryType, $services.spanType][tab.value!]
+      return [$services.categoryType, $services.spanType][tab.value!];
     }
-    return [$services.spanType, $services.relationType][tab.value!]
+    return [$services.spanType, $services.relationType][tab.value!];
   }
   if (project.value.canDefineCategory) {
-    return $services.categoryType
+    return $services.categoryType;
   }
-  return $services.spanType
-})
+  return $services.spanType;
+});
 
 watch(tab, () => {
-  list()
-})
+  list();
+});
 
 onMounted(async () => {
-  member.value = await $repositories.member.fetchMyRole(projectId.value)
-  await list()
-})
+  member.value = await $repositories.member.fetchMyRole(projectId.value);
+  await list();
+});
 
 async function list() {
-  isLoading.value = true
-  items.value = await service.value.list(projectId.value)
-  isLoading.value = false
+  isLoading.value = true;
+  items.value = await service.value.list(projectId.value);
+  isLoading.value = false;
 }
 
 async function remove() {
-  await service.value.bulkDelete(projectId.value, selected.value)
-  list()
-  dialogDelete.value = false
-  selected.value = []
+  await service.value.bulkDelete(projectId.value, selected.value);
+  list();
+  dialogDelete.value = false;
+  selected.value = [];
 }
 
 async function download() {
-  await service.value.export(projectId.value)
+  await service.value.export(projectId.value);
 }
 
 function editItem(item: LabelDTO) {
-  router.push(`labels/${item.id}/edit?type=${labelType.value}`)
+  router.push(`labels/${item.id}/edit?type=${labelType.value}`);
 }
 </script>
 

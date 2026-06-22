@@ -22,15 +22,17 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from 'vue'
-import type { MyProgress } from '@/domain/models/metrics/metrics'
+import type { PropType } from "vue";
+import type { MyProgress } from "@/domain/models/metrics/metrics";
 
 const props = defineProps({
   progress: {
     type: Object as PropType<MyProgress>,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const percentage = computed(() => Math.ceil((props.progress.complete / props.progress.total) * 100))
+const percentage = computed(() =>
+  Math.ceil((props.progress.complete / props.progress.total) * 100),
+);
 </script>

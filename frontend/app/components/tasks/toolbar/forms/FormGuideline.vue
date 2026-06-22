@@ -13,20 +13,20 @@
 <script setup>
 // import 'tui-editor/dist/tui-editor-contents.css'
 // import 'highlight.js/styles/github.css'
-import { Viewer } from '@toast-ui/vue-editor'
-import '@/assets/style/editor.css'
+import { Viewer } from "@toast-ui/vue-editor";
+import "@/assets/style/editor.css";
 
 defineProps({
   guidelineText: {
     type: String,
-    default: '',
-    required: true
-  }
-})
+    default: "",
+    required: true,
+  },
+});
 
-const emit = defineEmits(['click:close'])
+const emit = defineEmits(["click:close"]);
 
 function close() {
-  emit('click:close')
+  emit("click:close");
 }
 </script>

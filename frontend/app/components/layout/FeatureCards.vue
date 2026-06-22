@@ -4,7 +4,7 @@
       <v-col cols="12" sm="4" class="my-3">
         <div class="text-center">
           <h2 class="text-h5">
-            {{ $t('home.featuresTitle') }}
+            {{ $t("home.featuresTitle") }}
           </h2>
         </div>
       </v-col>
@@ -26,25 +26,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from "vue";
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 const featureCards = computed(() => [
   {
-    imageSrc: 'feature3.png',
-    title: t('home.featuresTitle1'),
-    text: t('home.featuresText1')
+    imageSrc: "feature3.png",
+    title: t("home.featuresTitle1"),
+    text: t("home.featuresText1"),
   },
   {
-    imageSrc: 'feature2.png',
-    title: t('home.featuresTitle2'),
-    text: t('home.featuresText2')
+    imageSrc: "feature2.png",
+    title: t("home.featuresTitle2"),
+    text: t("home.featuresText2"),
   },
   {
-    imageSrc: 'feature1.png',
-    title: t('home.featuresTitle3'),
-    text: t('home.featuresText3')
-  }
-])
+    imageSrc: "feature1.png",
+    title: t("home.featuresTitle3"),
+    text: t("home.featuresText3"),
+  },
+]);
 </script>

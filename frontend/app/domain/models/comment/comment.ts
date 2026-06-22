@@ -5,10 +5,10 @@ export class CommentItem {
     readonly username: string,
     readonly example: number,
     readonly text: string,
-    readonly createdAt: string
+    readonly createdAt: string,
   ) {}
 
   by(userId: number) {
-    return this.user === userId
+    return this.user === userId;
   }
 }

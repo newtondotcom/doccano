@@ -46,63 +46,63 @@
 
 <script setup>
 definePageMeta({
-  layout: 'demo'
-})
+  layout: "demo",
+});
 
-const allowOverlapping = ref(false)
-const rtl = ref(false)
+const allowOverlapping = ref(false);
+const rtl = ref(false);
 const entityLabels = [
   {
     id: 4,
-    text: 'LOC',
+    text: "LOC",
     prefixKey: null,
-    suffixKey: 'l',
-    color: '#7c20e0',
-    textColor: '#ffffff'
+    suffixKey: "l",
+    color: "#7c20e0",
+    textColor: "#ffffff",
   },
   {
     id: 5,
-    text: 'MISC',
+    text: "MISC",
     prefixKey: null,
-    suffixKey: 'm',
-    color: '#fbb028',
-    textColor: '#000000'
+    suffixKey: "m",
+    color: "#fbb028",
+    textColor: "#000000",
   },
   {
     id: 6,
-    text: 'ORG',
+    text: "ORG",
     prefixKey: null,
-    suffixKey: 'o',
-    color: '#e6d176',
-    textColor: '#000000'
+    suffixKey: "o",
+    color: "#e6d176",
+    textColor: "#000000",
   },
   {
     id: 7,
-    text: 'PER',
+    text: "PER",
     prefixKey: null,
-    suffixKey: 'p',
-    color: '#6a74b9',
-    textColor: '#ffffff'
-  }
-]
+    suffixKey: "p",
+    color: "#6a74b9",
+    textColor: "#ffffff",
+  },
+];
 const relations = ref([
   {
     id: 0,
     fromId: 16,
     toId: 17,
-    labelId: 0
-  }
-])
+    labelId: 0,
+  },
+]);
 const relationLabels = [
   {
     id: 0,
-    text: 'isLorem',
-    color: '#ffffff'
-  }
-]
+    text: "isLorem",
+    color: "#ffffff",
+  },
+];
 const currentDoc = ref({
   id: 8,
-  text: 'After bowling Somerset out for 83 on the opening morning at Grace Road, Leicestershire extended their first innings by 94 runs before being bowled out for 296 with England discard Andy Caddick taking three for 83.',
+  text: "After bowling Somerset out for 83 on the opening morning at Grace Road, Leicestershire extended their first innings by 94 runs before being bowled out for 296 with England discard Andy Caddick taking three for 83.",
   annotations: [
     {
       id: 17,
@@ -110,7 +110,7 @@ const currentDoc = ref({
       label: 4,
       startOffset: 60,
       endOffset: 70,
-      user: 1
+      user: 1,
     },
     {
       id: 19,
@@ -118,7 +118,7 @@ const currentDoc = ref({
       label: 4,
       startOffset: 164,
       endOffset: 171,
-      user: 1
+      user: 1,
     },
     {
       id: 16,
@@ -126,7 +126,7 @@ const currentDoc = ref({
       label: 6,
       startOffset: 14,
       endOffset: 22,
-      user: 1
+      user: 1,
     },
     {
       id: 18,
@@ -134,7 +134,7 @@ const currentDoc = ref({
       label: 6,
       startOffset: 72,
       endOffset: 86,
-      user: 1
+      user: 1,
     },
     {
       id: 20,
@@ -142,54 +142,54 @@ const currentDoc = ref({
       label: 7,
       startOffset: 180,
       endOffset: 192,
-      user: 1
-    }
+      user: 1,
+    },
   ],
   meta: { wikiPageId: 2 },
-  annotation_approver: null
-})
+  annotation_approver: null,
+});
 
 watch(rtl, () => {
-  relations.value = []
-  currentDoc.value.annotations = []
+  relations.value = [];
+  currentDoc.value.annotations = [];
   if (rtl.value) {
-    currentDoc.value.text = 'داستان SVG Tiny 1.2 طولا ني است.'
+    currentDoc.value.text = "داستان SVG Tiny 1.2 طولا ني است.";
   } else {
     currentDoc.value.text =
-      'After bowling Somerset out for 83 on the opening morning at Grace Road, Leicestershire extended their first innings by 94 runs before being bowled out for 296 with England discard Andy Caddick taking three for 83.'
+      "After bowling Somerset out for 83 on the opening morning at Grace Road, Leicestershire extended their first innings by 94 runs before being bowled out for 296 with England discard Andy Caddick taking three for 83.";
   }
-})
+});
 
 function deleteEntity(annotationId) {
   currentDoc.value.annotations = currentDoc.value.annotations.filter(
-    (item) => item.id !== annotationId
-  )
+    (item) => item.id !== annotationId,
+  );
   relations.value.forEach((r) => {
     if (r.fromId === annotationId || r.toId === annotationId) {
-      deleteRelation(r.id)
+      deleteRelation(r.id);
     }
-  })
+  });
 }
 
 function updateEntity(annotationId, labelId) {
-  const index = currentDoc.value.annotations.findIndex((item) => item.id === annotationId)
-  currentDoc.value.annotations[index].label = labelId
-  currentDoc.value.annotations = [...currentDoc.value.annotations]
+  const index = currentDoc.value.annotations.findIndex((item) => item.id === annotationId);
+  currentDoc.value.annotations[index].label = labelId;
+  currentDoc.value.annotations = [...currentDoc.value.annotations];
 }
 
 function addEntity(startOffset, endOffset, labelId) {
-  console.log(startOffset, endOffset, labelId)
+  console.log(startOffset, endOffset, labelId);
   const payload = {
     id: Math.floor(Math.random() * Math.floor(Number.MAX_SAFE_INTEGER)),
     startOffset,
     endOffset,
-    label: labelId
-  }
-  currentDoc.value.annotations = [...currentDoc.value.annotations, payload]
+    label: labelId,
+  };
+  currentDoc.value.annotations = [...currentDoc.value.annotations, payload];
 }
 
 function deleteRelation(relationId) {
-  relations.value = relations.value.filter((item) => item.id !== relationId)
+  relations.value = relations.value.filter((item) => item.id !== relationId);
 }
 </script>
 
@@ -198,7 +198,7 @@ function deleteRelation(relationId) {
   font-size: 1.25rem !important;
   font-weight: 500;
   line-height: 2rem;
-  font-family: 'Roboto', sans-serif !important;
+  font-family: "Roboto", sans-serif !important;
   opacity: 0.8;
 }
 </style>

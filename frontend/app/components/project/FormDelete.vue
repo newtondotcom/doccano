@@ -7,7 +7,7 @@
     @cancel="$emit('cancel')"
   >
     <template #content>
-      {{ $t('overview.deleteProjectMessage') }}
+      {{ $t("overview.deleteProjectMessage") }}
       <v-list dense>
         <v-list-item v-for="(item, i) in selected" :key="i">
           <v-list-item-title>{{ item.name }}</v-list-item-title>
@@ -18,18 +18,18 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from 'vue'
-import { Project } from '@/domain/models/project/project'
+import type { PropType } from "vue";
+import { Project } from "@/domain/models/project/project";
 
 defineProps({
   selected: {
     type: Array as PropType<Project[]>,
-    default: () => []
-  }
-})
+    default: () => [],
+  },
+});
 
 defineEmits<{
-  remove: []
-  cancel: []
-}>()
+  remove: [];
+  cancel: [];
+}>();
 </script>

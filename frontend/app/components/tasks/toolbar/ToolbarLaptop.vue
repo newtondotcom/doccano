@@ -2,7 +2,10 @@
   <v-toolbar class="toolbar-control" dense flat>
     <v-row no-gutters>
       <v-btn-toggle>
-        <TasksToolbarButtonsButtonReview :is-reviewd="isReviewd" @click:review="$emit('click:review')" />
+        <TasksToolbarButtonsButtonReview
+          :is-reviewd="isReviewd"
+          @click:review="$emit('click:review')"
+        />
 
         <TasksToolbarButtonsButtonFilter :value="filterOption" @click:filter="changeFilter" />
 
@@ -10,7 +13,10 @@
 
         <TasksToolbarButtonsButtonGuideline @click:guideline="dialogGuideline = true" />
         <v-dialog v-model="dialogGuideline">
-          <TasksToolbarFormsFormGuideline :guideline-text="guidelineText" @click:close="dialogGuideline = false" />
+          <TasksToolbarFormsFormGuideline
+            :guideline-text="guidelineText"
+            @click:close="dialogGuideline = false"
+          />
         </v-dialog>
 
         <TasksToolbarButtonsButtonComment @click:comment="dialogComment = true" />
@@ -60,43 +66,43 @@
 const props = defineProps({
   docId: {
     type: Number,
-    required: true
+    required: true,
   },
   enableAutoLabeling: {
     type: Boolean,
     default: false,
-    required: true
+    required: true,
   },
   guidelineText: {
     type: String,
-    default: '',
-    required: true
+    default: "",
+    required: true,
   },
   isReviewd: {
     type: Boolean,
-    default: false
+    default: false,
   },
   total: {
     type: Number,
-    default: 1
-  }
-})
+    default: 1,
+  },
+});
 
-const emit = defineEmits(['click:review', 'click:clear-label', 'update:enable-auto-labeling'])
+const emit = defineEmits(["click:review", "click:clear-label", "update:enable-auto-labeling"]);
 
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
-const dialogAutoLabeling = ref(false)
-const dialogClear = ref(false)
-const dialogComment = ref(false)
-const dialogGuideline = ref(false)
-const dialogShortcut = ref(false)
-const errorMessage = ref('')
+const dialogAutoLabeling = ref(false);
+const dialogClear = ref(false);
+const dialogComment = ref(false);
+const dialogGuideline = ref(false);
+const dialogShortcut = ref(false);
+const errorMessage = ref("");
 
-const page = computed(() => parseInt(route.query.page as string, 10))
-const filterOption = computed(() => route.query.isChecked as string)
-const orderOption = computed(() => route.query.ordering as string)
+const page = computed(() => parseInt(route.query.page as string, 10));
+const filterOption = computed(() => route.query.isChecked as string);
+const orderOption = computed(() => route.query.ordering as string);
 
 function updatePage(pageNum: number) {
   router.push({
@@ -104,40 +110,40 @@ function updatePage(pageNum: number) {
       page: pageNum.toString(),
       isChecked: filterOption.value,
       ordering: route.query.ordering,
-      q: route.query.q
-    }
-  })
+      q: route.query.q,
+    },
+  });
 }
 
 function changeFilter(isChecked: string) {
   router.push({
     query: {
-      page: '1',
+      page: "1",
       isChecked,
       ordering: route.query.ordering,
-      q: route.query.q
-    }
-  })
+      q: route.query.q,
+    },
+  });
 }
 
 function changeOrder(ordering: string) {
   router.push({
     query: {
-      page: '1',
+      page: "1",
       isChecked: filterOption.value,
       q: route.query.q,
-      ordering
-    }
-  })
+      ordering,
+    },
+  });
 }
 
 function updateAutoLabeling(isEnable: boolean) {
-  emit('update:enable-auto-labeling', isEnable)
+  emit("update:enable-auto-labeling", isEnable);
 }
 
 function confirmClear() {
-  emit('click:clear-label')
-  dialogClear.value = false
+  emit("click:clear-label");
+  dialogClear.value = false;
 }
 </script>
 

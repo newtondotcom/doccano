@@ -28,46 +28,46 @@
 </template>
 
 <script setup>
-import { useMainStore as useProjectsStore } from '@/store/projects'
+import { useMainStore as useProjectsStore } from "@/store/projects";
 
 definePageMeta({
-  layout: 'project',
-  middleware: ['check-auth', 'auth', 'setCurrentProject', 'isProjectAdmin'],
+  layout: "project",
+  middleware: ["check-auth", "auth", "setCurrentProject", "isProjectAdmin"],
   validate(route) {
-    return /^\d+$/.test(route.params.id)
-  }
-})
+    return /^\d+$/.test(route.params.id);
+  },
+});
 
-const route = useRoute()
-const { $services, $repositories } = useNuxtApp()
-const projectsStore = useProjectsStore()
+const route = useRoute();
+const { $services, $repositories } = useNuxtApp();
+const projectsStore = useProjectsStore();
 
-const categoryTypes = ref([])
-const categoryDistribution = ref({})
-const relationTypes = ref([])
-const relationDistribution = ref({})
-const spanTypes = ref([])
-const spanDistribution = ref({})
+const categoryTypes = ref([]);
+const categoryDistribution = ref({});
+const relationTypes = ref([]);
+const relationDistribution = ref({});
+const spanTypes = ref([]);
+const spanDistribution = ref({});
 
-const project = computed(() => projectsStore.project)
-const projectId = computed(() => route.params.id)
+const project = computed(() => projectsStore.project);
+const projectId = computed(() => route.params.id);
 
 onMounted(async () => {
   if (project.value.canDefineCategory) {
-    categoryTypes.value = await $services.categoryType.list(projectId.value)
+    categoryTypes.value = await $services.categoryType.list(projectId.value);
     categoryDistribution.value = await $repositories.metrics.fetchCategoryDistribution(
-      projectId.value
-    )
+      projectId.value,
+    );
   }
   if (project.value.canDefineSpan) {
-    spanTypes.value = await $services.spanType.list(projectId.value)
-    spanDistribution.value = await $repositories.metrics.fetchSpanDistribution(projectId.value)
+    spanTypes.value = await $services.spanType.list(projectId.value);
+    spanDistribution.value = await $repositories.metrics.fetchSpanDistribution(projectId.value);
   }
   if (project.value.canDefineRelation) {
-    relationTypes.value = await $services.relationType.list(projectId.value)
+    relationTypes.value = await $services.relationType.list(projectId.value);
     relationDistribution.value = await $repositories.metrics.fetchRelationDistribution(
-      projectId.value
-    )
+      projectId.value,
+    );
   }
-})
+});
 </script>

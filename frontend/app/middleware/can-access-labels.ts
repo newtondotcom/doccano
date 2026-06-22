@@ -1,23 +1,23 @@
-import { useMainStore as useProjectsStore } from '@/store/projects'
+import { useMainStore as useProjectsStore } from "@/store/projects";
 
 export default defineNuxtRouteMiddleware(async (to) => {
   if (!/^\d+$/.test(to.params.id as string)) {
-    return abortNavigation()
+    return abortNavigation();
   }
 
-  const projectsStore = useProjectsStore()
+  const projectsStore = useProjectsStore();
   if (!projectsStore.project?.canDefineLabel) {
-    return abortNavigation()
+    return abortNavigation();
   }
 
-  const { $repositories } = useNuxtApp()
-  const member = await $repositories.member.fetchMyRole(to.params.id as string)
+  const { $repositories } = useNuxtApp();
+  const member = await $repositories.member.fetchMyRole(to.params.id as string);
 
   if (member.isProjectAdmin) {
-    return
+    return;
   }
 
   if (!projectsStore.project.allowMemberToCreateLabelType) {
-    return abortNavigation()
+    return abortNavigation();
   }
-})
+});

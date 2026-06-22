@@ -1,4 +1,4 @@
 export default {
-  guideline: 'Leitfaden',
-  writeGuidelinePrompt: 'Bitte schreib einen Annotationsleitfaden.'
-}
+  guideline: "Leitfaden",
+  writeGuidelinePrompt: "Bitte schreib einen Annotationsleitfaden.",
+};

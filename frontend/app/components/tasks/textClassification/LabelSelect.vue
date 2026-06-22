@@ -20,19 +20,19 @@ defineProps({
   labels: {
     type: Array,
     default: () => [],
-    required: true
+    required: true,
   },
   annotations: {
     type: Array,
     default: () => [],
-    required: true
+    required: true,
   },
   singleLabel: {
     type: Boolean,
     default: false,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-defineEmits(['add', 'remove'])
+defineEmits(["add", "remove"]);
 </script>

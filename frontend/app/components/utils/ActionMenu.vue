@@ -18,21 +18,21 @@
 </template>
 
 <script setup lang="ts">
-import { mdiMenuDown } from '@mdi/js'
+import { mdiMenuDown } from "@mdi/js";
 
 defineProps({
   text: {
     type: String,
-    default: 'Actions'
+    default: "Actions",
   },
   items: {
     type: Array,
     default: () => [],
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
 const emit = defineEmits<{
-  [event: string]: []
-}>()
+  [event: string]: [];
+}>();
 </script>

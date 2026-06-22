@@ -1,7 +1,7 @@
 export interface Assignment {
-  id: string
-  assignee: string
-  assignee_id: number
+  id: string;
+  assignee: string;
+  assignee_id: number;
 }
 
 export class ExampleItem {
@@ -14,15 +14,15 @@ export class ExampleItem {
     readonly fileUrl: string,
     readonly isConfirmed: boolean,
     readonly filename: string,
-    readonly assignments: Assignment[]
+    readonly assignments: Assignment[],
   ) {}
 
   get url() {
-    const l = this.fileUrl.indexOf('/media/')
+    const l = this.fileUrl.indexOf("/media/");
     if (l < 0) {
-      return this.fileUrl
+      return this.fileUrl;
     }
-    return this.fileUrl.slice(l)
+    return this.fileUrl.slice(l);
   }
 }
 
@@ -31,6 +31,6 @@ export class ExampleItemList {
     readonly count: number,
     readonly next: string | null,
     readonly prev: string | null,
-    readonly items: ExampleItem[]
+    readonly items: ExampleItem[],
   ) {}
 }
