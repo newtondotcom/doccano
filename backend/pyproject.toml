@@ -27,6 +27,7 @@ dependencies = [
     "djangorestframework>=3.17.1",
     "djangorestframework-filters==1.0.0.dev2", # this module is outdated
     "djangorestframework-xml>=2.0.0",
+    "drf-spectacular[sidecar]>=0.29.0",
     "drf-yasg[validation]>=1.21.15",
     "environs>=15.0.1",
     "filetype>=1.2.0",

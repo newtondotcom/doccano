@@ -57,6 +57,8 @@ INSTALLED_APPS = [
     "polymorphic",
     "corsheaders",
     "drf_yasg",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -85,7 +87,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-    "allauth.account.middleware.AccountMiddleware"
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 
@@ -173,6 +175,17 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.BrowsableAPIRenderer",
         "rest_framework_xml.renderers.XMLRenderer",
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Doccano API",
+    "DESCRIPTION": "Doccano API Schema Description",
+    "VERSION": "0.0.1",
+    "SERVE_INCLUDE_SCHEMA": True,
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
 }
 
 # Internationalization
@@ -216,11 +229,15 @@ if DATABASES["default"].get("ENGINE") == "django.db.backends.sqlite3":
 if DATABASES["default"].get("ENGINE") == "django.db.backends.mysql":
     DATABASES["default"].get("OPTIONS", {}).pop("sslmode", None)
     if env("MYSQL_SSL_CA", None):
-        DATABASES["default"].setdefault("OPTIONS", {}).setdefault("ssl", {}).setdefault("ca", env("MYSQL_SSL_CA", None))
+        DATABASES["default"].setdefault("OPTIONS", {}).setdefault("ssl", {}).setdefault(
+            "ca", env("MYSQL_SSL_CA", None)
+        )
 
 # default to a sensible modern driver for Azure SQL
 if DATABASES["default"].get("ENGINE") == "sql_server.pyodbc":
-    DATABASES["default"].setdefault("OPTIONS", {}).setdefault("driver", "ODBC Driver 17 for SQL Server")
+    DATABASES["default"].setdefault("OPTIONS", {}).setdefault(
+        "driver", "ODBC Driver 17 for SQL Server"
+    )
 
 
 # Sessions and CSRF
@@ -235,7 +252,11 @@ ALLOWED_HOSTS = ["*"]
 
 if DEBUG:
     CORS_ORIGIN_ALLOW_ALL = True
-    CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:3000", "http://0.0.0.0:3000", "http://localhost:3000"]
+    CSRF_TRUSTED_ORIGINS = [
+        "http://127.0.0.1:3000",
+        "http://0.0.0.0:3000",
+        "http://localhost:3000",
+    ]
     CSRF_TRUSTED_ORIGINS += env.list("CSRF_TRUSTED_ORIGINS", [])
 
 # Batch size for importing data
@@ -289,7 +310,10 @@ SOCIALACCOUNT_PROVIDERS = {
     "okta": {
         "OKTA_BASE_URL": env("OAUTH_OKTA_OAUTH2_API_URL", ""),
         "OAUTH_PKCE_ENABLED": True,
-        "APP": {"client_id": env("OAUTH_OKTA_OAUTH2_KEY", ""), "secret": env("OAUTH_OKTA_OAUTH2_SECRET", "")},
+        "APP": {
+            "client_id": env("OAUTH_OKTA_OAUTH2_KEY", ""),
+            "secret": env("OAUTH_OKTA_OAUTH2_SECRET", ""),
+        },
     }
 }
 
