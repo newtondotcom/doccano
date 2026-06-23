@@ -10,7 +10,7 @@ class ApiService {
   private baseURL: string | undefined;
 
   constructor() {
-    this.baseURL = process.env.baseUrl;
+    this.baseURL = "v1"; // process.env.baseUrl;
   }
 
   private getCsrfToken(): string | undefined {
