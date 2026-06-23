@@ -89,7 +89,8 @@ import { useMainStore as useConfigStore } from "@/store/config";
 
 const router = useRouter();
 const route = useRoute();
-const { localePath, t } = useI18n();
+const { t } = useI18n();
+const localePath = useLocalePath();
 
 const authStore = useAuthStore();
 const projectsStore = useProjectsStore();
