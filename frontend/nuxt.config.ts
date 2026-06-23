@@ -26,9 +26,7 @@ export default defineNuxtConfig({
       redirectOn: "root",
     },
   },
-  build: {
-    transpile: ["vuetify"],
-  },
+
   vite: {
     plugins: [vuetify({ autoImport: true })],
     vue: {
@@ -36,5 +34,86 @@ export default defineNuxtConfig({
         transformAssetUrls,
       },
     },
+  },
+
+  devServer: {
+    host: "0.0.0.0",
+  },
+
+  env: {
+    baseUrl: "/v1",
+  },
+
+  /*
+   ** Customize the progress-bar color
+   */
+  loading: { color: "#fff" },
+
+  /*
+   ** Axios module configuration
+   ** See https://axios.nuxtjs.org/options
+   */
+  axios: {
+    proxy: true,
+  },
+
+  proxy: {
+    // Use a fake value for use at build-time
+    "/v1/": {
+      target: process.env.API_URL || "http://127.0.0.1:8000",
+    },
+    "/media": {
+      target: process.env.API_URL || "http://127.0.0.1:8000",
+    },
+  },
+
+  app: {
+    cdnURL: process.env.PUBLIC_PATH || "/_nuxt/",
+    /*
+     ** Headers of the page
+     */
+    head: {
+      titleTemplate: "%s - " + process.env.npm_package_name,
+      title: process.env.npm_package_name || "",
+      meta: [
+        { charset: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        {
+          hid: "description",
+          name: "description",
+          content: process.env.npm_package_description || "",
+        },
+      ],
+      link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
+    },
+  },
+
+  build: {
+    transpile: ["vuetify"],
+    /*
+     ** You can extend webpack config here
+     */
+    // extend(config, _) {
+    //   // config.module.rules.push({
+    //   //   test: /\.(txt|csv|conll|jsonl)$/i,
+    //   //   loader: 'file-loader',
+    //   //   options: {
+    //   //     name: '[path][name].[ext]'
+    //   //   }
+    //   // })
+    //   config.module.rules.push({
+    //     enforce: "pre",
+    //     test: /\.(txt|csv|json|jsonl)$/,
+    //     loader: "raw-loader",
+    //     exclude: /(node_modules)/,
+    //   });
+    //   config.module.rules.push({
+    //     test: /\.(ogg|mp3|wav|mpe?g)$/i,
+    //     loader: "file-loader",
+    //     options: {
+    //       name: "[path][name].[ext]",
+    //     },
+    //   });
+    // },
   },
 });
