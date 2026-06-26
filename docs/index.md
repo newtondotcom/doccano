@@ -23,6 +23,8 @@ To complete a labeling project with doccano:
 
 ## Quickstart
 
+> If you want to fastly spin Doccano using containers, read [our guide](./advanced/compose_quickstart.md)
+
 1. Install doccano with pip (Python 3.8+):
 
       ```bash
