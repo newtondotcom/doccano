@@ -20,11 +20,6 @@
             "description": "The value to use as the Django secret key.",
             "generator": "secret"
         },
-        "GOOGLE_TRACKING_ID": {
-            "description": "Google Analytics tracking id.",
-            "required": false,
-            "value": ""
-        },
         "DJANGO_SETTINGS_MODULE": {
             "description": "Django Settings Module. You don't have to change this.",
             "required": true,
