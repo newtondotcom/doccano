@@ -10,7 +10,7 @@ repository = "https://github.com/doccano/doccano"
 documentation = "https://doccano.github.io/doccano/"
 requires-python = ">=3.12"
 dependencies = [
-    "auto-labeling-pipeline>=0.1.23",
+    "auto-labeling-pipeline",
     "celery>=5.6.3",
     "chardet>=7.4.3",
     "dj-database-url>=3.1.2",
@@ -56,3 +56,6 @@ wait_for_db = "uv run manage.py wait_for_db"
 test = "uv run manage.py test --pattern=\"test*.py\""
 migrate = "uv run manage.py migrate"
 collectstatic = "uv run manage.py collectstatic --noinput"
+
+[tool.uv.sources]
+auto-labeling-pipeline={ path = "packages/auto-labeling-pipeline" }
