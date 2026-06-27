@@ -1,0 +1,274 @@
+<template>
+  <div id="app" style="width: 1000px; background-color: #eee">
+    <button @click="changeText">Change text</button>
+    <button @click="resetEntity">Reset entity</button>
+    <button @click="changeLabel">Change label</button>
+    <button @click="rtl = !rtl">Change RTL{{ rtl }}</button>
+    <button @click="allowOverlapping = !allowOverlapping">
+      Allow overlapping({{ allowOverlapping }})
+    </button>
+    <button @click="addRelation">Add relation</button>
+    <div style="width: 600px; display: inline-block">
+      <v-annotator
+        :allow-overlapping="allowOverlapping"
+        :text="text"
+        :entities="entities"
+        :entity-labels="entityLabels"
+        :grapheme-mode="graphemeMode"
+        :relations="relations"
+        :relation-labels="relationLabels"
+        :rtl="rtl"
+        :selected-entities="selectedEntities"
+        @add:entity="addEntity"
+        @click:entity="updateEntity"
+        @click:relation="updateRelation"
+        @contextmenu:entity="deleteEntity"
+        @contextmenu:relation="deleteRelation"
+      />
+    </div>
+    <div style="width: 400px; display: inline-block">
+      <v-annotator
+        :allow-overlapping="allowOverlapping"
+        :text="text2"
+        :entities="entities2"
+        :entity-labels="entityLabels"
+        :grapheme-mode="graphemeMode"
+        :relations="relations2"
+        :relation-labels="relationLabels"
+        :rtl="rtl"
+        @add:entity="addEntity2"
+        @contextmenu:entity="deleteEntity2"
+      />
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import VAnnotator from './components/VAnnotator.vue'
+import { type Entity } from './domain/models/Label/Entity'
+import { type Relation } from './domain/models/Label/Relation'
+
+interface EntityI {
+  id: number
+  user: number
+  label: number
+  startOffset: number
+  endOffset: number
+}
+
+defineOptions({
+  name: 'App',
+})
+
+const allowOverlapping = ref(false)
+const graphemeMode = ref(false)
+const id = ref(100)
+// text: "من ويكيبيديا، الموسوعة الحرة\nداستان SVG Tiny 1.2 طولا ني است.",
+// rtl: true,
+// text: "👶🏻👦🏻👧🏻👨🏻👩🏻👱🏻‍♀️👱🏻👴🏻👵🏻👲🏻👳🏻‍♀️👳🏻👮🏻‍♀️👮🏻👷🏻‍♀️👷🏻💂🏻‍♀️💂🏻🕵🏻‍♀️👩🏻‍⚕️👨🏻‍⚕️👩🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾"
+const rtl = ref(false)
+const text = ref(
+  'we must respect the will of the individual.\nTake it easy I can assure you that everything will turn out to be fine.\nThe president Obama.'.repeat(
+    1, //0000
+  ),
+)
+const entities = ref<EntityI[]>([
+  {
+    id: 0,
+    user: 0,
+    label: 0,
+    startOffset: 3,
+    endOffset: 7,
+  },
+  {
+    id: 4,
+    user: 0,
+    label: 0,
+    startOffset: 35,
+    endOffset: 46,
+  },
+  {
+    id: 1,
+    user: 0,
+    label: 1,
+    startOffset: 59,
+    endOffset: 62,
+  },
+  {
+    id: 6,
+    user: 0,
+    label: 1,
+    startOffset: 63,
+    endOffset: 69,
+  },
+  {
+    id: 7,
+    user: 0,
+    label: 1,
+    startOffset: 70,
+    endOffset: 73,
+  },
+  {
+    id: 2,
+    user: 0,
+    label: 0,
+    startOffset: 79,
+    endOffset: 89,
+  },
+  {
+    id: 3,
+    user: 0,
+    label: 1,
+    startOffset: 79,
+    endOffset: 94,
+  },
+  {
+    id: 5,
+    user: 0,
+    label: 1,
+    startOffset: 130,
+    endOffset: 135,
+  },
+])
+const relations = ref<Relation[]>([
+  {
+    id: 0,
+    fromId: 4,
+    toId: 0,
+    labelId: 0,
+  },
+  {
+    id: 2,
+    fromId: 5,
+    toId: 4,
+    labelId: 0,
+  },
+  {
+    id: 3,
+    fromId: 1,
+    toId: 6,
+    labelId: 1,
+  },
+  {
+    id: 4,
+    fromId: 1,
+    toId: 7,
+    labelId: 1,
+  },
+])
+const entityLabels = ref([
+  {
+    id: 0,
+    text: 'VeryLongLabelWithManyCharacters',
+    color: '#2196F3',
+  },
+  {
+    id: 1,
+    text: 'Ipsum',
+    color: '#F9A825',
+  },
+])
+const relationLabels = ref([
+  {
+    id: 0,
+    text: 'superLongRelationLabel',
+    color: '#ffffff',
+  },
+  {
+    id: 1,
+    text: 'isLivedIn',
+    color: '#ffffff',
+  },
+])
+
+const text2 = ref(
+  '👶🏻👦🏻👧🏻👨🏻👩🏻👱🏻‍♀️👱🏻👴🏻👵🏻👲🏻👳🏻‍♀️👳🏻👮🏻‍♀️👮🏻👷🏻‍♀️👷🏻💂🏻‍♀️💂🏻🕵🏻‍♀️👩🏻‍⚕️👨🏻‍⚕️👩🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾👨🏻‍🌾',
+)
+const entities2 = ref<EntityI[]>([])
+const relations2 = ref<Relation[]>([])
+
+// for (let i = 0; i < 10000; i++) {
+//   addEntity(i * 10 + 100, i * 10 + 105);
+// }
+
+const selectedEntities = computed(() => [entities.value[0], entities.value[1]])
+
+function addEntity(event: Event, startOffset: number, endOffset: number) {
+  entities.value.push({
+    id: id.value,
+    startOffset,
+    endOffset,
+    label: 0,
+    user: 0,
+  })
+  id.value++
+}
+
+function updateEntity(event: Event, entityId: number) {
+  const entity = entities.value.find((e) => e.id === entityId)
+  console.log(JSON.stringify(entity))
+  console.log(event)
+}
+
+function deleteEntity(entity: Entity) {
+  entities.value = entities.value.filter((e) => e.id !== entity.id)
+  relations.value.forEach((relation) => {
+    if (relation.fromId === entity.id || relation.toId === entity.id) {
+      deleteRelation(relation)
+    }
+  })
+}
+
+function changeText() {
+  text.value = 'The president Obama came to Japan.'
+  resetEntity()
+}
+
+function resetEntity() {
+  entities.value = []
+  resetRelation()
+}
+
+function changeLabel() {
+  entityLabels.value[0].color = '#FF5733'
+  entityLabels.value[0].text = 'Misc'
+}
+
+function addRelation() {
+  relations.value.push({
+    id: 1,
+    fromId: 1,
+    toId: 2,
+    labelId: 1,
+  })
+}
+
+function updateRelation(event: Event, relation: Relation) {
+  console.log(relation)
+  console.log(event)
+}
+
+function deleteRelation(relation: Relation) {
+  relations.value = relations.value.filter((r) => r.id !== relation.id)
+}
+
+function resetRelation() {
+  relations.value = []
+}
+
+function addEntity2(event: Event, startOffset: number, endOffset: number) {
+  entities2.value.push({
+    id: id.value,
+    startOffset,
+    endOffset,
+    label: 0,
+    user: 0,
+  })
+  id.value++
+}
+
+function deleteEntity2(entity: Entity) {
+  entities2.value = entities2.value.filter((e) => e.id !== entity.id)
+}
+</script>

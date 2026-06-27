@@ -1,0 +1,40 @@
+{
+  "name": "vue3-annotator",
+  "version": "0.1.31",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build"
+  },
+  "dependencies": {
+    "@flatten-js/interval-tree": "^2.0.3",
+    "grapheme-splitter": "^1.0.4",
+    "lodash-es": "^4.18.1",
+    "uuid": "^14.0.1",
+    "vue": "catalog:",
+    "vue-virtual-scroller": "^3.0.4"
+  },
+  "devDependencies": {
+    "@tsconfig/node24": "^24.0.4",
+    "@types/node": "^24.13.2",
+    "@vitejs/plugin-vue": "^6.0.7",
+    "@vue/tsconfig": "^0.9.1",
+    "jest": "^30.4.2",
+    "npm-run-all2": "^9.0.2",
+    "typescript": "~6.0.0",
+    "vite": "^8.0.16",
+    "vite-plugin-vue-devtools": "^8.1.2",
+    "vue-tsc": "^3.3.5"
+  },
+  "engines": {
+    "node": "^22.18.0 || >=24.12.0"
+  },
+  "browserslist": [
+    "defaults and fully supports es6-module",
+    "maintained node versions"
+  ]
+}
