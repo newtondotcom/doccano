@@ -25,19 +25,23 @@
         />
       </template>
       <template #[`item.text`]="{ item }">
-        <v-edit-dialog>
-          <span class="title" style="font-weight: 400">
-            {{ item.text }}
-          </span>
-          <template #input>
-            <v-textarea
-              :value="item.text"
-              :label="$t('generic.edit')"
-              autofocus
-              @change="update(item.id, $event)"
-            />
+        <v-menu :close-on-content-click="false" location="bottom">
+          <template #activator="{ props }">
+            <span class="title" style="font-weight: 400; cursor: pointer" v-bind="props">
+              {{ item.text }}
+            </span>
           </template>
-        </v-edit-dialog>
+          <template #default="{ isActive }">
+            <v-card min-width="300" class="pa-4">
+              <v-textarea
+                :model-value="item.text"
+                :label="$t('generic.edit')"
+                autofocus
+                @change="update(item.id, $event.target.value); isActive.value = false"
+              />
+            </v-card>
+          </template>
+        </v-menu>
       </template>
       <template #[`item.action`]="{ item }">
         <v-icon small @click="remove(item.id)">

@@ -1,9 +1,11 @@
 <template>
   <div class="v-data-footer">
-    <v-edit-dialog large persistent @save="changePageNumber">
-      <span>{{ value }} of {{ total }}</span>
-      <template #input>
-        <div class="mt-4 title">Move Page</div>
+    <v-menu :close-on-content-click="false" location="bottom" v-model="isMenuOpen">
+      <template #activator="{ props }">
+        <span v-bind="props" style="cursor: pointer;">{{ value }} of {{ total }}</span>
+      </template>
+      <v-card min-width="250" class="pa-4">
+        <div class="title mb-2">Move Page</div>
         <v-text-field
           v-model="editedPage"
           :rules="rules"
@@ -11,9 +13,14 @@
           single-line
           counter
           autofocus
+          @keyup.enter="saveAndClose"
         />
-      </template>
-    </v-edit-dialog>
+        <v-card-actions class="justify-end pa-0 mt-2">
+          <v-btn variant="text" @click="isMenuOpen = false">Cancel</v-btn>
+          <v-btn color="primary" variant="text" @click="saveAndClose">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-menu>
     <v-btn
       v-shortkey.once="['shift', 'arrowleft']"
       :disabled="isFirstPage"
@@ -79,11 +86,23 @@ const props = defineProps({
 
 const emit = defineEmits(["click:prev", "click:next", "click:first", "click:last", "click:jump"]);
 
+const isMenuOpen = ref(false);
 const editedPage = ref("1");
 const rules = [
   (v: string) =>
     (v && parseInt(v, 10) > 0 && parseInt(v, 10) <= props.total) || "Invalid page number!",
 ];
+
+watch(isMenuOpen, (val) => {
+  if (val) {
+    editedPage.value = props.value.toString();
+  }
+});
+
+function saveAndClose() {
+  changePageNumber();
+  isMenuOpen.value = false;
+}
 
 const isFirstPage = computed(() => props.value === 1);
 const isLastPage = computed(() => props.value === props.total || props.total === 0);
