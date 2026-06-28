@@ -8,7 +8,6 @@
       hide-default-footer
       disable-pagination
       class="elevation-1"
-      @input="update"
     >
       <template #top>
         <v-text-field
@@ -25,22 +24,28 @@
         />
       </template>
       <template #[`item.text`]="{ item }">
-        <v-menu :close-on-content-click="false" location="bottom">
+        <v-menu
+          v-model="openMenus[item.id]"
+          :close-on-content-click="false"
+          location="bottom"
+          @update:model-value="(v) => { if (v) onMenuOpen(item) }"
+        >
           <template #activator="{ props }">
             <span class="title" style="font-weight: 400; cursor: pointer" v-bind="props">
               {{ item.text }}
             </span>
           </template>
-          <template #default="{ isActive }">
-            <v-card min-width="300" class="pa-4">
-              <v-textarea
-                :model-value="item.text"
-                :label="$t('generic.edit')"
-                autofocus
-                @change="update(item.id, $event.target.value); isActive.value = false"
-              />
-            </v-card>
-          </template>
+          <v-card min-width="300" class="pa-4">
+            <v-textarea
+              v-model="editingText"
+              :label="$t('generic.edit')"
+              autofocus
+            />
+            <v-card-actions class="justify-end pa-0 mt-2">
+              <v-btn variant="text" @click="openMenus[item.id] = false">{{ $t('generic.cancel') }}</v-btn>
+              <v-btn color="primary" variant="text" @click="saveEdit(item.id); openMenus[item.id] = false">{{ $t('generic.save') }}</v-btn>
+            </v-card-actions>
+          </v-card>
         </v-menu>
       </template>
       <template #[`item.action`]="{ item }">
@@ -66,6 +71,8 @@ defineProps({
 const emit = defineEmits(["update:annotation", "create:annotation", "delete:annotation"]);
 
 const newText = ref("");
+const editingText = ref("");
+const openMenus = ref<Record<number, boolean>>({});
 const headers = [
   {
     text: "Text",
@@ -80,6 +87,14 @@ const headers = [
 ];
 const isComposing = ref(false);
 const hasCompositionJustEnded = ref(false);
+
+function onMenuOpen(item: any) {
+  editingText.value = item.text;
+}
+
+function saveEdit(annotationId: number) {
+  update(annotationId, editingText.value);
+}
 
 function update(annotationId: number, text: string) {
   if (text.length > 0) {
