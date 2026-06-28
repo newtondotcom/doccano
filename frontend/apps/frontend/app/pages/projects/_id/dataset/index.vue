@@ -86,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import _ from "lodash";
+import { debounce } from "@/utils/debounce";
 import { useMainStore as useProjectsStore } from "@/store/projects";
 import { getLinkToAnnotationPage } from "@/presenter/linkToAnnotationPage";
 import { ExampleDTO, ExampleListDTO } from "@/services/application/example/exampleData";
@@ -143,7 +143,7 @@ async function load() {
 
 watch(
   () => route.query,
-  _.debounce(() => {
+  debounce(() => {
     load();
   }, 1000),
   { immediate: true, deep: true },

@@ -5,7 +5,7 @@ export class ConfigItemList {
     return new ConfigItemList(items);
   }
 
-  toArray(): Object[] {
+  toArray(): object[] {
     return this.configItems.map((item) => item.toObject());
   }
 }

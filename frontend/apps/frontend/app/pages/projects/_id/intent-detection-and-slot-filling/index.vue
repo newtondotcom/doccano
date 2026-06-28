@@ -47,7 +47,6 @@
 </template>
 
 <script setup>
-import _ from "lodash";
 import { useMainStore as useConfigStore } from "@/store/config";
 import { Category } from "@/domain/models/tasks/category";
 
@@ -80,7 +79,7 @@ const shortKeys = computed(() =>
 );
 
 const doc = computed(() => {
-  if (_.isEmpty(docs.value) || docs.value.items.length === 0) {
+  if (!docs.value?.items?.length) {
     return {};
   }
   return docs.value.items[0];

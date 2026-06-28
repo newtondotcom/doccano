@@ -3,6 +3,25 @@
   "version": "0.1.31",
   "private": true,
   "type": "module",
+  "main": "./dist/vue3-annotator.js",
+  "module": "./dist/vue3-annotator.js",
+  "exports": {
+    ".": {
+      "import": "./dist/vue3-annotator.js",
+      "default": "./dist/vue3-annotator.js"
+    },
+    "./dist/vue3-annotator.css": "./dist/vue3-annotator.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "Vue",
+    "Vue.js",
+    "NLP",
+    "Natural Language Processing",
+    "Annotation"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
@@ -13,7 +32,6 @@
   "dependencies": {
     "@flatten-js/interval-tree": "^2.0.3",
     "grapheme-splitter": "^1.0.4",
-    "lodash-es": "^4.18.1",
     "uuid": "^14.0.1",
     "vue": "catalog:",
     "vue-virtual-scroller": "^3.0.4"

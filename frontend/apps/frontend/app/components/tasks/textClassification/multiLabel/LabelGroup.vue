@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import _ from "lodash";
+
 
 const props = defineProps({
   labels: {
@@ -40,11 +40,11 @@ const annotatedLabel = computed(() => {
 
 function addOrRemove(indexes) {
   if (indexes.length > annotatedLabel.value.length) {
-    const index = _.difference(indexes, annotatedLabel.value);
+    const index = indexes.find((i) => !annotatedLabel.value.includes(i));
     const label = props.labels[index];
     add(label);
   } else {
-    const index = _.difference(annotatedLabel.value, indexes);
+    const index = annotatedLabel.value.find((i) => !indexes.includes(i));
     const label = props.labels[index];
     remove(label);
   }

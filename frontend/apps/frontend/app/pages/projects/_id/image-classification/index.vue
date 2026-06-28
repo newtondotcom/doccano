@@ -55,7 +55,6 @@
 
 <script setup>
 import { mdiFormatListBulleted, mdiText } from "@mdi/js";
-import _ from "lodash";
 import { useLabelList } from "@/composables/useLabelList";
 import { Category } from "@/domain/models/tasks/category";
 
@@ -86,7 +85,7 @@ const progress = ref({});
 const projectId = computed(() => route.params.id);
 
 const image = computed(() => {
-  if (_.isEmpty(images.value) || images.value.items.length === 0) {
+  if (!images.value?.items?.length) {
     return {};
   }
   return images.value.items[0];

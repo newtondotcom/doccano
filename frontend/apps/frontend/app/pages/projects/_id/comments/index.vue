@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import _ from "lodash";
+import { debounce } from "@/utils/debounce";
 import { useMainStore as useProjectsStore } from "@/store/projects";
 import { CommentItem } from "@/domain/models/comment/comment";
 import { Page } from "@/domain/models/page";
@@ -62,7 +62,7 @@ async function load() {
 
 watch(
   () => route.query,
-  _.debounce(() => {
+  debounce(() => {
     load();
   }, 1000),
   { immediate: true, deep: true },

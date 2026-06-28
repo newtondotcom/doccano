@@ -71,7 +71,6 @@
 </template>
 
 <script setup>
-import _ from "lodash";
 import { useLabelList } from "@/composables/useLabelList";
 
 definePageMeta({
@@ -101,7 +100,7 @@ const scale = ref(1);
 const projectId = computed(() => route.params.id);
 
 const image = computed(() => {
-  if (_.isEmpty(images.value) || images.value.items.length === 0) {
+  if (!images.value?.items?.length) {
     return {};
   }
   return images.value.items[0];

@@ -13,7 +13,7 @@
 import "@/assets/style/editor.css";
 import { Editor } from "@toast-ui/vue-editor";
 import "codemirror/lib/codemirror.css";
-import _ from "lodash";
+import { debounce } from "@/utils/debounce";
 // import 'tui-editor/dist/tui-editor-contents.css'
 // import 'tui-editor/dist/tui-editor.css'
 
@@ -43,7 +43,7 @@ onMounted(async () => {
   mounted.value = true;
 });
 
-const updateProject = _.debounce(() => {
+const updateProject = debounce(() => {
   if (mounted.value) {
     project.value.guideline = toastuiEditor.value.invoke("getMarkdown");
     $services.project.update(route.params.id, project.value);

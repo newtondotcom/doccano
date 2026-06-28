@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { debounce } from 'lodash-es'
+import { debounce } from '@/utils/debounce'
 import { v4 as uuidv4 } from 'uuid'
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import VLine from './VLine.vue'

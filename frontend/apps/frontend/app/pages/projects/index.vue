@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import _ from "lodash";
+import { debounce } from "@/utils/debounce";
 import { useMainStore as useAuthStore } from "@/store/auth";
 import { Page } from "@/domain/models/page";
 import { Project } from "@/domain/models/project/project";
@@ -63,7 +63,7 @@ async function load() {
 
 watch(
   () => route.query,
-  _.debounce(() => {
+  debounce(() => {
     load();
   }, 1000),
   { immediate: true, deep: true },

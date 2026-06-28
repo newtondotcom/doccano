@@ -2,7 +2,6 @@ declare module '*.vue' {
   import Vue from 'vue'
   export default Vue
 }
-declare module 'lodash-es'
 declare module 'unicode-bidirectional'
 declare module 'vue-virtual-scroller' {
   import Vue, { ComponentOptions, PluginObject, Component } from 'vue'
