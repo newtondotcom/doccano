@@ -9,7 +9,7 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
-    "oxfmt": "^0.56.0",
+    "oxfmt": "^0.57.0",
     "oxlint": "^1.71.0",
     "turbo": "^2.10.0",
     "typescript": "5.9.2",
