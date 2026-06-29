@@ -16,6 +16,7 @@
     "apps/docs": {
       "name": "doccano-docs",
       "devDependencies": {
+        "vitepress": "^2.0.0-alpha.17",
         "vue": "catalog:",
       },
     },
