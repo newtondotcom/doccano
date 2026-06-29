@@ -232,10 +232,10 @@ uv sync
 Second, set up the database and run the development server. Doccano uses [Django](https://www.djangoproject.com/) and [Django Rest Framework](https://www.django-rest-framework.org/) as a backend. We can set up them by using Django command:
 
 ```bash
-uv run manage.py migrate
-uv run manage.py create_roles
-uv run manage.py create_admin --noinput --username "admin" --email "admin@example.com" --password "password"
-uv run manage.py runserver
+uv run src/manage.py migrate
+uv run src/manage.py create_roles
+uv run src/manage.py create_admin --noinput --username "admin" --email "admin@example.com" --password "password"
+uv run src/manage.py runserver
 ```
 
 In another terminal, you need to run Celery to use import/export dataset feature:
@@ -313,10 +313,10 @@ pip install doccano-1.5.5.post335.dev0+6be6d198-py3-none-any.whl
 
 doccano also supports one-click deployment to cloud providers. Click the following button, configure the environment, and access the UI.
 
-| Service | Button |
-|---------|---|
-| AWS   | [![AWS CloudFormation Launch Stack SVG Button](https://cdn.rawgit.com/buildkite/cloudformation-launch-stack-button-svg/master/launch-stack.svg)](https://console.aws.amazon.com/cloudformation/home?#/stacks/new?stackName=doccano&templateURL=https://doccano.s3.amazonaws.com/public/cloudformation/template.aws.yaml)  |
-| Heroku  | [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://dashboard.heroku.com/new?template=https%3A%2F%2Fgithub.com%2Fdoccano%2Fdoccano)  |
+| Service | Button                                                                                                                                                                                                                                                                                                                   |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| AWS     | [![AWS CloudFormation Launch Stack SVG Button](https://cdn.rawgit.com/buildkite/cloudformation-launch-stack-button-svg/master/launch-stack.svg)](https://console.aws.amazon.com/cloudformation/home?#/stacks/new?stackName=doccano&templateURL=https://doccano.s3.amazonaws.com/public/cloudformation/template.aws.yaml) |
+| Heroku  | [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://dashboard.heroku.com/new?template=https%3A%2F%2Fgithub.com%2Fdoccano%2Fdoccano)                                                                                                                                                                         |
 
 ## Upgrade doccano
 

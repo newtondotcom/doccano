@@ -1,45 +1,45 @@
-import GraphemeSplitter from 'grapheme-splitter'
+import GraphemeSplitter from "grapheme-splitter";
 
 export class Text {
-  private graphemes: string[] = []
-  private g2c: Map<number, number> = new Map()
-  private c2g: Map<number, number> = new Map()
-  private idx2len: Map<number, number> = new Map()
+  private graphemes: string[] = [];
+  private g2c: Map<number, number> = new Map();
+  private c2g: Map<number, number> = new Map();
+  private idx2len: Map<number, number> = new Map();
 
   constructor(readonly text: string) {
-    this.setGraphemeMapping()
-    this.setCodePointMapping()
-    this.setWordBoundary()
+    this.setGraphemeMapping();
+    this.setCodePointMapping();
+    this.setWordBoundary();
   }
 
   private setCodePointMapping() {
     for (const [graphemeOffset, codeOffset] of this.g2c) {
-      this.c2g.set(codeOffset, graphemeOffset)
+      this.c2g.set(codeOffset, graphemeOffset);
     }
   }
 
   private setGraphemeMapping() {
-    const splitter = new GraphemeSplitter()
-    this.graphemes = splitter.splitGraphemes(this.text)
-    let total = 0
+    const splitter = new GraphemeSplitter();
+    this.graphemes = splitter.splitGraphemes(this.text);
+    let total = 0;
     for (let i = 0; i < this.graphemeLength; i++) {
-      this.g2c.set(i, total)
-      total += this.graphemeAt(i).length
+      this.g2c.set(i, total);
+      total += this.graphemeAt(i).length;
     }
-    this.g2c.set(this.graphemeLength, total)
+    this.g2c.set(this.graphemeLength, total);
   }
 
   private setWordBoundary() {
-    let index = 0
-    const words = this.text.split(/\s/)
+    let index = 0;
+    const words = this.text.split(/\s/);
     for (let i = 0; i < words.length; i++) {
-      const word = words[i] ?? ''
-      if (word === '') {
-        index++
-        continue
+      const word = words[i] ?? "";
+      if (word === "") {
+        index++;
+        continue;
       } else {
-        this.idx2len.set(index, word.length)
-        index += word.length + 1 // +1 is whitespace.
+        this.idx2len.set(index, word.length);
+        index += word.length + 1; // +1 is whitespace.
       }
     }
   }
@@ -51,8 +51,8 @@ export class Text {
    * @returns {(string | undefined)} - a word or undefined.
    */
   getWord(index: number): string | undefined {
-    const len = this.idx2len.get(index)
-    return len ? this.text.substr(index, len) : undefined
+    const len = this.idx2len.get(index);
+    return len ? this.text.substr(index, len) : undefined;
   }
 
   /**
@@ -62,7 +62,7 @@ export class Text {
    * @returns {(number | undefined)} - A graphemeOffset or undefined.
    */
   toGraphemeOffset(codePointOffset: number): number | undefined {
-    return this.c2g.get(codePointOffset)
+    return this.c2g.get(codePointOffset);
   }
 
   /**
@@ -71,7 +71,7 @@ export class Text {
    * @returns {(number | undefined)} - A codePointOffset or undefined.
    */
   toCodePointOffset(graphemeOffset: number): number | undefined {
-    return this.g2c.get(graphemeOffset)
+    return this.g2c.get(graphemeOffset);
   }
 
   /**
@@ -82,9 +82,9 @@ export class Text {
    */
   graphemeAt(index: number): string {
     if (0 <= index && index < this.graphemeLength) {
-      return this.graphemes[index] ?? ''
+      return this.graphemes[index] ?? "";
     } else {
-      return ''
+      return "";
     }
   }
 
@@ -95,7 +95,7 @@ export class Text {
    * @returns {string} - A character.
    */
   charAt(index: number): string {
-    return this.text.charAt(index)
+    return this.text.charAt(index);
   }
 
   /**
@@ -103,7 +103,7 @@ export class Text {
    * @returns {number} - text length.
    */
   get graphemeLength(): number {
-    return this.graphemes.length
+    return this.graphemes.length;
   }
 
   /**
@@ -111,7 +111,7 @@ export class Text {
    * @returns {number} - text length.
    */
   get codePointLength(): number {
-    return this.text.length
+    return this.text.length;
   }
 
   /**
@@ -121,6 +121,6 @@ export class Text {
    * @returns {string} - text.
    */
   substr(from: number, length: number): string {
-    return this.text.substr(from, length)
+    return this.text.substr(from, length);
   }
 }

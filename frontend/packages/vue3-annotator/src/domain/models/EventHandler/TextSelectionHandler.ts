@@ -1,6 +1,6 @@
-import { TextLine } from '../Line/LineText'
-import { Entities } from '../Label/Entity'
-import { Text } from '../Label/Text'
+import { TextLine } from "../Line/LineText";
+import { Entities } from "../Label/Entity";
+import { Text } from "../Label/Text";
 
 export class TextSelector {
   constructor(
@@ -15,56 +15,56 @@ export class TextSelector {
    * @returns {[number, number]} - The offsets of the selected text.
    */
   getOffsets(entities: Entities, text: Text): [number, number] {
-    const [startOffset, endOffset] = this.getRange()
+    const [startOffset, endOffset] = this.getRange();
     if (this.validate(startOffset, endOffset, entities)) {
-      return this.convert(startOffset, endOffset, text)
+      return this.convert(startOffset, endOffset, text);
     } else {
-      throw RangeError(`[${startOffset}, ${endOffset}] is invalid.`)
+      throw RangeError(`[${startOffset}, ${endOffset}] is invalid.`);
     }
   }
 
   private getRange(): [number, number] {
-    const selection = window.getSelection()
+    const selection = window.getSelection();
     // get elements.
-    const startElement = selection!.anchorNode!.parentNode
-    const endElement = selection!.focusNode!.parentNode
+    const startElement = selection!.anchorNode!.parentNode;
+    const endElement = selection!.focusNode!.parentNode;
 
     // Get TextLine objects.
     // This depends on BaseText.vue component.
     // See the component in detail.
-    const startLine = (startElement as unknown as { annotatorElement: TextLine }).annotatorElement
-    const endLine = (endElement as unknown as { annotatorElement: TextLine }).annotatorElement
+    const startLine = (startElement as unknown as { annotatorElement: TextLine }).annotatorElement;
+    const endLine = (endElement as unknown as { annotatorElement: TextLine }).annotatorElement;
 
     // get offsets.
-    const startOffset = startLine.startOffset + selection!.anchorOffset
-    const endOffset = endLine.startOffset + selection!.focusOffset
+    const startOffset = startLine.startOffset + selection!.anchorOffset;
+    const endOffset = endLine.startOffset + selection!.focusOffset;
 
-    selection?.removeAllRanges()
+    selection?.removeAllRanges();
     if (startOffset > endOffset) {
-      return [endOffset, startOffset]
+      return [endOffset, startOffset];
     } else {
-      return [startOffset, endOffset]
+      return [startOffset, endOffset];
     }
   }
 
   private validate(startOffset: number, endOffset: number, entities: Entities): boolean {
     if (startOffset >= endOffset) {
-      return false
+      return false;
     }
     if (this.allowOverlapping) {
-      return true
+      return true;
     }
     if (entities.intersectAny(startOffset, endOffset)) {
-      return false
+      return false;
     }
-    return true
+    return true;
   }
 
   private convert(startOffset: number, endOffset: number, text: Text): [number, number] {
     if (this.graphemeMode) {
-      return [text.toGraphemeOffset(startOffset)!, text.toGraphemeOffset(endOffset)!]
+      return [text.toGraphemeOffset(startOffset)!, text.toGraphemeOffset(endOffset)!];
     } else {
-      return [startOffset, endOffset]
+      return [startOffset, endOffset];
     }
   }
 }

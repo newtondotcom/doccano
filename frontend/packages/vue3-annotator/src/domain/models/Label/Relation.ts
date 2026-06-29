@@ -1,12 +1,12 @@
-import { Entity, Entities } from './Entity'
-import { type Identifiable } from './Identifiable'
-import IntervalTree from '@flatten-js/interval-tree'
+import { Entity, Entities } from "./Entity";
+import { type Identifiable } from "./Identifiable";
+import IntervalTree from "@flatten-js/interval-tree";
 
 export interface Relation {
-  id: number
-  labelId: number
-  fromId: number
-  toId: number
+  id: number;
+  labelId: number;
+  fromId: number;
+  toId: number;
 }
 
 export class RelationListItem implements Identifiable {
@@ -28,7 +28,7 @@ export class RelationListItem implements Identifiable {
       (startOffset <= this.startOffset && this.startOffset < endOffset) ||
       (startOffset < this.endOffset && this.endOffset <= endOffset) ||
       (this.startOffset < startOffset && endOffset < this.endOffset)
-    )
+    );
   }
 
   /**
@@ -37,7 +37,7 @@ export class RelationListItem implements Identifiable {
    * @returns {boolean} - true if the entity is a part of the relation, otherwise false.
    */
   consistOf(entity: Entity): boolean {
-    return this.fromEntity.equalTo(entity) || this.toEntity.equalTo(entity)
+    return this.fromEntity.equalTo(entity) || this.toEntity.equalTo(entity);
   }
 
   /**
@@ -50,7 +50,7 @@ export class RelationListItem implements Identifiable {
    * @returns {boolean} - the result.
    */
   isOpenOnLeft(startOffset: number): boolean {
-    return this.startOffset < startOffset
+    return this.startOffset < startOffset;
   }
 
   /**
@@ -63,8 +63,8 @@ export class RelationListItem implements Identifiable {
    * @returns {boolean} - the result.
    */
   isOpenOnRight(endOffset: number): boolean {
-    const offset = Math.max(this.fromEntity.startOffset, this.toEntity.startOffset)
-    return offset >= endOffset
+    const offset = Math.max(this.fromEntity.startOffset, this.toEntity.startOffset);
+    return offset >= endOffset;
   }
 
   /**
@@ -75,8 +75,8 @@ export class RelationListItem implements Identifiable {
    * @returns {boolean} - the result.
    */
   isVisible(startOffset: number): boolean {
-    const offset = Math.max(this.fromEntity.startOffset, this.toEntity.startOffset)
-    return startOffset <= offset
+    const offset = Math.max(this.fromEntity.startOffset, this.toEntity.startOffset);
+    return startOffset <= offset;
   }
 
   /**
@@ -84,7 +84,7 @@ export class RelationListItem implements Identifiable {
    * @returns {number} - the width between each entity.
    */
   get width(): number {
-    return Math.abs(this.fromEntity.center - this.toEntity.center)
+    return Math.abs(this.fromEntity.center - this.toEntity.center);
   }
 
   /**
@@ -93,7 +93,7 @@ export class RelationListItem implements Identifiable {
    * @returns {number} - the start offset.
    */
   get startOffset(): number {
-    return Math.min(this.fromEntity.startOffset, this.toEntity.startOffset)
+    return Math.min(this.fromEntity.startOffset, this.toEntity.startOffset);
   }
 
   /**
@@ -102,19 +102,19 @@ export class RelationListItem implements Identifiable {
    * @returns {number} - the end offset.
    */
   get endOffset(): number {
-    return Math.max(this.fromEntity.endOffset, this.toEntity.endOffset)
+    return Math.max(this.fromEntity.endOffset, this.toEntity.endOffset);
   }
 }
 
 export class RelationList {
-  private tree: IntervalTree<RelationListItem> = new IntervalTree()
+  private tree: IntervalTree<RelationListItem> = new IntervalTree();
 
   constructor(relations: Relation[], entities: Entities) {
     for (const relation of relations) {
-      const fromEntity = entities.findById(relation.fromId)!
-      const toEntity = entities.findById(relation.toId)!
-      const item = new RelationListItem(relation.id, relation.labelId, fromEntity, toEntity)
-      this.tree.insert([item.startOffset, item.endOffset], item)
+      const fromEntity = entities.findById(relation.fromId)!;
+      const toEntity = entities.findById(relation.toId)!;
+      const item = new RelationListItem(relation.id, relation.labelId, fromEntity, toEntity);
+      this.tree.insert([item.startOffset, item.endOffset], item);
     }
   }
 
@@ -127,6 +127,6 @@ export class RelationList {
   filterByRange(startOffset: number, endOffset: number): RelationListItem[] {
     return this.tree
       .search([startOffset, endOffset])
-      .filter((rel: RelationListItem) => rel.isIn(startOffset, endOffset))
+      .filter((rel: RelationListItem) => rel.isIn(startOffset, endOffset));
   }
 }

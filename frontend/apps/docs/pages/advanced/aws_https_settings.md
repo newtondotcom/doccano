@@ -1,12 +1,12 @@
 # HTTPS settings for doccano in AWS
 
-1. Create hosted zone in Route 53 
+1. Create hosted zone in Route 53
 2. Create certificate in ACM
 3. Create EC2 instance
 4. Create ELB
 5. Create A record in Route 53
 
-## Create hosted zone in Route 53  
+## Create hosted zone in Route 53
 
 HTTPS need a domain name. If you don't have one, you can register it by the AWS Route 53 service, or you can get one from other domain seller.
 

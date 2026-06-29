@@ -1,6 +1,6 @@
-import IntervalTree from '@flatten-js/interval-tree'
-import { Text } from './Text'
-import { type Identifiable } from './Identifiable'
+import IntervalTree from "@flatten-js/interval-tree";
+import { Text } from "./Text";
+import { type Identifiable } from "./Identifiable";
 
 export class Entity implements Identifiable {
   constructor(
@@ -12,7 +12,7 @@ export class Entity implements Identifiable {
     if (startOffset > endOffset) {
       throw new RangeError(
         `The startOffset(${startOffset}) must be smaller than endOffset(${endOffset}).`,
-      )
+      );
     }
   }
 
@@ -27,7 +27,7 @@ export class Entity implements Identifiable {
       (startOffset <= this.startOffset && this.startOffset < endOffset) ||
       (startOffset < this.endOffset && this.endOffset <= endOffset) ||
       (this.startOffset < startOffset && endOffset < this.endOffset)
-    )
+    );
   }
 
   /**
@@ -36,7 +36,7 @@ export class Entity implements Identifiable {
    * @returns {boolean}
    */
   equalTo(other: Entity): boolean {
-    return this.id === other.id
+    return this.id === other.id;
   }
 
   /**
@@ -45,7 +45,7 @@ export class Entity implements Identifiable {
    * @returns {boolean} - true if offset <= this.startOffset.
    */
   startsAfter(offset: number): boolean {
-    return offset <= this.startOffset
+    return offset <= this.startOffset;
   }
 
   /**
@@ -53,18 +53,18 @@ export class Entity implements Identifiable {
    * This is used to calculate the width of the relation.
    */
   get center(): number {
-    return this.startOffset + (this.endOffset - this.startOffset) / 2
+    return this.startOffset + (this.endOffset - this.startOffset) / 2;
   }
 }
 
 export class Entities {
-  private tree: IntervalTree<Entity> = new IntervalTree()
-  private id2entity: Map<number, Entity> = new Map()
+  private tree: IntervalTree<Entity> = new IntervalTree();
+  private id2entity: Map<number, Entity> = new Map();
 
   constructor(entities: Entity[]) {
     for (const entity of entities) {
-      this.tree.insert([entity.startOffset, entity.endOffset], entity)
-      this.id2entity.set(entity.id, entity)
+      this.tree.insert([entity.startOffset, entity.endOffset], entity);
+      this.id2entity.set(entity.id, entity);
     }
   }
 
@@ -79,7 +79,7 @@ export class Entities {
             text ? text.toCodePointOffset(entity.endOffset)! : entity.endOffset,
           ),
       ),
-    )
+    );
   }
 
   /**
@@ -87,7 +87,7 @@ export class Entities {
    * @returns {number} - The number of entities.
    */
   get size(): number {
-    return this.tree.size
+    return this.tree.size;
   }
 
   /**
@@ -97,7 +97,7 @@ export class Entities {
    * @returns {(Entity | undefined)} - Entity if match is found, otherwise undefined.
    */
   findById(id: number): Entity | undefined {
-    return this.id2entity.get(id)!
+    return this.id2entity.get(id)!;
   }
 
   /**
@@ -109,7 +109,7 @@ export class Entities {
   filterByRange(startOffset: number, endOffset: number): Entity[] {
     return this.tree
       .search([startOffset, endOffset])
-      .filter((entity: Entity) => entity.isIn(startOffset, endOffset))
+      .filter((entity: Entity) => entity.isIn(startOffset, endOffset));
   }
 
   /**
@@ -119,6 +119,6 @@ export class Entities {
    * @returns {boolean} - true if intersection found, otherwise false.
    */
   intersectAny(startOffset: number, endOffset: number): boolean {
-    return this.filterByRange(startOffset, endOffset).length > 0
+    return this.filterByRange(startOffset, endOffset).length > 0;
   }
 }

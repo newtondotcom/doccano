@@ -25,13 +25,13 @@ To complete a labeling project with doccano:
 
 > If you want to fastly spin Doccano using containers, read [our guide](./advanced/compose_quickstart.md)
 
-1. Install doccano with pip (Python 3.8+):
+1.  Install doccano with pip (Python 3.8+):
 
-      ```bash
-      pip install doccano
-      ```
+    ```bash
+    pip install doccano
+    ```
 
-2. Run doccano:
+2.  Run doccano:
 
          doccano init
          doccano createuser
@@ -39,28 +39,29 @@ To complete a labeling project with doccano:
          # In another terminal, run the command:
          doccano task
 
-3. Open the doccano UI at <http://localhost:8000/auth>.
-4. Sign in with the username and password created by `doccano createuser`.
+3.  Open the doccano UI at <http://localhost:8000/auth>.
+4.  Sign in with the username and password created by `doccano createuser`.
 
-      The default is **username:** admin, **password:** password.
+    The default is **username:** admin, **password:** password.
 
-5. Change the default admin password at <http://localhost:8000/admin/password_change/>.
-6. Return to the doccano UI at <http://localhost:8000/projects?>. 
-7. Create a project for labeling data. Click **Create**, select a project type, and fill out project details.
-8. Import a dataset. Go to the **Dataset** page and click **Actions** >  **Import Dataset** and import the dataset you want to use.
-9. Click **Annotate** and label the data.
+5.  Change the default admin password at <http://localhost:8000/admin/password_change/>.
+6.  Return to the doccano UI at <http://localhost:8000/projects?>.
+7.  Create a project for labeling data. Click **Create**, select a project type, and fill out project details.
+8.  Import a dataset. Go to the **Dataset** page and click **Actions** > **Import Dataset** and import the dataset you want to use.
+9.  Click **Annotate** and label the data.
 10. When you're finished, export the labeled dataset. Go to the **Dataset** page and click **Actions** > **Export dataset**.
 
 ## Architecture
 
 You can customize doccano to suit your needs. The architecture of doccano consists of two parts: backend and frontend.
 
-|      Module      |                 Technology                  |                Description                 |
-| ---------------- | ------------------------------------------- | ------------------------------------------ |
-| [doccano backend](https://github.com/doccano/doccano/tree/master/backend)  | Python, [Django](https://www.djangoproject.com/), and [Django Rest Framework](https://www.django-rest-framework.org/)   | Perform data labeling via REST APIs.              |
-| [doccano frontend](https://github.com/doccano/doccano/tree/master/frontend) | Javascript web app using [Vue.js](https://vuejs.org/) and [Nuxt.js](https://nuxtjs.org/) | Perform data labeling in a user interface. |
+| Module                                                                      | Technology                                                                                                            | Description                                |
+| --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| [doccano backend](https://github.com/doccano/doccano/tree/master/backend)   | Python, [Django](https://www.djangoproject.com/), and [Django Rest Framework](https://www.django-rest-framework.org/) | Perform data labeling via REST APIs.       |
+| [doccano frontend](https://github.com/doccano/doccano/tree/master/frontend) | Javascript web app using [Vue.js](https://vuejs.org/) and [Nuxt.js](https://nuxtjs.org/)                              | Perform data labeling in a user interface. |
 
 ## Contact
+
 If you get stuck, check the [FAQ](faq.md).
 
 For help and feedback, feel free to contact [the author](https://github.com/Hironsan).

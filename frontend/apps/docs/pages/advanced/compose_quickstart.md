@@ -16,6 +16,7 @@ docker compose -f docker/compose.prod.yml up --build
 ```
 
 This will start:
+
 - The Django backend
 - The frontend UI
 - The Celery worker (required for export)
@@ -28,6 +29,7 @@ Open [http://localhost:8000](http://localhost:8000) in your browser.
 ## 4. Create a Superuser
 
 In a new terminal, run:
+
 ```bash
 docker compose -f docker/compose.prod.yml exec backend python manage.py createsuperuser
 ```
@@ -40,6 +42,7 @@ docker compose -f docker/compose.prod.yml exec backend python manage.py createsu
 ## 6. Stopping Doccano
 
 To stop all services:
+
 ```bash
 docker compose -f docker/compose.prod.yml down
 ```

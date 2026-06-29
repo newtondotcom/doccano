@@ -1,11 +1,11 @@
-import config from '@/domain/models/Config/Config'
-import { type Identifiable } from './Identifiable'
+import config from "@/domain/models/Config/Config";
+import { type Identifiable } from "./Identifiable";
 
 export interface Label {
-  readonly id: number
-  readonly text: string
-  readonly color?: string
-  readonly backgroundColor?: string
+  readonly id: number;
+  readonly text: string;
+  readonly color?: string;
+  readonly backgroundColor?: string;
 }
 
 export class LabelListItem implements Identifiable {
@@ -18,58 +18,58 @@ export class LabelListItem implements Identifiable {
   ) {}
 
   get width(): number {
-    return this.textWidth
+    return this.textWidth;
   }
 
   get truncatedText(): string {
     if (this.text.length <= this.maxLength) {
-      return this.text
+      return this.text;
     } else {
-      return `${this.text.slice(0, this.maxLength)}...`
+      return `${this.text.slice(0, this.maxLength)}...`;
     }
   }
 
   get truncatedWidth(): number {
-    const meanCharLength = this.textWidth / this.text.length
-    return meanCharLength * Math.min(this.text.length, this.maxLength)
+    const meanCharLength = this.textWidth / this.text.length;
+    return meanCharLength * Math.min(this.text.length, this.maxLength);
   }
 }
 
 export class EntityLabelListItem extends LabelListItem {
   get width(): number {
-    return config.diameter + config.labelMargin + this.textWidth
+    return config.diameter + config.labelMargin + this.textWidth;
   }
 }
 
 export class RelationLabelListItem extends LabelListItem {}
 
 export class LabelList {
-  private id2Label: { [key: number]: LabelListItem } = {}
+  private id2Label: { [key: number]: LabelListItem } = {};
 
   constructor(private labels: LabelListItem[]) {
     for (const label of labels) {
-      this.id2Label[label.id] = label
+      this.id2Label[label.id] = label;
     }
   }
 
   getById(id: number): LabelListItem | undefined {
-    return this.id2Label[id]
+    return this.id2Label[id];
   }
 
   getColor(id: number): string | undefined {
-    return this.getById(id)?.color
+    return this.getById(id)?.color;
   }
 
   getText(id: number): string | undefined {
-    return this.getById(id)?.truncatedText
+    return this.getById(id)?.truncatedText;
   }
 
   getWidth(id: number): number | undefined {
-    return this.getById(id)?.truncatedWidth
+    return this.getById(id)?.truncatedWidth;
   }
 
   get maxLabelWidth(): number {
-    return Math.max(...this.labels.map((label) => label.truncatedWidth), 0)
+    return Math.max(...this.labels.map((label) => label.truncatedWidth), 0);
   }
 
   static valueOf(
@@ -89,6 +89,6 @@ export class LabelList {
             maxLabelLength,
           ),
       ),
-    )
+    );
   }
 }

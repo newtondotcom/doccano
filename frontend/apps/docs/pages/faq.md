@@ -7,14 +7,15 @@ To create a new doccano user:
 1. Run the doccano webserver.
 2. Log in to the admin site (in the case of pip installation) via <http://localhost:{port}/admin/>.
 
-      The example below uses the port `8000` and username `admin`. If you set your own port or username and password on running the server, use those values to log in.
-      ![](images/faq/user_creation/login.png)
+   The example below uses the port `8000` and username `admin`. If you set your own port or username and password on running the server, use those values to log in.
+   ![](images/faq/user_creation/login.png)
+
 3. After logging in to the admin site, click **Users**:
-      ![](images/faq/user_creation/select_users.png)
+   ![](images/faq/user_creation/select_users.png)
 4. Click the **ADD USER** button in the upper right corner:
-      ![](images/faq/user_creation/select_add_user.png)
+   ![](images/faq/user_creation/select_add_user.png)
 5. After entering the username and password for the new user, click **SAVE**:
-      ![](images/faq/user_creation/create_user.png)
+   ![](images/faq/user_creation/create_user.png)
 
 Congratulations. Now you can log in to doccano as a new user. After logging out of the admin site, try logging in to doccano as a new user.
 
@@ -27,10 +28,10 @@ To add a user to your project:
 1. Log in to doccano.
 2. Click on your project.
 3. From the left side menu, click **Members**. If you are not the administrator of the project, **Members** will not appear.
-      ![](images/faq/add_annotator/select_members.png)
+   ![](images/faq/add_annotator/select_members.png)
 4. Click **Add** and fill in the Add Member form with the user name and role you want to add to the project.
 5. Click **Save**.
-      ![](images/faq/add_annotator/select_user.png)
+   ![](images/faq/add_annotator/select_user.png)
 
 Now the new user can access the project.
 
@@ -41,16 +42,17 @@ To change a user's password:
 1. Run the doccano webserver.
 2. Log in to the admin site (in the case of pip installation) via <http://localhost:{port}/admin/>.
 
-      **Note**: You need to have a staff permission to log in to the admin site. If you don't have the right permissions, ask the administrator to change your password.
-      ![](images/faq/user_creation/login.png)
+   **Note**: You need to have a staff permission to log in to the admin site. If you don't have the right permissions, ask the administrator to change your password.
+   ![](images/faq/user_creation/login.png)
+
 3. Click **Users**.
-      ![](images/faq/user_creation/select_users.png)
+   ![](images/faq/user_creation/select_users.png)
 4. Click on the name of the user whose password you want to change:
-      ![](images/faq/how_to_change_password/user_list.png)
+   ![](images/faq/how_to_change_password/user_list.png)
 5. Click the link that says **this form** in the password section.
-      ![](images/faq/how_to_change_password/user_page.png)
+   ![](images/faq/how_to_change_password/user_page.png)
 6. Fill out the form and change the password.
-      ![](images/faq/how_to_change_password/change_password.png)
+   ![](images/faq/how_to_change_password/change_password.png)
 
 ## I can't upload my data
 
@@ -74,12 +76,12 @@ In the case of Docker Compose, you can change the port number by editing `compos
 
 1. Change `80:8080` to `<your_port>:8080` in `nginx`/`ports` section as follows:
 
-      ```yaml
-      nginx:
-         image: doccano/doccano:frontend
-         ports:
-         - <your_port>:8080
-      ```
+   ```yaml
+   nginx:
+     image: doccano/doccano:frontend
+     ports:
+       - <your_port>:8080
+   ```
 
 2. Add the `CSRF_TRUSTED_ORIGINS` environment variable to the `backend`/`environment` section as follows:
 
