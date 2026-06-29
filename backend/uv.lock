@@ -76,7 +76,7 @@ dev = [
     { name = "flake8", specifier = "==6.0.0" },
     { name = "isort", specifier = "==5.12.0" },
     { name = "mypy", specifier = "==1.4.1" },
-    { name = "pytest", specifier = "==7.4.0" },
+    { name = "pytest", specifier = "==7.4.4" },
     { name = "pytest-cov", specifier = "==4.1.0" },
     { name = "types-requests", specifier = "==2.31.0.1" },
     { name = "vcrpy", specifier = "==5.0.0" },
