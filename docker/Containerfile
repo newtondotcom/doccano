@@ -63,7 +63,7 @@ COPY --from=backend-builder /usr/local/bin/gunicorn /usr/local/bin/gunicorn
 COPY --chown=doccano:doccano . /doccano
 WORKDIR /doccano/backend
 COPY --from=frontend-builder /frontend/dist /doccano/backend/client/dist
-RUN uv run manage.py collectstatic --noinput \
+RUN uv run src/manage.py collectstatic --noinput \
  && chown -R doccano:doccano .
 
 VOLUME /data
