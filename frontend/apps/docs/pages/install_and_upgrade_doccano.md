@@ -113,7 +113,7 @@ docker run -d \
   -e RABBITMQ_DEFAULT_USER=doccano_rabit \
   -e RABBITMQ_DEFAULT_PASS=doccano_pass \
   -p 5672:5672 \
-  rabbitmq:3.10.7-alpine
+  rabbitmq:3.11.7-alpine
 ```
 
 Then, set `CELERY_BROKER_URL` environment variable according to your RabbitMQ credentials. If you want to know the schema, please refer to the [official documentation](https://docs.celeryq.dev/en/stable/userguide/configuration.html#broker-settings).

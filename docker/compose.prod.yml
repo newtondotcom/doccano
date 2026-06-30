@@ -57,7 +57,7 @@ services:
             - network-frontend
 
     rabbitmq:
-        image: rabbitmq:3.10.7-alpine
+        image: rabbitmq:3.11.7-alpine
         environment:
             RABBITMQ_DEFAULT_USER: "${RABBITMQ_DEFAULT_USER}"
             RABBITMQ_DEFAULT_PASS: "${RABBITMQ_DEFAULT_PASS}"

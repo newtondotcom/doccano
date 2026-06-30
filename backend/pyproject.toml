@@ -2,13 +2,10 @@
 name = "doccano"
 version = "1.8.5"
 description = "doccano, text annotation tool for machine learning practitioners"
-authors = ["Hironsan <hiroki.nakayama.py@gmail.com>","newtondotcom <redacted@mail.com>"]
+authors = [ {name = "Hironsan", email = "hiroki.nakayama.py@gmail.com"},{ name="newtondotcom"}]
 license = "MIT"
 readme = "README.md"
-homepage = "https://doccano.github.io/doccano/"
-repository = "https://github.com/doccano/doccano"
-documentation = "https://doccano.github.io/doccano/"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 dependencies = [
     "auto-labeling-pipeline",
     "celery>=5.6.3",
@@ -59,3 +56,8 @@ collectstatic = "uv run src/manage.py collectstatic --noinput"
 
 [tool.uv.sources]
 auto-labeling-pipeline={ path = "packages/auto-labeling-pipeline" }
+
+[project.urls]
+Homepage = "https://doccano.github.io/doccano/"
+Repository = "https://github.com/doccano/doccano"
+Documentation = "https://doccano.github.io/doccano/"

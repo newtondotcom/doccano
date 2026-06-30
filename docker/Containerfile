@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION="3.10-trixie"
+ARG PYTHON_VERSION="3.11-trixie"
 
 # FRONT BUILDING
 FROM oven/bun:debian AS frontend-builder
@@ -56,7 +56,7 @@ RUN useradd -ms /bin/sh doccano
 RUN mkdir /data \
  && chown doccano:doccano /data
 
-COPY --from=backend-builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY --from=backend-builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=backend-builder /usr/local/bin/celery /usr/local/bin/celery
 COPY --from=backend-builder /usr/local/bin/gunicorn /usr/local/bin/gunicorn
 
