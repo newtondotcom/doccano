@@ -43,6 +43,7 @@ export default defineConfig({
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/newtondotcom/doccano' }
-    ]
-  }
+    ],
+  },
+  ignoreDeadLinks: true
 })

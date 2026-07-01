@@ -5,7 +5,7 @@
 To create a new doccano user:
 
 1. Run the doccano webserver.
-2. Log in to the admin site (in the case of pip installation) via <http://localhost:{port}/admin/>.
+2. Log in to the admin site (in the case of pip installation) via <http://localhost:8000/admin/>.
 
    The example below uses the port `8000` and username `admin`. If you set your own port or username and password on running the server, use those values to log in.
    ![](images/faq/user_creation/login.png)
@@ -40,7 +40,7 @@ Now the new user can access the project.
 To change a user's password:
 
 1. Run the doccano webserver.
-2. Log in to the admin site (in the case of pip installation) via <http://localhost:{port}/admin/>.
+2. Log in to the admin site (in the case of pip installation) via <http://localhost:8000/admin/>.
 
    **Note**: You need to have a staff permission to log in to the admin site. If you don't have the right permissions, ask the administrator to change your password.
    ![](images/faq/user_creation/login.png)
