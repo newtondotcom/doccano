@@ -2,7 +2,7 @@
 name = "auto-labeling-pipeline"
 dynamic = ["version"]
 description = "Auto labeling pipeline for doccano"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 readme = "README.md"
 license = "MIT"
 authors = [ {name = "Hironsan", email = "hiroki.nakayama.py@gmail.com"},{ name="newtondotcom"}]

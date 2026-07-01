@@ -5,7 +5,7 @@ description = "doccano, text annotation tool for machine learning practitioners"
 authors = [ {name = "Hironsan", email = "hiroki.nakayama.py@gmail.com"},{ name="newtondotcom"}]
 license = "MIT"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "auto-labeling-pipeline",
     "celery>=5.6.3",
