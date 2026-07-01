@@ -9,3 +9,5 @@
 "Object Detection",
 "Polygon Segmentation",
 "Speech to Text",
+
+- [ ] Write proper test for nuxt front end with https://nuxt.com/docs/4.x/getting-started/testing
