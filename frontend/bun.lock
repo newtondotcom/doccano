@@ -6,8 +6,8 @@
       "name": "doccano",
       "devDependencies": {
         "oxfmt": "^0.57.0",
-        "oxlint": "^1.71.0",
-        "turbo": "^2.10.0",
+        "oxlint": "^1.72.0",
+        "turbo": "^2.10.2",
       },
     },
     "apps/docs": {
