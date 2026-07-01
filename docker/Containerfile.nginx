@@ -4,8 +4,7 @@ FROM oven/bun:debian AS frontend-builder
 COPY frontend/ /app/
 WORKDIR /app
 # hadolint ignore=DL3008
-RUN bun install --frozen-lockfile --ignore-scripts 
-RUN bun run generate
+RUN bun install --frozen-lockfile --ignore-scripts && bun run generate
 
 FROM nginx:1.31.1-alpine AS runtime
 

@@ -5,8 +5,7 @@ FROM oven/bun:debian AS frontend-builder
 COPY frontend/ /app/
 WORKDIR /app
 # hadolint ignore=DL3008
-RUN bun install --frozen-lockfile --ignore-scripts 
-RUN bun run generate
+RUN bun install --frozen-lockfile --ignore-scripts && bun run generate
 
 # BACK BUILDING
 FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION} AS backend-builder
