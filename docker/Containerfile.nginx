@@ -7,7 +7,7 @@ WORKDIR /app
 RUN bun install --frozen-lockfile --ignore-scripts 
 RUN bun run generate
 
-FROM nginx:1.31.1-alpine AS runtime
+FROM nginx:1.31.2-alpine AS runtime
 
 RUN addgroup -g 61000 doccano \
   && adduser -G doccano -S doccano -u 61000
