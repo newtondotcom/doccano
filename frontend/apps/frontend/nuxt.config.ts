@@ -9,7 +9,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: false },
   ssr: false,
-  modules: ["@pinia/nuxt", "@nuxtjs/i18n"],
+  modules: ["@pinia/nuxt", "@nuxtjs/i18n", "@nuxt/test-utils/module"],
   i18n: {
     restructureDir: join(rootDir, "app/i18n"),
     langDir: ".",
@@ -40,6 +40,10 @@ export default defineNuxtConfig({
           target: process.env.API_URL || "http://localhost:8000",
           changeOrigin: true,
         },
+        "/media": {
+          target: process.env.MEDIA_URL || "http://localhost:8000",
+          changeOrigin: true,
+        },
       },
     },
   },
@@ -53,20 +57,6 @@ export default defineNuxtConfig({
       baseUrl: "/v1",
     },
   },
-
-  // routeRules: {
-  //   // Use a fake value for use at build-time
-  //   "/v1/**": {
-  //     proxy: {
-  //       to: process.env.API_URL + "/**" || "http://localhost:8000/**",
-  //     },
-  //   },
-  //   "/media/**": {
-  //     proxy: {
-  //       to: process.env.API_URL + "/**" || "http://localhost:8000/**",
-  //     },
-  //   },
-  // },
 
   app: {
     cdnURL: process.env.PUBLIC_PATH || "/_nuxt/",

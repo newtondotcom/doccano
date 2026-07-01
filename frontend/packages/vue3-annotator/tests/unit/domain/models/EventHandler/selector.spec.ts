@@ -8,13 +8,13 @@ const range: [number, number] = [0, 5];
 const graphemeRange: [number, number] = [1, 6];
 
 class EntitiesIntersectMock extends Entities {
-  intersectAny(startOffset: number, endOffset: number): boolean {
+  intersectAny(_startOffset: number, _endOffset: number): boolean {
     return true;
   }
 }
 
 class EntitiesNotIntersectMock extends Entities {
-  intersectAny(startOffset: number, endOffset: number): boolean {
+  intersectAny(_startOffset: number, _endOffset: number): boolean {
     return false;
   }
 }
@@ -27,7 +27,7 @@ describe("TextSelector", () => {
       },
     };
   });
-  const handleErrorSpy = jest
+  const _handleErrorSpy = jest
     .spyOn(TextSelector.prototype as any, "getRange")
     .mockReturnValue(range);
   const text = new TextMock();
