@@ -40,7 +40,7 @@ jobs:
             - name: Install npm modules
               run: bun install
             - name: Lint
-              run: bun lint:fix
+              run: bun lint
             - name: Format
               run: bun fmt
 
