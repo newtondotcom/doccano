@@ -46,7 +46,7 @@
     "vue-router": "^5.1.0",
     "vue3-annotator": "workspace:*",
     "vue3-shortkey": "^4.0.0",
-    "vuetify-nuxt-module": "1.0.0-rc.1",
+    "vuetify-nuxt-module": "1.0.0-rc.2",
     "wavesurfer.js": "^7.12.8"
   },
   "devDependencies": {
