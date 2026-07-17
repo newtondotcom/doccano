@@ -40,6 +40,7 @@ dependencies = [
 dev = [
     "django-debug-toolbar>=7.0.0",
     "model-bakery>=1.23.5",
+    "pytest>=9.1.1",
     "taskipy>=1.14.1",
     "unittest-xml-reporting>=4.0.0",
 ]
@@ -60,6 +61,9 @@ auto-labeling-pipeline= { workspace = true }
 members = [
     "packages/auto-labeling-pipeline"
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["packages"]
 
 [project.urls]
 Homepage = "https://doccano.github.io/doccano/"
