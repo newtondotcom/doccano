@@ -69,6 +69,11 @@ dependencies = [
     { name = "requests" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "vcrpy" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "boto3", specifier = "==1.28.7" },
@@ -76,6 +81,9 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.3.0" },
     { name = "requests", specifier = "==2.31.0" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "vcrpy", specifier = ">=8.3.0" }]
 
 [[package]]
 name = "billiard"
@@ -580,7 +588,6 @@ dev = [
     { name = "pytest" },
     { name = "taskipy" },
     { name = "unittest-xml-reporting" },
-    { name = "vcrpy" },
 ]
 prod = [
     { name = "gunicorn" },
@@ -624,7 +631,6 @@ dev = [
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "taskipy", specifier = ">=1.14.1" },
     { name = "unittest-xml-reporting", specifier = ">=4.0.0" },
-    { name = "vcrpy", specifier = ">=8.3.0" },
 ]
 prod = [{ name = "gunicorn", specifier = ">=26.0.0" }]
 
