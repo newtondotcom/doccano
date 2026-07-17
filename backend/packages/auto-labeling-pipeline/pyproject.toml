@@ -1,6 +1,6 @@
 [project]
 name = "auto-labeling-pipeline"
-dynamic = ["version"]
+version = "1.8.5"
 description = "Auto labeling pipeline for doccano"
 requires-python = ">=3.12"
 readme = "README.md"
@@ -19,14 +19,7 @@ Repository = "https://github.com/doccano/auto-labeling-pipeline"
 
 [dependency-groups]
 dev = [
-    "pytest==7.4.4",
-    "autopep8==2.0.2",
-    "flake8==6.0.0",
-    "pytest-cov==4.1.0",
-    "isort==5.12.0",
-    "mypy==1.4.1",
-    "vcrpy==5.0.0",
-    "types-requests==2.31.0.1",
+    "pytest==7.4.4"
 ]
 
 [tool.setuptools]
@@ -40,5 +33,5 @@ name = "pypi"
 url = "https://pypi.org/simple"
 
 [build-system]
-requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=6.2"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.9.27,<0.10.0"]
+build-backend = "uv_build"

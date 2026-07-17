@@ -2,14 +2,6 @@
 
 Auto labeling pipeline helps doccano to annotate a document automatically. This package is intended to be used from the inside of doccano. You shouldn't use this package directly.
 
-## Installation
-
-To install auto-labeling-pipeline, simply run:
-
-```bash
-pip install auto-labeling-pipeline
-```
-
 ## How to contribute
 
 You can contribute this project by adding new templates as follows:
