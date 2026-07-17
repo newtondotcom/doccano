@@ -14,7 +14,7 @@
       <TasksToolbarMobile :total="docs.count" class="d-flex d-sm-none" />
     </template>
     <template #content>
-      <v-card v-shortkey="shortKeys" @shortkey="addOrRemoveCategory">
+      <v-card>
         <v-card-title>
           <TasksTextClassificationLabelGroup
             :labels="categoryTypes"
@@ -47,6 +47,7 @@
 </template>
 
 <script setup>
+import { useEventListener } from "@vueuse/core";
 import { useMainStore as useConfigStore } from "@/store/config";
 import { Category } from "@/domain/models/tasks/category";
 
@@ -76,6 +77,13 @@ const projectId = computed(() => route.params.id);
 
 const shortKeys = computed(() =>
   Object.fromEntries(categoryTypes.value.map((item) => [item.id, [item.suffixKey]])),
+);
+const shortKeyToLabelId = computed(() =>
+  Object.fromEntries(
+    Object.entries(shortKeys.value)
+      .map(([labelId, keys]) => [keys?.[0]?.toLowerCase(), Number.parseInt(labelId, 10)])
+      .filter(([key]) => !!key),
+  ),
 );
 
 const doc = computed(() => {
@@ -162,8 +170,7 @@ async function addCategory(labelId) {
   await listCategory(doc.value.id);
 }
 
-async function addOrRemoveCategory(event) {
-  const labelId = parseInt(event.srcKey, 10);
+async function addOrRemoveCategory(labelId) {
   const category = categories.value.find((item) => item.label === labelId);
   if (category) {
     await removeCategory(category.id);
@@ -196,6 +203,31 @@ async function confirm() {
   await load();
   updateProgress();
 }
+
+function shouldIgnoreShortcut(event) {
+  const target = event.target;
+  return (
+    event.repeat ||
+    (target instanceof HTMLElement &&
+      (target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT" ||
+        target.isContentEditable))
+  );
+}
+
+useEventListener("keydown", (event) => {
+  if (shouldIgnoreShortcut(event)) {
+    return;
+  }
+  const pressedKey = event.key.toLowerCase();
+  const labelId = shortKeyToLabelId.value[pressedKey];
+  if (!labelId) {
+    return;
+  }
+  event.preventDefault();
+  addOrRemoveCategory(labelId);
+});
 </script>
 
 <style scoped>

@@ -16,10 +16,7 @@
       <TasksToolbarMobile :total="totalExample" class="d-flex d-sm-none" />
     </template>
     <template #content>
-      <v-card
-        v-shortkey="shortKeys"
-        @shortkey="annotateOrRemoveLabel(project.id, example.id, $event.srcKey)"
-      >
+      <v-card>
         <v-card-title>
           <component
             :is="labelComponent"
@@ -42,6 +39,7 @@
 </template>
 
 <script setup>
+import { useEventListener } from "@vueuse/core";
 import { useExampleItem } from "@/composables/useExampleItem";
 import { useLabelList } from "@/composables/useLabelList";
 import { useProjectItem } from "@/composables/useProjectItem";
@@ -80,6 +78,13 @@ const {
 } = useLabelList(useNuxtApp().$services.categoryType);
 const { labels } = toRefs(labelState);
 const labelComponent = ref("TasksTextClassificationLabelGroup");
+const shortKeyToLabelId = computed(() =>
+  Object.fromEntries(
+    Object.entries(shortKeys.value)
+      .map(([labelId, keys]) => [keys?.[0]?.toLowerCase(), labelId])
+      .filter(([key]) => !!key),
+  ),
+);
 
 getLabelList(projectId);
 getProjectById(projectId);
@@ -105,5 +110,30 @@ watch(enableAutoLabeling, async (val) => {
     await autoLabel(exampleState.example.id);
     await getTeacherList(exampleState.example.id);
   }
+});
+
+function shouldIgnoreShortcut(event) {
+  const target = event.target;
+  return (
+    event.repeat ||
+    (target instanceof HTMLElement &&
+      (target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT" ||
+        target.isContentEditable))
+  );
+}
+
+useEventListener("keydown", (event) => {
+  if (shouldIgnoreShortcut(event)) {
+    return;
+  }
+  const key = event.key.toLowerCase();
+  const labelId = shortKeyToLabelId.value[key];
+  if (!labelId || !project.value?.id || !example.value?.id) {
+    return;
+  }
+  event.preventDefault();
+  annotateOrRemoveLabel(project.value.id, example.value.id, labelId);
 });
 </script>

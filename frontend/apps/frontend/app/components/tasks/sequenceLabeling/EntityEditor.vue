@@ -1,5 +1,5 @@
 <template>
-  <div v-shortkey="['esc']" @shortkey="cleanUp">
+  <div>
     <VAnnotator
       :dark="theme.global.current.value.dark"
       :rtl="rtl"
@@ -42,6 +42,7 @@
 import { VAnnotator } from "vue3-annotator";
 import "vue3-annotator/dist/vue3-annotator.css";
 import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
+import { useEventListener } from "@vueuse/core";
 import { SpanDTO } from "@/services/application/tasks/sequenceLabeling/sequenceLabelingData";
 import { useTheme } from "vuetify";
 
@@ -240,4 +241,26 @@ function updateRelation(labelId: number) {
 function deleteRelation(rel: any) {
   emit("contextmenu:relation", rel.id);
 }
+
+function shouldIgnoreShortcut(event: KeyboardEvent): boolean {
+  const target = event.target;
+  return (
+    event.repeat ||
+    (target instanceof HTMLElement &&
+      (target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT" ||
+        target.isContentEditable))
+  );
+}
+
+useEventListener("keydown", (event: KeyboardEvent) => {
+  if (shouldIgnoreShortcut(event)) {
+    return;
+  }
+  if (event.key.toLowerCase() === "escape") {
+    event.preventDefault();
+    cleanUp();
+  }
+});
 </script>
