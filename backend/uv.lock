@@ -588,6 +588,7 @@ dev = [
     { name = "pytest" },
     { name = "taskipy" },
     { name = "unittest-xml-reporting" },
+    { name = "vcrpy" },
 ]
 prod = [
     { name = "gunicorn" },
@@ -631,6 +632,7 @@ dev = [
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "taskipy", specifier = ">=1.14.1" },
     { name = "unittest-xml-reporting", specifier = ">=4.0.0" },
+    { name = "vcrpy", specifier = ">=8.3.0" },
 ]
 prod = [{ name = "gunicorn", specifier = ">=26.0.0" }]
 

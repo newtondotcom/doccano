@@ -43,6 +43,7 @@ dev = [
     "pytest>=9.1.1",
     "taskipy>=1.14.1",
     "unittest-xml-reporting>=4.0.0",
+    "vcrpy>=8.3.0",
 ]
 prod = [
     "gunicorn>=26.0.0",
