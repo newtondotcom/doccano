@@ -40,7 +40,7 @@ function toPayload(item: ExampleItem): { [key: string]: any } {
 function extractParamFromQuery(q: string, name: string): [string, string | null] {
   const pattern = new RegExp(`${name}:(".+?"|\\S+)`);
   if (pattern.test(q)) {
-    const value = pattern.exec(q)![1];
+    const value = pattern.exec(q)?.[1] ?? null;
     q = q.replace(pattern, "");
     return [q, value];
   }

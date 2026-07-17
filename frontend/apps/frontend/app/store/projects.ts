@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
+import type { Project } from "@/domain/models/project/project";
 
 export const useMainStore = defineStore("projects", {
   state: () => ({
-    current: {},
+    current: null as Project | null,
   }),
   getters: {
     currentProject(state) {
@@ -15,7 +16,7 @@ export const useMainStore = defineStore("projects", {
   },
 
   actions: {
-    setCurrent(payload) {
+    setCurrent(payload: Project | null) {
       this.current = payload;
     },
     async setCurrentProject(projectId: string | number) {

@@ -1,5 +1,5 @@
 export class Status {
-  ready: boolean;
-  result: object;
-  error: any;
+  ready = false;
+  result: object = {};
+  error: any = null;
 }

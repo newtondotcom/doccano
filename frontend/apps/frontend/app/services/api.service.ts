@@ -31,10 +31,10 @@ class ApiService {
     };
   }
 
-  request<T = unknown>(
+  request<T = any>(
     method: HttpMethod,
     url: string,
-    data: Record<string, unknown> = {},
+    data: any = {},
     config: RequestConfig = {},
   ): Promise<T> {
     const { ...restConfig } = config;
@@ -48,37 +48,37 @@ class ApiService {
     });
   }
 
-  get<T = unknown>(url: string, config: RequestConfig = {}): Promise<T> {
+  get<T = any>(url: string, config: RequestConfig = {}): Promise<T> {
     return this.request<T>("GET", url, {}, config);
   }
 
-  post<T = unknown>(
+  post<T = any>(
     url: string,
-    data: Record<string, unknown> = {},
+    data: any = {},
     config: RequestConfig = {},
   ): Promise<T> {
     return this.request<T>("POST", url, data, config);
   }
 
-  put<T = unknown>(
+  put<T = any>(
     url: string,
-    data: Record<string, unknown> = {},
+    data: any = {},
     config: RequestConfig = {},
   ): Promise<T> {
     return this.request<T>("PUT", url, data, config);
   }
 
-  patch<T = unknown>(
+  patch<T = any>(
     url: string,
-    data: Record<string, unknown> = {},
+    data: any = {},
     config: RequestConfig = {},
   ): Promise<T> {
     return this.request<T>("PATCH", url, data, config);
   }
 
-  delete<T = unknown>(
+  delete<T = any>(
     url: string,
-    data: Record<string, unknown> = {},
+    data: any = {},
     config: RequestConfig = {},
   ): Promise<T> {
     return this.request<T>("DELETE", url, data, config);

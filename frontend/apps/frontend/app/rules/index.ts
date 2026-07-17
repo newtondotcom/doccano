@@ -1,51 +1,57 @@
 // Rules for project label.
-export const colorRules = (msg) => {
-  return [(v) => !!v || msg.colorRequired];
+type MessageMap = Record<string, string>;
+
+export const colorRules = (msg: MessageMap) => {
+  return [(v: unknown) => !!v || msg.colorRequired];
 };
 
-export const labelNameRules = (msg) => {
+export const labelNameRules = (msg: MessageMap) => {
   return [
-    (v) => !!v || msg.labelRequired,
-    (v) => (v && v.length <= 100) || msg.labelLessThan100Chars,
+    (v: string | null | undefined) => !!v || msg.labelRequired,
+    (v: string | null | undefined) => (v && v.length <= 100) || msg.labelLessThan100Chars,
   ];
 };
 
 // Rules for project member.
-export const userNameRules = (msg) => {
+export const userNameRules = (msg: MessageMap) => {
   return [
-    (v) => !!v || msg.userNameRequired,
-    (v) => (v && v.length <= 30) || msg.userNameLessThan30Chars,
+    (v: string | null | undefined) => !!v || msg.userNameRequired,
+    (v: string | null | undefined) => (v && v.length <= 30) || msg.userNameLessThan30Chars,
   ];
 };
 
-export const roleRules = (msg) => {
-  return [(v) => !!v || msg.roleRequired];
+export const roleRules = (msg: MessageMap) => {
+  return [(v: unknown) => !!v || msg.roleRequired];
 };
 
 // Rules for Document.
-export const fileFormatRules = (msg) => {
-  return [(v) => !!v || msg.fileFormatRequired];
+export const fileFormatRules = (msg: MessageMap) => {
+  return [(v: unknown) => !!v || msg.fileFormatRequired];
 };
 
-export const uploadFileRules = (msg) => {
+export const uploadFileRules = (msg: MessageMap) => {
   return [
-    (v) => !!v || msg.fileRequired,
-    (v) => !v || v.some((file) => file.size < 100000000) || msg.fileLessThan1MB,
+    (v: File[] | null | undefined) => !!v || msg.fileRequired,
+    (v: File[] | null | undefined) =>
+      !v || v.some((file: File) => file.size < 100000000) || msg.fileLessThan1MB,
   ];
 };
 
-export const uploadSingleFileRules = (msg) => {
-  return [(v) => !!v || msg.fileRequired, (v) => !v || v.size < 1000000 || msg.fileLessThan1MB];
+export const uploadSingleFileRules = (msg: MessageMap) => {
+  return [
+    (v: File | null | undefined) => !!v || msg.fileRequired,
+    (v: File | null | undefined) => !v || v.size < 1000000 || msg.fileLessThan1MB,
+  ];
 };
 
 // Rules for user.
-export const passwordRules = (msg) => {
+export const passwordRules = (msg: MessageMap) => {
   return [
-    (v) => !!v || msg.passwordRequired,
-    (v) => (v && v.length <= 30) || msg.passwordLessThan30Chars,
+    (v: string | null | undefined) => !!v || msg.passwordRequired,
+    (v: string | null | undefined) => (v && v.length <= 30) || msg.passwordLessThan30Chars,
   ];
 };
 
 export const templateNameRules = () => {
-  return [(v) => !!v || "Name is required"];
+  return [(v: string | null | undefined) => !!v || "Name is required"];
 };

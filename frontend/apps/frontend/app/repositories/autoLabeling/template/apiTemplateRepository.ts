@@ -1,7 +1,7 @@
 import ApiService from "@/services/api.service";
 import {
   type ConfigResponse,
-  type ConfigTemplateItem,
+  ConfigTemplateItem,
 } from "@/domain/models/autoLabeling/template";
 
 export class APITemplateRepository {
