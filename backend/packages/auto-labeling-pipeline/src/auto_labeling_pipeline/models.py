@@ -1,5 +1,7 @@
 import abc
 import base64
+import gzip
+import json
 from typing import Dict, Literal, Optional, Type
 
 import boto3
@@ -30,11 +32,22 @@ class RequestModelFactory:
             return all_subclasses
 
         for subclass in get_all_subclasses(RequestModel):
-            if not hasattr(subclass, "Config"):
-                continue
-            if subclass.Config.title == model_name:
+            config_title = subclass.model_config.get("title")
+            if not config_title and hasattr(subclass, "Config"):
+                config_title = getattr(subclass.Config, "title", None)
+            if config_title == model_name:
                 return subclass
         raise NameError(f"{model_name} is not found.")
+
+
+def parse_json_response(response: requests.Response):
+    try:
+        return response.json()
+    except requests.exceptions.JSONDecodeError:
+        content = response.content or response.text.encode("latin1")
+        if content.startswith(b"\x1f\x8b"):
+            content = gzip.decompress(content)
+        return json.loads(content.decode("utf-8"))
 
 
 def find_and_replace_value(obj, value, target="{{ text }}"):
@@ -68,8 +81,8 @@ class CustomRESTRequestModel(RequestModel):
             params=self.params,
             headers=self.headers,
             json=self.body,
-        ).json()
-        return response
+        )
+        return parse_json_response(response)
 
 
 class GCPEntitiesRequestModel(RequestModel):
@@ -114,8 +127,8 @@ class GCPEntitiesRequestModel(RequestModel):
             "document": {"type": self.type, "language": self.language, "content": text},
             "encodingType": "UTF32",
         }
-        response = requests.post(url, headers=headers, params=params, json=body).json()
-        return response
+        response = requests.post(url, headers=headers, params=params, json=body)
+        return parse_json_response(response)
 
 
 class AWSMixin(BaseModel):
@@ -277,8 +290,8 @@ class GCPImageLabelDetectionRequestModel(RequestModel):
                 }
             ]
         }
-        response = requests.post(url, headers=headers, params=params, json=body).json()
-        return response
+        response = requests.post(url, headers=headers, params=params, json=body)
+        return parse_json_response(response)
 
 
 class AmazonRekognitionLabelDetectionRequestModel(AWSMixin, RequestModel):
@@ -473,5 +486,5 @@ class GCPSpeechToTextRequestModel(RequestModel):
             },
             "audio": {"content": load_image_as_b64(filepath)},
         }
-        response = requests.post(url, headers=headers, params=params, json=body).json()
-        return response
+        response = requests.post(url, headers=headers, params=params, json=body)
+        return parse_json_response(response)
