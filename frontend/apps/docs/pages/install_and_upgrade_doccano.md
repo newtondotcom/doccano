@@ -254,7 +254,8 @@ uv run task mypy
 Similarly, you can run the test by executing the following command:
 
 ```bash
-uv run task test
+uv run task test-django
+uv run task test-packages
 ```
 
 Did you pass the test? Great!

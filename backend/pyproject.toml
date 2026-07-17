@@ -50,7 +50,8 @@ prod = [
 
 [tool.taskipy.tasks]
 wait_for_db = "uv run src/manage.py wait_for_db"
-test = "uv run src/manage.py test --pattern=\"test*.py\""
+test-django = "uv run src/manage.py test --pattern=\"test*.py\""
+test-packages = "uv run pytest"
 migrate = "uv run src/manage.py migrate"
 collectstatic = "uv run src/manage.py collectstatic --noinput"
 
@@ -59,7 +60,7 @@ auto-labeling-pipeline= { workspace = true }
 
 [tool.uv.workspace]
 members = [
-    "packages/auto-labeling-pipeline"
+    "packages/*"
 ]
 
 [tool.pytest.ini_options]

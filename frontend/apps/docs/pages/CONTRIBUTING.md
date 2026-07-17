@@ -102,7 +102,8 @@ Explain the suggestion and include additional details to help developers underst
 1.  **Implement your changes:** Use your preferred text editor to modify the `doccano` source code. Be sure to keep your changes focused and in scope, and follow the coding conventions described below! Document your code as you write it. Run your changes against any existing tests and add new ones as needed to validate your changes; make sure you don’t accidentally break existing functionality! Several common commands can be accessed via the uv task:
 
         $ uv run task mypy
-        $ uv run task test
+        $ uv run task test-django
+        $ uv run task test-packages
 
     For the frontend, you can execute the following commands:
 
