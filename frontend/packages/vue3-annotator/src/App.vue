@@ -12,7 +12,7 @@
       <v-annotator
         :allow-overlapping="allowOverlapping"
         :text="text"
-        :entities="entities"
+        :entities="annotatorEntities"
         :entity-labels="entityLabels"
         :grapheme-mode="graphemeMode"
         :relations="relations"
@@ -30,7 +30,7 @@
       <v-annotator
         :allow-overlapping="allowOverlapping"
         :text="text2"
-        :entities="entities2"
+        :entities="annotatorEntities2"
         :entity-labels="entityLabels"
         :grapheme-mode="graphemeMode"
         :relations="relations2"
@@ -47,7 +47,8 @@
 import { computed, ref } from 'vue'
 import VAnnotator from './components/VAnnotator.vue'
 import { type Entity } from './domain/models/Label/Entity'
-import { type Relation } from './domain/models/Label/Relation'
+import { Entity as AnnotatorEntity } from './domain/models/Label/Entity'
+import { type Relation, type RelationListItem } from './domain/models/Label/Relation'
 
 interface EntityI {
   id: number
@@ -192,7 +193,17 @@ const relations2 = ref<Relation[]>([])
 //   addEntity(i * 10 + 100, i * 10 + 105);
 // }
 
-const selectedEntities = computed(() => [entities.value[0], entities.value[1]])
+const annotatorEntities = computed<Entity[]>(() =>
+  entities.value.map((entity) =>
+    new AnnotatorEntity(entity.id, entity.label, entity.startOffset, entity.endOffset),
+  ),
+)
+const annotatorEntities2 = computed<Entity[]>(() =>
+  entities2.value.map((entity) =>
+    new AnnotatorEntity(entity.id, entity.label, entity.startOffset, entity.endOffset),
+  ),
+)
+const selectedEntities = computed<Entity[]>(() => annotatorEntities.value.slice(0, 2))
 
 function addEntity(event: Event, startOffset: number, endOffset: number) {
   entities.value.push({
@@ -231,8 +242,12 @@ function resetEntity() {
 }
 
 function changeLabel() {
-  entityLabels.value[0].color = '#FF5733'
-  entityLabels.value[0].text = 'Misc'
+  const firstLabel = entityLabels.value[0]
+  if (!firstLabel) {
+    return
+  }
+  firstLabel.color = '#FF5733'
+  firstLabel.text = 'Misc'
 }
 
 function addRelation() {
@@ -244,12 +259,12 @@ function addRelation() {
   })
 }
 
-function updateRelation(event: Event, relation: Relation) {
+function updateRelation(event: Event, relation: RelationListItem) {
   console.log(relation)
   console.log(event)
 }
 
-function deleteRelation(relation: Relation) {
+function deleteRelation(relation: Relation | RelationListItem) {
   relations.value = relations.value.filter((r) => r.id !== relation.id)
 }
 

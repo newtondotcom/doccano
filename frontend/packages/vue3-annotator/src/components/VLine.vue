@@ -76,7 +76,7 @@ const props = withDefaults(
     font: Font
     text: string
     entityLabels: LabelList
-    relationLabels?: LabelList
+    relationLabels: LabelList
     rtl?: boolean
     baseX?: number
     left?: number
@@ -87,7 +87,6 @@ const props = withDefaults(
   {
     relations: () => [],
     dark: false,
-    relationLabels: undefined,
     rtl: false,
     baseX: 0,
     left: 0,
