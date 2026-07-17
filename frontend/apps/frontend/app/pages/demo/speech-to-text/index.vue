@@ -24,6 +24,8 @@
 </template>
 
 <script setup>
+import speechSampleUrl from "@/assets/examples/speech_1.mp3";
+
 definePageMeta({
   layout: "demo",
 });
@@ -45,7 +47,7 @@ const currentDoc = ref({
   annotation_approver: null,
 });
 
-const src = require("@/assets/examples/speech_1.mp3").default;
+const src = speechSampleUrl;
 
 function _deleteAnnotation(annotationId) {
   currentDoc.value.annotations = currentDoc.value.annotations.filter(

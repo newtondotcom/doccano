@@ -39,8 +39,8 @@
 import Konva from "konva";
 import { Box } from "konva/lib/shapes/Transformer.d";
 import Rectangle from "@/domain/models/tasks/boundingbox/Rectangle";
-import RectangleProps from "@/domain/models/tasks/boundingbox/RectangleProps";
-import LabelProps from "@/domain/models/tasks/shared/LabelProps";
+import type RectangleProps from "@/domain/models/tasks/boundingbox/RectangleProps";
+import type LabelProps from "@/domain/models/tasks/shared/LabelProps";
 import { inverseTransform, transform } from "@/domain/models/tasks/shared/Scaler";
 
 const props = withDefaults(

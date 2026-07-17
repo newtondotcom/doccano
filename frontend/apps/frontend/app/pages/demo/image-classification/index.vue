@@ -26,6 +26,8 @@
 </template>
 
 <script setup>
+import catImageUrl from "@/assets/images/demo/cat.jpeg";
+
 definePageMeta({
   layout: "demo",
 });
@@ -53,7 +55,7 @@ const singleLabel = ref(true);
 
 const currentDoc = ref({
   id: 8,
-  filename: require("@/assets/images/demo/cat.jpeg"),
+  filename: catImageUrl,
   annotations: [
     {
       id: 17,
