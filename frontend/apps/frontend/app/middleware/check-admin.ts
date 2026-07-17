@@ -2,7 +2,7 @@ import { useMainStore as useProjectsStore } from "@/store/projects";
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const { $repositories } = useNuxtApp();
-  const { localePath } = useI18n();
+  const localePath = useLocalePath();
   const projectsStore = useProjectsStore();
   const projectId = to.params.id as string;
 

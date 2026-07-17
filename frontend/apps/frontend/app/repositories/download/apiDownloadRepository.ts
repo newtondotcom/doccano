@@ -16,7 +16,7 @@ export class APIDownloadRepository {
   async download(projectId: string, taskId: string): Promise<void> {
     const url = `/projects/${projectId}/download?taskId=${taskId}`;
     const config = {
-      responseType: "blob",
+      responseType: "blob" as const,
     };
     const response = await this.request.get(url, config);
     const downloadUrl = window.URL.createObjectURL(new Blob([response.data]));

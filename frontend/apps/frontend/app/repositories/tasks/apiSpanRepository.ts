@@ -2,13 +2,13 @@ import { AnnotationRepository } from "@/domain/models/tasks/annotationRepository
 import { Span } from "@/domain/models/tasks/span";
 
 export class APISpanRepository extends AnnotationRepository<Span> {
-  labelName = "spans";
+  override labelName = "spans";
 
-  toModel(item: { [key: string]: any }): Span {
+  override toModel(item: { [key: string]: any }): Span {
     return new Span(item.id, item.label, item.user, item.start_offset, item.end_offset);
   }
 
-  toPayload(item: Span): { [key: string]: any } {
+  override toPayload(item: Span): { [key: string]: any } {
     return {
       id: item.id,
       label: item.label,

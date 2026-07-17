@@ -1,6 +1,6 @@
 export default defineNuxtRouteMiddleware(async (to) => {
   const { $repositories } = useNuxtApp();
-  const { localePath } = useI18n();
+  const localePath = useLocalePath();
   const projectId = to.params.id as string;
 
   const member = await $repositories.member.fetchMyRole(projectId);

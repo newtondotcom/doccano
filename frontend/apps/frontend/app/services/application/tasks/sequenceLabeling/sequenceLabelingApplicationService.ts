@@ -8,10 +8,10 @@ import { Relation } from "@/domain/models/tasks/relation";
 
 export class SequenceLabelingApplicationService extends AnnotationApplicationService<Span> {
   constructor(
-    readonly repository: APISpanRepository,
+    override readonly repository: APISpanRepository,
     readonly relationRepository: APIRelationRepository,
   ) {
-    super(new APISpanRepository());
+    super(repository);
   }
 
   public async list(projectId: string, exampleId: number): Promise<SpanDTO[]> {

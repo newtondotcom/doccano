@@ -21,8 +21,9 @@ export const useExampleItem = () => {
   ) => {
     const examples = await exampleService.fetchOne(projectId, page, q, isChecked, ordering);
     state.totalExample = examples.count;
-    if (examples.items.length !== 0) {
-      state.example = examples.items[0];
+    const [firstExample] = examples.items;
+    if (firstExample) {
+      state.example = firstExample;
     }
   };
 

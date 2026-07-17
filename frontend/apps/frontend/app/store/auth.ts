@@ -2,8 +2,8 @@ import { defineStore } from "pinia";
 
 export const useMainStore = defineStore("auth", {
   state: () => ({
-    username: null,
-    id: null,
+    username: null as string | null,
+    id: null as number | null,
     isAuthenticated: false,
     isStaff: false,
   }),

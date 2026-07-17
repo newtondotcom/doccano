@@ -1,5 +1,5 @@
 import { LabelDTO } from "@/services/application/label/labelData";
-import { CreateLabelCommand, UpdateLabelCommand } from "@/services/application/label/labelCommand";
+import type { CreateLabelCommand, UpdateLabelCommand } from "@/services/application/label/labelCommand";
 import { LabelApplicationService } from "@/services/application/label/labelApplicationService";
 
 export const useLabelList = (service: LabelApplicationService) => {
