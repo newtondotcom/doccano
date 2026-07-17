@@ -24,6 +24,8 @@
       "packages/*"
     ],
     "catalog": {
+      "typescript": "^6.0.3",
+      "uuid": "^14.0.1",
       "vue": "^3.5.38"
     }
   }

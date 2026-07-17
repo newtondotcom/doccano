@@ -33,7 +33,7 @@
   "dependencies": {
     "@flatten-js/interval-tree": "^2.0.3",
     "grapheme-splitter": "^1.0.4",
-    "uuid": "^14.0.1",
+    "uuid": "catalog:",
     "vue": "catalog:",
     "vue-virtual-scroller": "^3.0.4"
   },
@@ -44,7 +44,7 @@
     "@vue/tsconfig": "^0.9.1",
     "jest": "^30.4.2",
     "npm-run-all2": "^9.0.2",
-    "typescript": "~6.0.0",
+    "typescript": "catalog:",
     "vite": "^8.0.16",
     "vite-plugin-vue-devtools": "^8.1.2",
     "vue-tsc": "^3.3.5"
