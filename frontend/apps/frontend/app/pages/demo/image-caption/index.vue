@@ -73,6 +73,7 @@
 
 <script setup>
 import { mdiPencil, mdiDeleteOutline } from "@mdi/js";
+import catImageUrl from "@/assets/images/demo/cat.jpeg";
 
 definePageMeta({
   layout: "demo",
@@ -106,7 +107,7 @@ const hasCompositionJustEnded = ref(false);
 
 const currentDoc = ref({
   id: 8,
-  filename: require("@/assets/images/demo/cat.jpeg"),
+  filename: catImageUrl,
   annotations: [
     {
       id: 17,

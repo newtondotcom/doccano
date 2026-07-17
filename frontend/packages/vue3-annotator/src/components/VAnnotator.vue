@@ -18,6 +18,7 @@
     <RecycleScroller page-mode class="scroller" :items="items">
       <template v-slot="{ item, index }">
         <v-line
+          v-if="font"
           :annotator-uuid="uuid"
           :dark="dark"
           :entities="entityList.filterByRange(item.textLine.startOffset, item.textLine.endOffset)"
@@ -120,7 +121,7 @@ const emit = defineEmits<{
 }>()
 
 const uuid = uuidv4()
-const font = ref<Font | null>(null)
+const font = ref(new Font(16, 'sans-serif', '400', 20, new Map([['\n', 0]])))
 const heights = reactive<{ [id: string]: number }>({})
 const maxWidth = ref(-1)
 const baseX = ref(0)
@@ -175,15 +176,20 @@ watch(
 )
 
 const _text = computed(() => new Text(props.text))
-const entityLabelList = computed<LabelList | null>(() => {
+const entityLabelList = computed<LabelList>(() => {
   if (textElement.value) {
     const widths = props.entityLabels.map((label) => widthOf(label.text, textElement.value!))
     return LabelList.valueOf(props.maxLabelLength, props.entityLabels, widths, EntityLabelListItem)
   } else {
-    return null
+    return LabelList.valueOf(
+      props.maxLabelLength,
+      props.entityLabels,
+      props.entityLabels.map(() => 0),
+      EntityLabelListItem,
+    )
   }
 })
-const relationLabelList = computed<LabelList | null>(() => {
+const relationLabelList = computed<LabelList>(() => {
   if (textElement.value) {
     const widths = props.relationLabels.map((label) => widthOf(label.text, textElement.value!))
     return LabelList.valueOf(
@@ -193,16 +199,21 @@ const relationLabelList = computed<LabelList | null>(() => {
       RelationLabelListItem,
     )
   } else {
-    return null
+    return LabelList.valueOf(
+      props.maxLabelLength,
+      props.relationLabels,
+      props.relationLabels.map(() => 0),
+      RelationLabelListItem,
+    )
   }
 })
 const items = computed<ViewLine[]>(() => {
   const viewLines: ViewLine[] = []
-  for (let i = 0; i < textLines.value.length; i++) {
-    const id = `${textLines.value[i].startOffset}:${textLines.value[i].endOffset}`
+  for (const textLine of textLines.value) {
+    const id = `${textLine.startOffset}:${textLine.endOffset}`
     viewLines.push({
       id,
-      textLine: textLines.value[i],
+      textLine,
       size: heights[id] || 64,
     })
   }
@@ -221,7 +232,7 @@ const relationList = computed<RelationList>(() => {
   return new RelationList(props.relations, entityList.value)
 })
 const textLines = computed<TextLine[]>(() => {
-  if (!font.value || !entityLabelList.value || maxWidth.value === -1) {
+  if (maxWidth.value === -1) {
     return []
   } else {
     const maxLabelWidth = entityLabelList.value.maxLabelWidth

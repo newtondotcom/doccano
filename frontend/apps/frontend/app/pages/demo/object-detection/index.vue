@@ -58,11 +58,13 @@
 </template>
 
 <script setup>
+import catImageUrl from "@/assets/images/demo/cat.jpeg";
+
 definePageMeta({
   layout: "demo",
 });
 
-const imageUrl = require("@/assets/images/demo/cat.jpeg");
+const imageUrl = catImageUrl;
 const rectangles = ref([
   {
     id: "uuid",

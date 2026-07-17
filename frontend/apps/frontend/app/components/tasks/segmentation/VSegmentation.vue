@@ -44,8 +44,8 @@
 <script setup lang="ts">
 import Konva from "konva";
 import Polygon from "@/domain/models/tasks/segmentation/Polygon";
-import PolygonProps from "@/domain/models/tasks/segmentation/PolygonProps";
-import LabelProps from "@/domain/models/tasks/shared/LabelProps";
+import type PolygonProps from "@/domain/models/tasks/segmentation/PolygonProps";
+import type LabelProps from "@/domain/models/tasks/shared/LabelProps";
 import { transform } from "@/domain/models/tasks/shared/Scaler";
 
 const props = withDefaults(

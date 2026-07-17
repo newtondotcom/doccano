@@ -23,7 +23,12 @@ export default class Polygon {
     this.id = id;
     this.labelId = labelId;
     for (let i = 0; i < points.length; i += 2) {
-      this.addPoint(points[i], points[i + 1]);
+      const x = points[i];
+      const y = points[i + 1];
+      if (x === undefined || y === undefined) {
+        throw new ValidationError("Invalid polygon point pair");
+      }
+      this.addPoint(x, y);
     }
   }
 
@@ -95,6 +100,9 @@ export default class Polygon {
     for (let i = 0; i < this.points.length; i += 1) {
       const p1 = this.points[i];
       const p2 = this.points[(i + 1) % this.points.length];
+      if (!p1 || !p2) {
+        continue;
+      }
       lineSegments.push(new LineSegment(p1, p2));
     }
     return lineSegments;

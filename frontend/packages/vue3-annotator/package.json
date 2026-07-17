@@ -27,7 +27,8 @@
     "build": "run-p check-types \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
-    "check-types": "vue-tsc --build"
+    "check-types": "vue-tsc --build",
+    "postinstall": "bun run build-only"
   },
   "dependencies": {
     "@flatten-js/interval-tree": "^2.0.3",
