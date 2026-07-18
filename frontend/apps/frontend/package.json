@@ -30,7 +30,7 @@
     "@toast-ui/vue-editor": "^3.2.3",
     "chart.js": "^4.5.1",
     "class-transformer": "^0.5.1",
-    "codemirror": "5",
+    "codemirror": "6",
     "date-fns": "^4.4.0",
     "filepond": "^4.32.12",
     "filepond-plugin-file-validate-type": "^1.2.9",
