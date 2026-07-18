@@ -22,45 +22,37 @@
       </v-card>
     </v-menu>
     <v-btn
-      v-shortkey.once="['shift', 'arrowleft']"
       :disabled="isFirstPage"
       text
       fab
       small
-      @shortkey="firstPage"
       @click="firstPage"
     >
       <v-icon>{{ mdiPageFirst }}</v-icon>
     </v-btn>
     <v-btn
-      v-shortkey.once="['arrowleft']"
       :disabled="isFirstPage"
       text
       fab
       small
-      @shortkey="prevPage"
       @click="prevPage"
     >
       <v-icon>{{ mdiChevronLeft }}</v-icon>
     </v-btn>
     <v-btn
-      v-shortkey.once="['arrowright']"
       :disabled="isLastPage"
       text
       fab
       small
-      @shortkey="nextPage"
       @click="nextPage"
     >
       <v-icon>{{ mdiChevronRight }}</v-icon>
     </v-btn>
     <v-btn
-      v-shortkey.once="['shift', 'arrowright']"
       :disabled="isLastPage"
       text
       fab
       small
-      @shortkey="lastPage"
       @click="lastPage"
     >
       <v-icon>{{ mdiPageLast }}</v-icon>
@@ -69,6 +61,7 @@
 </template>
 
 <script setup lang="ts">
+import { useEventListener } from "@vueuse/core";
 import { mdiPageFirst, mdiPageLast, mdiChevronLeft, mdiChevronRight } from "@mdi/js";
 
 const props = defineProps({
@@ -139,4 +132,40 @@ function firstPage() {
 function lastPage() {
   emit("click:last");
 }
+
+function shouldIgnoreShortcut(event: KeyboardEvent): boolean {
+  const target = event.target;
+  return (
+    event.repeat ||
+    (target instanceof HTMLElement &&
+      (target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT" ||
+        target.isContentEditable))
+  );
+}
+
+useEventListener("keydown", (event: KeyboardEvent) => {
+  if (shouldIgnoreShortcut(event)) {
+    return;
+  }
+  const key = event.key.toLowerCase();
+  if (key === "arrowleft") {
+    event.preventDefault();
+    if (event.shiftKey) {
+      firstPage();
+    } else {
+      prevPage();
+    }
+    return;
+  }
+  if (key === "arrowright") {
+    event.preventDefault();
+    if (event.shiftKey) {
+      lastPage();
+    } else {
+      nextPage();
+    }
+  }
+});
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <TasksLayoutText v-if="doc.id" v-shortkey="shortKeys" @shortkey="changeSelectedLabel">
+  <TasksLayoutText v-if="doc.id">
     <template #header>
       <TasksToolbarLaptop
         :doc-id="doc.id"
@@ -60,11 +60,9 @@
               <v-chip
                 v-for="(item, index) in labelTypes"
                 :key="item.id"
-                v-shortkey="[item.suffixKey]"
                 :color="item.backgroundColor"
                 filter
                 :text-color="$contrastColor(item.backgroundColor)"
-                @shortkey="selectedLabelIndex = index"
               >
                 {{ item.text }}
                 <v-avatar
@@ -86,6 +84,7 @@
 </template>
 
 <script setup>
+import { useEventListener } from "@vueuse/core";
 import { mdiChevronDown, mdiChevronUp } from "@mdi/js";
 import { useMainStore as useConfigStore } from "@/store/config";
 
@@ -114,10 +113,6 @@ const showLabelTypes = ref(true);
 
 const isRTL = computed(() => configStore.isRTL);
 const projectId = computed(() => route.params.id);
-
-const shortKeys = computed(() =>
-  Object.fromEntries(spanTypes.value.map((item) => [item.id, [item.suffixKey]])),
-);
 
 const doc = computed(() => {
   if (!docs.value?.items?.length) {
@@ -266,8 +261,35 @@ async function confirm() {
 }
 
 function changeSelectedLabel(event) {
-  selectedLabelIndex.value = spanTypes.value.findIndex((item) => item.suffixKey === event.srcKey);
+  selectedLabelIndex.value = labelTypes.value.findIndex((item) => item.suffixKey === event);
 }
+
+function shouldIgnoreShortcut(event) {
+  const target = event.target;
+  return (
+    event.repeat ||
+    (target instanceof HTMLElement &&
+      (target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT" ||
+        target.isContentEditable))
+  );
+}
+
+useEventListener("keydown", (event) => {
+  if (shouldIgnoreShortcut(event)) {
+    return;
+  }
+  const pressedKey = event.key.toLowerCase();
+  const matchedLabel = labelTypes.value.find(
+    (item) => item.suffixKey && item.suffixKey.toLowerCase() === pressedKey,
+  );
+  if (!matchedLabel) {
+    return;
+  }
+  event.preventDefault();
+  changeSelectedLabel(pressedKey);
+});
 </script>
 
 <style scoped>

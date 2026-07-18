@@ -23,7 +23,7 @@
       <TasksToolbarMobile :total="images.count" class="d-flex d-sm-none" />
     </template>
     <template #content>
-      <v-card v-shortkey="shortKeys" @shortkey="addOrRemove">
+      <v-card>
         <v-card-title>
           <TasksTextClassificationLabelGroup
             v-if="labelOption === 0"
@@ -54,6 +54,7 @@
 </template>
 
 <script setup>
+import { useEventListener } from "@vueuse/core";
 import { mdiFormatListBulleted, mdiText } from "@mdi/js";
 import { useLabelList } from "@/composables/useLabelList";
 import { Category } from "@/domain/models/tasks/category";
@@ -83,6 +84,13 @@ const imageSize = reactive({
 const progress = ref({});
 
 const projectId = computed(() => route.params.id);
+const shortKeyToLabelId = computed(() =>
+  Object.fromEntries(
+    Object.entries(shortKeys.value)
+      .map(([labelId, keys]) => [keys?.[0]?.toLowerCase(), Number.parseInt(labelId, 10)])
+      .filter(([key]) => !!key),
+  ),
+);
 
 const image = computed(() => {
   if (!images.value?.items?.length) {
@@ -136,8 +144,7 @@ async function add(labelId) {
   await list(image.value.id);
 }
 
-async function addOrRemove(event) {
-  const labelId = parseInt(event.srcKey, 10);
+async function addOrRemove(labelId) {
   const annotation = annotations.value.find((item) => item.label === labelId);
   if (annotation) {
     await remove(annotation.id);
@@ -177,6 +184,31 @@ function setImageSize(val) {
   };
   img.src = val.url;
 }
+
+function shouldIgnoreShortcut(event) {
+  const target = event.target;
+  return (
+    event.repeat ||
+    (target instanceof HTMLElement &&
+      (target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT" ||
+        target.isContentEditable))
+  );
+}
+
+useEventListener("keydown", (event) => {
+  if (shouldIgnoreShortcut(event)) {
+    return;
+  }
+  const pressedKey = event.key.toLowerCase();
+  const labelId = shortKeyToLabelId.value[pressedKey];
+  if (!labelId) {
+    return;
+  }
+  event.preventDefault();
+  addOrRemove(labelId);
+});
 </script>
 
 <style scoped>
