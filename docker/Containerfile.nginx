@@ -6,7 +6,7 @@ WORKDIR /app
 # hadolint ignore=DL3008
 RUN bun install --frozen-lockfile --ignore-scripts && bun run generate
 
-FROM nginx:1.31.2-alpine AS runtime
+FROM nginx:1.31.3-alpine AS runtime
 
 RUN addgroup -g 61000 doccano \
   && adduser -G doccano -S doccano -u 61000
