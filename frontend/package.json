@@ -11,8 +11,8 @@
   },
   "devDependencies": {
     "oxfmt": "^0.61.0",
-    "oxlint": "^1.72.0",
-    "turbo": "^2.10.2"
+    "oxlint": "^1.76.0",
+    "turbo": "^2.10.8"
   },
   "engines": {
     "node": ">=18"
@@ -24,7 +24,7 @@
       "packages/*"
     ],
     "catalog": {
-      "typescript": "^6.0.3",
+      "typescript": "^7.0.2",
       "uuid": "^14.0.1",
       "vue": "^3.5.38"
     }

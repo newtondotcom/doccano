@@ -12,10 +12,7 @@
 <script setup>
 import "@/assets/style/editor.css";
 import { Editor } from "@toast-ui/vue-editor";
-import "codemirror/lib/codemirror.css";
 import { debounce } from "@/utils/debounce";
-// import 'tui-editor/dist/tui-editor-contents.css'
-// import 'tui-editor/dist/tui-editor.css'
 
 definePageMeta({
   layout: "project",

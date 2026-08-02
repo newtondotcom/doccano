@@ -24,7 +24,7 @@
     "@flatten-js/core": "^1.6.12",
     "@mdi/font": "^7.4.47",
     "@mdi/js": "^7.4.47",
-    "@nuxtjs/i18n": "10.5.0",
+    "@nuxtjs/i18n": "10.6.0",
     "@pinia/nuxt": "^1.0.0",
     "@toast-ui/editor": "^3.2.2",
     "@toast-ui/vue-editor": "^3.2.3",
@@ -37,7 +37,7 @@
     "highlight.js": "^11.11.1",
     "js-cookie": "^3.0.8",
     "konva": "^10.3.0",
-    "nuxt": "^4.4.8",
+    "nuxt": "^4.5.1",
     "pinia": "^4.0.0",
     "uuid": "catalog:",
     "vue": "catalog:",
@@ -47,17 +47,17 @@
     "vue3-annotator": "workspace:*",
     "vue3-shortkey": "^4.0.0",
     "vuetify-nuxt-module": "1.0.0-rc.3",
-    "wavesurfer.js": "^7.12.8"
+    "wavesurfer.js": "^7.12.11"
   },
   "devDependencies": {
-    "@nuxt/test-utils": "^4.0.3",
-    "@vitest/coverage-v8": "^4.1.9",
+    "@nuxt/test-utils": "^4.1.0",
+    "@vitest/coverage-v8": "^4.1.10",
     "@vue/test-utils": "^2.4.11",
-    "happy-dom": "^20.10.6",
-    "playwright-core": "^1.61.1",
+    "happy-dom": "^20.11.1",
+    "playwright-core": "^1.62.1",
     "typescript": "catalog:",
     "vite-plugin-vuetify": "^2.1.3",
-    "vitest": "^4.1.9",
-    "vuetify": "^4.1.2"
+    "vitest": "^4.1.10",
+    "vuetify": "^4.1.7"
   }
 }

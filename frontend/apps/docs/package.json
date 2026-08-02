@@ -8,7 +8,7 @@
     "docs:preview": "vitepress preview pages"
   },
   "devDependencies": {
-    "vitepress": "^2.0.0-alpha.17",
+    "vitepress": "^1.6.4",
     "vue": "catalog:"
   }
 }
