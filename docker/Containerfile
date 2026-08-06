@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION="3.12-trixie"
+ARG PYTHON_VERSION="3.14-trixie"
 
 # FRONT BUILDING
 FROM oven/bun:debian AS frontend-builder
