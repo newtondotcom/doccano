@@ -46,7 +46,7 @@
         "vue3-annotator": "workspace:*",
         "vue3-shortkey": "^4.0.0",
         "vuetify-nuxt-module": "1.0.0-rc.6",
-        "wavesurfer.js": "^7.12.11",
+        "wavesurfer.js": "^8.0.0",
       },
       "devDependencies": {
         "@nuxt/test-utils": "^4.1.0",
@@ -2397,7 +2397,7 @@
 
     "walker": ["walker@1.0.8", "", { "dependencies": { "makeerror": "1.0.12" } }, "sha512-ts/8E8l5b7kY0vlWLewOkDXMmPdLcVV4GmOQLyxuSswIJsweeFZtAsMF7k1Nszz+TYBQrlYRmzOnr398y1JemQ=="],
 
-    "wavesurfer.js": ["wavesurfer.js@7.12.11", "", {}, "sha512-Sx0yZIz7jRJ9J9p7UL+pl9y0UQBB6UN/XNo+R7Gy4tCR5xZI9jMyA0dnt1R8TMVSQ4LZ10SeB2HJYQ+dV2dPSA=="],
+    "wavesurfer.js": ["wavesurfer.js@8.0.1", "", {}, "sha512-h0OnRWSVTqIYLSw3/IVrBtsun/xw9L5u4FA3bjfSDTFMX/xswVWS1JwK4fFu3ulmxRUSHg8zQORl6zENG983eg=="],
 
     "webidl-conversions": ["webidl-conversions@3.0.1", "", {}, "sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ=="],
 
